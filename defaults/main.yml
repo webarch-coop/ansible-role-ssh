@@ -1,0 +1,7 @@
+---
+# See https://infosec.mozilla.org/guidelines/openssh
+ssh_permit_root_login: "no"
+ssh_allow_groups: "sudo root"
+ssh_authentication_methods: "publickey password"
+ssh_password_authentication: "yes"
+ssh_pubkey_authentication: "yes"
