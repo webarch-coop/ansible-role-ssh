@@ -32,7 +32,7 @@
   rescue:
 
     - name: Last sshd_config backup
-      shell: ls /etc/ssh/sshd_config.* -tr | grep sshd_config | tail -n1
+      shell: ls -tr /etc/ssh/sshd_config.* | tail -n1
       register: ssh_config_backup
 
     - name: sshd_config backup restored
