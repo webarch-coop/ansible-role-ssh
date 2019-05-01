@@ -18,6 +18,8 @@ ssh_ciphers: "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@op
 ssh_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com"
 ```
 
+In addition there are three `Match group` blocks that are conditionally added to the `/etc/ssh/sshd_config` file depending on the presence of the `chroot`, `sshonly` and `sftponly` groups, see the [chroot role](https://git.coop/webarch/chroot) for the Debian Buster implementation.
+
 To use this role you need to use Ansible Galaxy to install it into another repository under `galaxy/roles/ssh` by adding a `requirements.yml` file in that repo that contains:
 
 ```yml
