@@ -26,38 +26,16 @@
   command: ssh-keygen -q -t rsa -b 4096 -f /root/.ssh/id_rsa -q -N "" -C "root@{{ ansible_hostname }}"
   when: ssh_rsa_pubkey.stat.exists == False
 
-- name: Update sshd_config, test it, restat if test passes and restore previous config if not
+- name: sshd_config in place
+  template:
+    src: templates/sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    validate: sshd -t -f %s
+    backup: true
+  register: ssh_config
 
-  block:
-
-    - name: sshd_config in place
-      template:
-        src: templates/sshd_config.j2
-        dest: /etc/ssh/sshd_config
-        validate: sshd -t -f %s
-        backup: true
-      register: ssh_config
-
-    # If this fails the rescue tasks are executed
-    - name: sshd_config tested
-      command: sshd -t
-      register: ssh_test
-      changed_when: false
-
-    - name: Restart SSH if configtest passed and ssh_config has changed
-      service:
-        name: ssh
-        state: restarted
-      when: ssh_config.changed
-
-  rescue:
-
-    - name: Last sshd_config backup
-      shell: ls -tr /etc/ssh/sshd_config.* | tail -n1
-      register: ssh_config_backup
-
-    - name: sshd_config backup restored
-      command: "cp {{ ssh_config_backup.stdout }} /etc/ssh/sshd_config"
-
-    - debug:
-        msg: "Previous sshd_config restored due to errors with update: {{ ssh_test.stderr }}"
+- name: Restart SSH if ssh_config has changed
+  service:
+    name: ssh
+    state: restarted
+  when: ssh_config.changed
