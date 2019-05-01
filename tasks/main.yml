@@ -42,10 +42,11 @@
       command: sshd -t
       register: ssh_test
 
-    - name: Restart SSH as configtest passed
+    - name: Restart SSH if configtest passed and ssh_config has changed
       service:
         name: ssh
         state: restarted
+      when: ssh_config.changed
 
   rescue:
 
