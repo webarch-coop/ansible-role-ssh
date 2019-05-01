@@ -1,2 +1,48 @@
 ---
-# template sshd_config
+- name: Groups on the server
+  shell: "getent group | awk -F: '{ print $1 }'"
+  register: ssh_getent_group
+  changed_when: false
+
+- name: Variable set for groups
+  set_fact:
+    ssh_groups: "{{ ssh_getent_group.stdout_lines }}"
+
+- name: sshd_config in place
+  template:
+    src: templates/sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    backup: yes
+  register: ssh_config
+
+- name: sshd_config tested
+  command: sshd -t
+  register: ssh_test
+
+- debug:
+    var: ssh_test
+    verbosity: 1
+
+- block:
+
+    - name: Last sshd_config backup
+      shell: ls /etc/ssh/sshd_config.* -tr | grep sshd_config | tail -n1
+      register: ssh_config_backup
+
+    - name: sshd_config backup restored
+      command: "cp {{ ssh_config_backup.stdout }} /etc/ssh/sshd_config"
+
+    - debug:
+        msg: "Previous sshd_config restored due to errors with update: {{ ssh_test.stderr }}"
+
+  when: ssh_test.stderr != ""
+
+- name: Conditional restart of sshd
+  service:
+    name: ssh
+    state: restarted
+  when: ( ssh_config.changed ) and ( ssh_test.stderr != "" )
+
+
+
+

@@ -15,26 +15,35 @@
 #ListenAddress 0.0.0.0
 #ListenAddress ::
 
-#HostKey /etc/ssh/ssh_host_rsa_key
-#HostKey /etc/ssh/ssh_host_ecdsa_key
-#HostKey /etc/ssh/ssh_host_ed25519_key
+# HostKey and Cipher defaults from https://infosec.mozilla.org/guidelines/openssh
+
+# Supported HostKey algorithms by order of preference.
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
 
 # Ciphers and keying
 #RekeyLimit default none
+KexAlgorithms {{ ssh_kex_algorithms | default('curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256') }}
+Ciphers {{ ssh_ciphers | default('chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr') }}
+MACs {{ ssh_macs | default('hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com') }}
 
 # Logging
 #SyslogFacility AUTH
-#LogLevel INFO
+LogLevel VERBOSE
 
 # Authentication:
 
 #LoginGraceTime 2m
-#PermitRootLogin prohibit-password
+PermitRootLogin {{ ssh_permit_root_login | default('prohibit-password') }} 
+AllowGroups {{ ssh_allow_groups | default('root sudo') }}
 #StrictModes yes
 #MaxAuthTries 6
 #MaxSessions 10
 
-#PubkeyAuthentication yes
+AuthenticationMethods {{ ssh_authentication_methods | default('publickey') }}
+PasswordAuthentication {{ ssh_password_authentication | default('no') }}
+PubkeyAuthentication {{ ssh_pubkey_authentication | default('yes') }}
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
 #AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
@@ -83,8 +92,8 @@ ChallengeResponseAuthentication no
 # and ChallengeResponseAuthentication to 'no'.
 UsePAM yes
 
-#AllowAgentForwarding yes
-#AllowTcpForwarding yes
+AllowAgentForwarding {{ ssh_allow_agent_forwarding | default('no') }}
+AllowTcpForwarding {{ ssh_allow_tcp_forwarding | default('no') }}
 #GatewayPorts no
 X11Forwarding no
 #X11DisplayOffset 10
@@ -120,15 +129,48 @@ Subsystem	sftp	/usr/lib/openssh/sftp-server
 #	PermitTTY no
 #	ForceCommand cvs server
 
-{% if users_chroot_dir.stat.exists %}
+{% if 'chroot' in ssh_groups %}
+# WSH Buster servers
 Match group chroot
     AllowGroups chroot
     DenyGroups sudo root
-    ChrootDirectory /{{ chroot_users_dir | default('/chroot-users') }}/{{ item.key }}/%u
+    ChrootDirectory /{{ chroot_users_dir | default('/chroot-users') }}/%u
+    X11Forwarding no
+    AllowTcpForwarding no
+    AuthenticationMethods publickey,password
+    PasswordAuthentication yes
+    PubkeyAuthentication yes
+    PermitUserRC no
+    PermitRootLogin No
+{% endif %}
+
+{% if 'sshonly' in ssh_groups %}
+# WSH Stretch servers
+Match group sshonly
+    AllowGroups sshonly
+    DenyGroups sftponly sudo root
+    ChrootDirectory /sshonly/%u
     X11Forwarding no
     AllowTcpForwarding no
     AuthenticationMethods publickey
     PasswordAuthentication no
+    PubkeyAuthentication yes
     PermitUserRC no
     PermitRootLogin No
+{% endif %}
+
+{% if 'sftponly' in ssh_groups %}
+# WSH Stretch and Jessie servers
+Match group sftponly
+    AllowGroups sftponly
+    DenyGroups sshonly sudo root
+    ChrootDirectory %h
+    X11Forwarding no
+    AllowTcpForwarding no
+    AuthenticationMethods publickey,password
+    PasswordAuthentication yes
+    PubkeyAuthentication yes
+    PermitUserRC no
+    PermitRootLogin No
+    ForceCommand internal-sftp
 {% endif %}
