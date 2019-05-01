@@ -8,7 +8,8 @@
   set_fact:
     ssh_groups: "{{ ssh_getent_group.stdout_lines }}"
 
-- name: Update sshd_config and test it
+- name: Update sshd_config, test it, restat if test passes and restore previous config if not 
+
   block:
 
     - name: sshd_config in place
@@ -18,9 +19,15 @@
         backup: yes
       register: ssh_config
 
+    # If this fails the rescue tasks are executed
     - name: sshd_config tested
       command: sshd -t
       register: ssh_test
+
+    - name: Restart SSH as configtest passed
+      service:
+        name: ssh
+        state: restarted
 
   rescue:
 
@@ -33,13 +40,3 @@
 
     - debug:
         msg: "Previous sshd_config restored due to errors with update: {{ ssh_test.stderr }}"
-
-- name: Conditional restart of sshd
-  service:
-    name: ssh
-    state: restarted
-  when: ( ssh_config.changed ) and ( ssh_test.stderr != "" )
-
-
-
-
