@@ -1,5 +1,7 @@
 # Ansible role to configure OpenSSH server
 
+This role tests the new SSH server configuration prior to restarting the service and if the test fails the original config is restored.
+
 The variables in the `defaults/main.yml` file which can be overridden:
 
 ```yaml
