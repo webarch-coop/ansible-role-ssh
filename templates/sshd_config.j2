@@ -137,7 +137,7 @@ Match group chroot
     ChrootDirectory {{ chroot_users_dir | default('/chroot-users') }}/%u
     X11Forwarding no
     AllowTcpForwarding no
-    AuthenticationMethods publickey,password
+    AuthenticationMethods publickey password
     PasswordAuthentication yes
     PubkeyAuthentication yes
     PermitUserRC no
@@ -167,7 +167,7 @@ Match group sftponly
     ChrootDirectory %h
     X11Forwarding no
     AllowTcpForwarding no
-    AuthenticationMethods publickey,password
+    AuthenticationMethods publickey password
     PasswordAuthentication yes
     PubkeyAuthentication yes
     PermitUserRC no
