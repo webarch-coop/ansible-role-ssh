@@ -3,28 +3,40 @@
   shell: "getent group | awk -F: '{ print $1 }'"
   register: ssh_getent_group
   changed_when: false
+  tags:
+    - ssh
 
 - name: Variable set for groups
   set_fact:
     ssh_groups: "{{ ssh_getent_group.stdout_lines }}"
+  tags:
+    - ssh
 
 - name: Stat SSH root ECDSA public key
   stat:
     path: /root/.ssh/id_ed25519
   register: ssh_ecdsa_pubkey
+  tags:
+    - ssh
 
 - name: Generating SSH ECDSA keypair
   command: ssh-keygen -q -t ed25519 -f /root/.ssh/id_ed25519 -q -N "" -C "root@{{ ansible_hostname }}"
   when: ssh_ecdsa_pubkey.stat.exists == False
+  tags:
+    - ssh
 
 - name: Stat SSH root RSA public key
   stat:
     path: /root/.ssh/id_rsa
   register: ssh_rsa_pubkey
+  tags:
+    - ssh
 
 - name: Generating SSH RSA keypair
   command: ssh-keygen -q -t rsa -b 4096 -f /root/.ssh/id_rsa -q -N "" -C "root@{{ ansible_hostname }}"
   when: ssh_rsa_pubkey.stat.exists == False
+  tags:
+    - ssh
 
 - name: sshd_config in place
   template:
@@ -33,9 +45,13 @@
     validate: sshd -t -f %s
     backup: true
   register: ssh_config
+  tags:
+    - ssh
 
 - name: Restart SSH if ssh_config has changed
   service:
     name: ssh
     state: restarted
   when: ssh_config.changed
+  tags:
+    - ssh
