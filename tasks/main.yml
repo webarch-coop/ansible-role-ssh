@@ -1,4 +1,17 @@
 ---
+- name: Create groups
+  block:
+
+    - name: Add group
+      group:
+        name: "{{ group }}"
+        state: present
+      loop: "{{ ssh_groups }}"
+      loop_control:
+        loop_var: group
+
+  when: ( ssh_groups is defined ) and ( ssh_groups != "" )
+
 - name: Groups on the server
   shell: "getent group | awk -F: '{ print $1 }'"
   register: ssh_getent_group
