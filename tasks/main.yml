@@ -9,6 +9,8 @@
       loop: "{{ ssh_groups }}"
       loop_control:
         loop_var: group
+      tags:
+        - ssh
 
   when: ( ssh_groups is defined ) and ( ssh_groups != "" )
 
