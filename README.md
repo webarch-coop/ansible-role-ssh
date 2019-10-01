@@ -8,8 +8,11 @@ The variables in the `defaults/main.yml` file which can be overridden:
 # See https://infosec.mozilla.org/guidelines/openssh
 # Options for PermitRootLogin are "yes", "no" and "prohibit-password"
 ssh_permit_root_login: "prohibit-password"
+# DenyUsers will only be used if ssh_deny_users is defined
+# ssh_deny_users: "stats phpmyadmin"
 ssh_allow_groups: "root sudo"
-# Options for AuthenticationMethods include publickey and password
+# Options for AuthenticationMethods include publickey and password, use a space between them
+# for OR eg: "publickey password" this is either and "publickey,password" is both required
 ssh_authentication_methods: "publickey"
 ssh_password_authentication: "no"
 ssh_pubkey_authentication: "yes"

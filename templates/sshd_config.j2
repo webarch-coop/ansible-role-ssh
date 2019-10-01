@@ -36,6 +36,9 @@ LogLevel VERBOSE
 
 #LoginGraceTime 2m
 PermitRootLogin {{ ssh_permit_root_login | default('prohibit-password') }} 
+{% if ssh_deny_users is defined %}
+DenyUsers {{ ssh_deny_users }}
+{% endif %}
 AllowGroups {{ ssh_allow_groups | default('root sudo') }}
 #StrictModes yes
 #MaxAuthTries 6
