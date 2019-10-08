@@ -137,7 +137,7 @@ Subsystem       sftp    internal-sftp
 Match group chroot
     AllowGroups chroot
     DenyGroups sudo root
-    ChrootDirectory {{ chroot_users_dir | default('/chroot-users') }}/%u
+    ChrootDirectory {{ chroot_users_dir | default('/users') }}/%u
     X11Forwarding no
     AllowTcpForwarding no
     AuthenticationMethods publickey password
