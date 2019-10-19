@@ -1,4 +1,12 @@
 ---
+- name: Packages installed
+  apt:
+    pkg:
+      - ssh-import-id
+    state: present
+  tags:
+    - ssh
+
 - name: Create groups
   block:
 
