@@ -18,7 +18,7 @@ content of the private key and the known hosts files can use used as GitLab CI
 env vars for SSH'ing to the server as root but only from the  sted IP
 addresses.
 
-To use this role you need to use Ansible Galaxy to install it into another
+The way we use this role is to use Ansible Galaxy to install it into another
 repository under `galaxy/roles/ssh` by adding a `requirements.yml` file in that
 repo that contains:
 
@@ -51,5 +51,3 @@ To pull this repo in run:
 ```bash
 ansible-galaxy install -r requirements.yml --force 
 ```
-
-
