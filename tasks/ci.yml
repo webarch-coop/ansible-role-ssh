@@ -46,7 +46,7 @@
     - ssh
 
 - name: "Generate a known_hosts file for {{ ansible_hostname }}"
-  shell: "ssh-keyscan -H {{ ansible_hostname }} > /root/.ssh/ci/known_hosts"
+  shell: "ssh-keyscan -H localhost > /root/.ssh/ci/known_hosts"
   args:
     creates: /root/.ssh/ci/known_hosts
   tags:
