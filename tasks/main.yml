@@ -2,6 +2,7 @@
 - name: Packages installed
   apt:
     pkg:
+      - libc-bin
       - ssh-import-id
     state: present
   tags:
@@ -23,7 +24,8 @@
   when: ( ssh_groups is defined ) and ( ssh_groups != "" )
 
 - name: Groups on the server
-  shell: "getent group | awk -F: '{ print $1 }'"
+  # shell: "getent group | awk -F: '{ print $1 }'"
+  command: getent group
   register: ssh_getent_group
   changed_when: false
   check_mode: false
@@ -32,7 +34,14 @@
 
 - name: Variable set for groups
   set_fact:
-    ssh_groups: "{{ ssh_getent_group.stdout_lines }}"
+    ssh_groups: "{{ ssh_getent_group.stdout_lines | string.split(':')[0] }}"
+  tags:
+    - ssh
+
+- name: Print the groups on the server
+  debug:
+    msg: "Groups on the server: {{ ssh_groups }}"
+    verbosity: 1
   tags:
     - ssh
 
