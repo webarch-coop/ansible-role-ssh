@@ -34,7 +34,7 @@
 
 - name: Variable set for groups
   set_fact:
-    ssh_groups: "{{ ssh_getent_group.stdout_lines | map('regex_replace(':.*')') | list }}"
+    ssh_groups: "{{ ssh_getent_group.stdout_lines | map('regex_replace', ':(.*)', '') | list }}"
   tags:
     - ssh
 
