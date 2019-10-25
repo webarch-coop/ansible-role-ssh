@@ -26,7 +26,7 @@
 - name: Groups on the server
   # shell: "getent group | awk -F: '{ print $1 }'"
   command: getent group
-  register: ssh_getent_group
+  register: ssh_getent_group | string.split(':')[0] | list
   changed_when: false
   check_mode: false
   tags:
