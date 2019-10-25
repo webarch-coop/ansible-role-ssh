@@ -26,7 +26,7 @@
 - name: Groups on the server
   # shell: "getent group | awk -F: '{ print $1 }'"
   command: getent group
-  register: ssh_getent_group | string.split(':')[0] | list
+  register: ssh_getent_group
   changed_when: false
   check_mode: false
   tags:
@@ -34,8 +34,7 @@
 
 - name: Variable set for groups
   set_fact:
-    #ssh_groups: "{{ ssh_getent_group.stdout_lines | string.split(':')[0] | list }}"
-    ssh_groups: "{{ ssh_getent_group.stdout }}"
+    ssh_groups: "{{ ssh_getent_group.stdout_lines | map('string.split', ':', '[0]' | list }}"
   tags:
     - ssh
 
