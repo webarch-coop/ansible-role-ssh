@@ -15,7 +15,7 @@
     - ssh
 
 - name: CI key pair present
-  command: "ssh-keygen -q -t ecdsa -f {{ inventory_hostname }}_ecdsa -C root@{{ inventory_hostname }} -N ''"
+  command: 'ssh-keygen -t ecdsa -f {{ inventory_hostname }}_ecdsa -C root@{{ inventory_hostname }} -q -N ""'
   args:
     chdir: /root/.ssh/ci
     creates: "/root/.ssh/ci/{{ inventory_hostname }}_ecdsa"
