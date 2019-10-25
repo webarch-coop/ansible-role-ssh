@@ -9,6 +9,8 @@
   loop:
     - /root/.ssh/ci
     - /root/.ssh/authorized_keys.d
+  loop_control:
+    loop_var: dir
   tags:
     - ssh
 
