@@ -59,7 +59,7 @@
 - name: Diffie-Hellman moduli at least 3072-bit-long
   template:
     src: moduli.j2
-    dest: /etc/ssh/moduli 
+    dest: /etc/ssh/moduli
   register: ssh_moduli
   tags:
     - ssh

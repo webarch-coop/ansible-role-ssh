@@ -16,7 +16,7 @@
   command: "ssh-keygen -q -t ecdsa -f {{ inventory_hostname }}_ecdsa -C root@{{ inventory_hostname }} -N ''"
   args:
     chdir: /root/.ssh/ci
-  creates: "/root/.ssh/ci/{{ inventory_hostname }}_ecdsa"
+    creates: "/root/.ssh/ci/{{ inventory_hostname }}_ecdsa"
   tags:
     - ssh
 
@@ -28,8 +28,9 @@
     - ssh
 
 - name: Authorized_keys line generated
-  template: authorized_keys.j2
-  dest: /root/.ssh/authorized_keys.d/authorized_keys_ci
+  template:
+    src: authorized_keys.j2
+    dest: /root/.ssh/authorized_keys.d/authorized_keys_ci
   tags:
     - ssh
 
@@ -46,4 +47,3 @@
   tags:
     - ssh
 ...
-
