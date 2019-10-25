@@ -40,6 +40,8 @@
   assemble:
     src: /root/.ssh/authorized_keys.d
     dest: /root/.ssh/authorized_keys
+    remote_src: true
+    validate: ssh-keygen -lf %s
   tags:
     - ssh
 
