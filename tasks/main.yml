@@ -50,6 +50,20 @@
   tags:
     - ssh
 
+- name: Include SSH key pair generation for CI
+  include_tasks: ci.yml
+  when: ssh_ci_ips is defined and ssh_ci_ips != []
+  tags:
+    - ssh
+
+- name: Diffie-Hellman moduli at least 3072-bit-long
+  template:
+    src: moduli.j2
+    dest: /etc/ssh/moduli 
+  register: ssh_moduli
+  tags:
+    - ssh
+
 - name: sshd_config in place
   template:
     src: templates/sshd_config.j2
@@ -60,11 +74,11 @@
   tags:
     - ssh
 
-- name: Restart SSH if ssh_config has changed
+- name: Restart SSH if config has changed
   service:
     name: ssh
     state: restarted
-  when: ssh_config.changed
+  when: ssh_moduli.changed or ssh_config.changed
   tags:
     - ssh
 ...

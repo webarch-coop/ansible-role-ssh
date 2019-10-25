@@ -1,0 +1,49 @@
+---
+- name: Directories present for CI key pairs
+  file:
+    path: "{{ dir }}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+  loop:
+    - /root/.ssh/ci
+    - /root/.ssh/authorized_keys.d
+  tags:
+    - ssh
+
+- name: CI key pair present
+  command: "ssh-keygen -q -t ecdsa -f {{ inventory_hostname }}_ecdsa -C root@{{ inventory_hostname }} -N ''"
+  args:
+    chdir: /root/.ssh/ci
+  creates: "/root/.ssh/ci/{{ inventory_hostname }}_ecdsa"
+  tags:
+    - ssh
+
+- name: Slurp the CI public key
+  slurp:
+    src: "/root/.ssh/ci/{{ inventory_hostname }}_ecdsa.pub"
+  register: ssh_ci_pubkey_b64encoded
+  tags:
+    - ssh
+
+- name: Authorized_keys line generated
+  template: authorized_keys.j2
+  dest: /root/.ssh/authorized_keys.d/authorized_keys_ci
+  tags:
+    - ssh
+
+- name: Assemble SSH public keys
+  assemble:
+    src: /root/.ssh/authorized_keys.d
+    dest: /root/.ssh/authorized_keys
+  tags:
+    - ssh
+
+- name: "Generate a known_hosts file for {{ ansible_hostname }}"
+  shell: "ssh-keyscan -H {{ ansible_hostname }} > /root/.ssh/ci/known_hosts"
+  creates: /root/.ssh/ci/known_hosts
+  tags:
+    - ssh
+...
+
