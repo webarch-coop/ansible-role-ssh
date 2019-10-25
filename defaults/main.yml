@@ -15,4 +15,9 @@ ssh_allow_tcp_forwarding: "no"
 ssh_kex_algorithms: "curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256"
 ssh_ciphers: "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
 ssh_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com"
+# If this array is defined and not empty then a key pair will be generated in
+# /root/.ssh/ci and the public key will be added to /root/.ssh/authorized_keys
+# prefixed with a from="" containing the public keys.
+# ssh_ci_ips
+#   - 81.95.52.70
 ...

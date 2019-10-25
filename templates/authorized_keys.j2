@@ -1,1 +1,1 @@
-{% if ssh_ci_ips is defined %}from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %} {% endif %}{{ ssh_ci_pub_key }} 
+{% if ssh_ci_ips is defined %}from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %} {% endif %}{{ ssh_ci_pubkey_b64encoded['content'] | b64decode }} 
