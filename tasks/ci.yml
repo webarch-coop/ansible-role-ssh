@@ -15,7 +15,7 @@
     - ssh
 
 - name: SSH CI key pair present
-  command: 'ssh-keygen -t ecdsa -f id_ecdsa -C "Ansible generated CI key" -q -N ""'
+  command: 'ssh-keygen -t ecdsa -f id_ecdsa -C "Ansible managed SSH CI public key" -q -N ""'
   args:
     chdir: /root/.ssh/ci
     creates: "/root/.ssh/ci/id_ecdsa"
