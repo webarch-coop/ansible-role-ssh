@@ -14,25 +14,28 @@
   tags:
     - ssh
 
-- name: CI key pair present
-  command: 'ssh-keygen -t ecdsa -f {{ inventory_hostname }}_ecdsa -C root@{{ inventory_hostname }} -q -N ""'
+- name: SSH CI key pair present
+  command: 'ssh-keygen -t ecdsa -f ecdsa -C "Ansible generated CI key" -q -N ""'
   args:
     chdir: /root/.ssh/ci
-    creates: "/root/.ssh/ci/{{ inventory_hostname }}_ecdsa"
+    creates: "/root/.ssh/ci/ecdsa"
   tags:
     - ssh
-
+    
 - name: Slurp the CI public key
   slurp:
-    src: "/root/.ssh/ci/{{ inventory_hostname }}_ecdsa.pub"
+    src: "/root/.ssh/ci/ecdsa.pub"
   register: ssh_ci_pubkey_b64encoded
   tags:
     - ssh
 
-- name: Authorized_keys line generated
-  template:
-    src: authorized_keys.j2
-    dest: /root/.ssh/authorized_keys.d/authorized_keys_ci
+- name: Public SSH CI key written to ~/.ssh/authorized_keys.d/authorized_keys_ci
+  authorized_key:
+    user: root
+    state: present
+    path: /root/.ssh/authorized_keys.d/authorized_keys_ci
+    key: "{{ ssh_ci_pubkey_b64encoded['content'] | b64decode }}" 
+    key_options: 'from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %}"'
   tags:
     - ssh
 
@@ -46,7 +49,7 @@
     - ssh
 
 - name: "Generate a known_hosts file for localhost"
-  shell: "ssh-keyscan -H localhost > /root/.ssh/ci/known_hosts"
+  shell: "ssh-keyscan -t ecdsa -H localhost > /root/.ssh/ci/known_hosts"
   args:
     creates: /root/.ssh/ci/known_hosts
   tags:
