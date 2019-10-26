@@ -48,8 +48,8 @@
   tags:
     - ssh
 
-- name: "Generate a known_hosts file for localhost"
-  shell: "ssh-keyscan -t ecdsa -H localhost > /root/.ssh/ci/known_hosts"
+- name: "Generate a known_hosts file for {{ inventory_hostname }}"
+  shell: "ssh-keyscan -t ecdsa -H {{ inventory_hostname }} > /root/.ssh/ci/known_hosts"
   args:
     creates: /root/.ssh/ci/known_hosts
   tags:
