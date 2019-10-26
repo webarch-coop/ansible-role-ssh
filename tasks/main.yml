@@ -18,6 +18,7 @@
       loop: "{{ ssh_groups }}"
       loop_control:
         loop_var: group
+        label: "{{ group.name }}"
       tags:
         - ssh
 
