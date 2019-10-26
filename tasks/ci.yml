@@ -15,16 +15,16 @@
     - ssh
 
 - name: SSH CI key pair present
-  command: 'ssh-keygen -t ecdsa -f ecdsa -C "Ansible generated CI key" -q -N ""'
+  command: 'ssh-keygen -t ecdsa -f id_ecdsa -C "Ansible generated CI key" -q -N ""'
   args:
     chdir: /root/.ssh/ci
-    creates: "/root/.ssh/ci/ecdsa"
+    creates: "/root/.ssh/ci/id_ecdsa"
   tags:
     - ssh
     
 - name: Slurp the CI public key
   slurp:
-    src: "/root/.ssh/ci/ecdsa.pub"
+    src: "/root/.ssh/ci/id_ecdsa.pub"
   register: ssh_ci_pubkey_b64encoded
   tags:
     - ssh
