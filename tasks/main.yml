@@ -46,7 +46,7 @@
 
 - name: Include SSH key pair generation for CI
   include_tasks: ci.yml
-  when: ssh_ci_ips is defined and ssh_ci_ips != []
+  when: ( ssh_ci_ips is defined ) and ( ssh_ci_ips != [] )
   tags:
     - ssh
 
