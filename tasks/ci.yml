@@ -1,57 +1,51 @@
 ---
-- name: Directories present for CI key pairs
-  file:
-    path: "{{ dir }}"
-    state: directory
-    mode: 0700
-    owner: root
-    group: root
-  loop:
-    - /root/.ssh/ci
-    - /root/.ssh/authorized_keys.d
-  loop_control:
-    loop_var: dir
-  tags:
-    - ssh
+- name: SSH CI tasks
+  block:
 
-- name: SSH CI key pair present
-  command: 'ssh-keygen -t ecdsa -f id_ecdsa -C "Ansible managed SSH CI public key" -q -N ""'
-  args:
-    chdir: /root/.ssh/ci
-    creates: "/root/.ssh/ci/id_ecdsa"
-  tags:
-    - ssh
+    - name: Directories present for CI key pairs
+      file:
+        path: "{{ dir }}"
+        state: directory
+        mode: 0700
+        owner: root
+        group: root
+      loop:
+        - /root/.ssh/ci
+        - /root/.ssh/authorized_keys.d
+      loop_control:
+        loop_var: dir
 
-- name: Slurp the CI public key
-  slurp:
-    src: "/root/.ssh/ci/id_ecdsa.pub"
-  register: ssh_ci_pubkey_b64encoded
-  tags:
-    - ssh
+    - name: SSH CI key pair present
+      command: 'ssh-keygen -t ecdsa -f id_ecdsa -C "Ansible managed SSH CI public key" -q -N ""'
+      args:
+        chdir: /root/.ssh/ci
+        creates: "/root/.ssh/ci/id_ecdsa"
 
-- name: Public SSH CI key written to ~/.ssh/authorized_keys.d/authorized_keys_ci
-  authorized_key:
-    user: root
-    state: present
-    path: /root/.ssh/authorized_keys.d/authorized_keys_ci
-    key: "{{ ssh_ci_pubkey_b64encoded['content'] | b64decode }}"
-    key_options: 'from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %}"'
-  tags:
-    - ssh
+    - name: Slurp the CI public key
+      slurp:
+        src: "/root/.ssh/ci/id_ecdsa.pub"
+      register: ssh_ci_pubkey_b64encoded
 
-- name: Assemble SSH public keys
-  assemble:
-    src: /root/.ssh/authorized_keys.d
-    dest: /root/.ssh/authorized_keys
-    remote_src: true
-    validate: ssh-keygen -lf %s
-  tags:
-    - ssh
+    - name: Public SSH CI key written to ~/.ssh/authorized_keys.d/authorized_keys_ci
+      authorized_key:
+        user: root
+        state: present
+        path: /root/.ssh/authorized_keys.d/authorized_keys_ci
+        key: "{{ ssh_ci_pubkey_b64encoded['content'] | b64decode }}"
+        key_options: 'from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %}"'
 
-- name: "Generate a known_hosts file for {{ inventory_hostname }}"
-  shell: "ssh-keyscan -t ecdsa -H {{ inventory_hostname }} > /root/.ssh/ci/known_hosts"
-  args:
-    creates: /root/.ssh/ci/known_hosts
+    - name: Assemble SSH public keys
+      assemble:
+        src: /root/.ssh/authorized_keys.d
+        dest: /root/.ssh/authorized_keys
+        remote_src: true
+        validate: ssh-keygen -lf %s
+
+    - name: "Generate a known_hosts file for {{ inventory_hostname }}"
+      shell: "ssh-keyscan -t ecdsa -H {{ inventory_hostname }} > /root/.ssh/ci/known_hosts"
+      args:
+        creates: /root/.ssh/ci/known_hosts
+
   tags:
     - ssh
 ...

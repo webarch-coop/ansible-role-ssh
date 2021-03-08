@@ -1,0 +1,9 @@
+---
+- name: SSH restarted
+  service:
+    name: ssh
+    state: restarted
+  listen: restart ssh
+  tags:
+    - ssh
+...

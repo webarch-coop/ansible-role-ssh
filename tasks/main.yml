@@ -1,78 +1,61 @@
 ---
-- name: Packages installed
-  apt:
-    pkg:
-      - libc-bin
-      - ssh-import-id
-    state: present
-  tags:
-    - ssh
-
-- name: Create groups
+- name: Configure OpenSSH server
   block:
 
-    - name: Add group
-      group:
-        name: "{{ group }}"
+    - name: Packages present
+      apt:
+        pkg:
+          - libc-bin
+          - ssh-import-id
         state: present
-      loop: "{{ ssh_groups }}"
-      loop_control:
-        loop_var: group
-      tags:
-        - ssh
 
-  when: ( ssh_groups is defined ) and ( ssh_groups != "" )
+    - name: Groups present
+      block:
 
-- name: Groups on the server
-  command: getent group
-  register: ssh_getent_group
-  changed_when: false
-  check_mode: false
-  tags:
-    - ssh
+        - name: Groups present
+          group:
+            name: "{{ group }}"
+            state: present
+          loop: "{{ ssh_groups }}"
+          loop_control:
+            loop_var: group
 
-- name: Variable set for groups
-  set_fact:
-    ssh_groups: "{{ ssh_getent_group.stdout_lines | map('regex_replace', ':(.*)', '') | list }}"
-  tags:
-    - ssh
+      when: ( ssh_groups is defined ) and ( ssh_groups != [] )
 
-- name: SSH ECDSA keypair for root present
-  command: ssh-keygen -q -t ed25519 -f /root/.ssh/id_ed25519 -q -N "" -C "root@{{ inventory_hostname }}"
-  args:
-    creates: /root/.ssh/id_ed25519
-  tags:
-    - ssh
+    - name: Register the groups on the server
+      command: getent group
+      register: ssh_getent_group
+      changed_when: false
+      check_mode: false
 
-- name: Include SSH key pair generation for CI
-  include_tasks: ci.yml
-  when: ( ssh_ci_ips is defined ) and ( ssh_ci_ips != [] )
-  tags:
-    - ssh
+    - name: Set a variable for existing groups
+      set_fact:
+        ssh_groups: "{{ ssh_getent_group.stdout_lines | map('regex_replace', ':(.*)', '') | list }}"
 
-- name: Diffie-Hellman moduli at least 3072-bit-long
-  template:
-    src: moduli.j2
-    dest: /etc/ssh/moduli
-  register: ssh_moduli
-  tags:
-    - ssh
+    - name: SSH ECDSA keypair for root present
+      command: ssh-keygen -q -t ed25519 -f /root/.ssh/id_ed25519 -q -N "" -C "root@{{ inventory_hostname }}"
+      args:
+        creates: /root/.ssh/id_ed25519
 
-- name: sshd_config in place
-  template:
-    src: templates/sshd_config.j2
-    dest: /etc/ssh/sshd_config
-    validate: sshd -t -f %s
-    backup: true
-  register: ssh_config
-  tags:
-    - ssh
+    - name: Include SSH key pair generation for CI
+      include_tasks: ci.yml
+      when: ( ssh_ci_ips is defined ) and ( ssh_ci_ips != [] )
 
-- name: Restart SSH if config has changed
-  service:
-    name: ssh
-    state: restarted
-  when: ssh_moduli.changed or ssh_config.changed
+    - name: Remove Diffie-Hellman moduli which are less than 4000 bits
+      lineinfile:
+        path: /etc/ssh/moduli
+        regexp: '^[0-9]{14}\ 2\ 6\ 100\ [1|2|3][0-9]{3}\ .*$'
+        state: absent
+      notify: restart ssh
+
+    - name: sshd_config in place
+      template:
+        src: templates/sshd_config.j2
+        dest: /etc/ssh/sshd_config
+        validate: sshd -t -f %s
+        backup: true
+      notify: restart ssh
+
   tags:
     - ssh
 ...
