@@ -138,6 +138,8 @@ Subsystem       sftp    internal-sftp
 #	PermitTTY no
 #	ForceCommand cvs server
 
+{% if ssh_allow_groups is defined and ssh_allow_groups != [] %}
+
 {% if 'chroot' in ssh_allow_groups %}
 Match group chroot
     AllowGroups chroot
@@ -179,6 +181,8 @@ Match group sftponly
     PermitUserRC no
     PermitRootLogin No
     ForceCommand internal-sftp
+{% endif %}
+
 {% endif %}
 
 # vim: ft=sshdconfig
