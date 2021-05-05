@@ -4,12 +4,15 @@ See the the variables in the [defaults/main.yml](defaults/main.yml) file.
 
 ## Groups
 
-By default only members of the `sudo` group can connect to the server.
+By default only members of the `root` and `sudo` group can connect to the
+server.
 
 There are three `Match group` blocks that are conditionally added to the
-`/etc/ssh/sshd_config` file depending on the presence of the `chroot`,
-`sshonly` and `sftponly` groups, see the [chroot
-role](https://git.coop/webarch/chroot) for the Debian Buster implementation.
+`/etc/ssh/sshd_config` file depending on the the `chroot`, `sshonly` and
+`sftponly` groups being in the `ssh_allow_groups` list
+
+See the [chroot role](https://git.coop/webarch/chroot) for the Debian Buster
+chroot implementation.
 
 ## CI keys
 
