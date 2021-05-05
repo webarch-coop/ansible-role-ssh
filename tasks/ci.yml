@@ -16,10 +16,14 @@
         loop_var: dir
 
     - name: SSH CI key pair present
-      command: 'ssh-keygen -t ecdsa -f id_ecdsa -C "Ansible managed SSH CI public key" -q -N ""'
-      args:
-        chdir: /root/.ssh/ci
-        creates: "/root/.ssh/ci/id_ecdsa"
+      openssh_keypair:
+        path: /root/.ssh/ci/id_ecdsa
+        type: ecdsa
+        comment: "Ansible managed SSH CI public key"
+        state: present
+        mode: 0600
+        owner: root
+        group: root
 
     - name: Slurp the CI public key
       slurp:
@@ -31,7 +35,7 @@
         user: root
         state: present
         path: /root/.ssh/authorized_keys.d/authorized_keys_ci
-        key: "{{ ssh_ci_pubkey_b64encoded['content'] | b64decode }}"
+        key: "{{ ssh_ci_pubkey_b64encoded['content'] | b64decode | trim }}"
         key_options: 'from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %}"'
 
     - name: Assemble SSH public keys

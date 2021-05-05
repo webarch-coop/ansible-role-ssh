@@ -9,33 +9,24 @@
           - ssh-import-id
         state: present
 
-    - name: Groups present
-      block:
-
-        - name: Groups present
-          group:
-            name: "{{ group }}"
-            state: present
-          loop: "{{ ssh_groups }}"
-          loop_control:
-            loop_var: group
-
+    - name: SSH groups present
+      group:
+        name: "{{ ssh_group }}"
+        state: present
+      loop: "{{ ssh_groups }}"
+      loop_control:
+        loop_var: ssh_group
       when: ( ssh_groups is defined ) and ( ssh_groups != [] )
 
-    - name: Register the groups on the server
-      command: getent group
-      register: ssh_getent_group
-      changed_when: false
-      check_mode: false
-
-    - name: Set a variable for existing groups
-      set_fact:
-        ssh_groups: "{{ ssh_getent_group.stdout_lines | map('regex_replace', ':(.*)', '') | list }}"
-
     - name: SSH ECDSA keypair for root present
-      command: ssh-keygen -q -t ed25519 -f /root/.ssh/id_ed25519 -q -N "" -C "root@{{ inventory_hostname }}"
-      args:
-        creates: /root/.ssh/id_ed25519
+      openssh_keypair:
+        path: /root/.ssh/id_ed25519
+        type: ed25519
+        comment: "root@{{ inventory_hostname }}"
+        state: present
+        mode: 0600
+        owner: root
+        group: root
 
     - name: Include SSH key pair generation for CI
       include_tasks: ci.yml
@@ -56,7 +47,7 @@
         backup: true
       notify: restart ssh
 
-    - name: Loop through the host keys
+    - name: Loop through the SSH host keys
       include_tasks: host_key.yml
       loop: "{{ ssh_host_keys }}"
       loop_control:
