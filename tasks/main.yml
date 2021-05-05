@@ -9,14 +9,26 @@
           - ssh-import-id
         state: present
 
-    - name: SSH groups present
+    - name: Check ssh_allow_groups variable
+      assert:
+        that:
+          - ssh_allow_groups | type_debug == "list"
+      when: ssh_allow_groups is defined
+
+    - name: Check ssh_deny_users variable
+      assert:
+        that:
+          - ssh_deny_users | type_debug == "list"
+      when: ssh_deny_users is defined
+
+    - name: SSH allow groups present
       group:
-        name: "{{ ssh_group }}"
+        name: "{{ ssh_allow_group }}"
         state: present
-      loop: "{{ ssh_groups }}"
+      loop: "{{ ssh_allow_groups }}"
       loop_control:
-        loop_var: ssh_group
-      when: ( ssh_groups is defined ) and ( ssh_groups != [] )
+        loop_var: ssh_allow_group
+      when: ( ssh_allow_groups is defined ) and ( ssh_allow_groups != [] )
 
     - name: SSH ECDSA keypair for root present
       openssh_keypair:

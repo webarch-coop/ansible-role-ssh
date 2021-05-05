@@ -39,7 +39,9 @@ PermitRootLogin {{ ssh_permit_root_login | default('prohibit-password') }}
 {% if ssh_deny_users is defined %}
 DenyUsers {{ ssh_deny_users }}
 {% endif %}
-AllowGroups {{ ssh_allow_groups | default('root sudo') }}
+{% if ssh_allow_groups is defined and ssh_allow_groups != [] %}
+AllowGroups {% for g in ssh_allow_groups %}{{ g }}{% endif %}
+{% endif %}
 #StrictModes yes
 #MaxAuthTries 6
 #MaxSessions 10
@@ -134,10 +136,9 @@ Subsystem       sftp    internal-sftp
 #	ForceCommand cvs server
 
 {% if 'chroot' in ssh_groups %}
-# WSH Buster servers
 Match group chroot
     AllowGroups chroot
-    DenyGroups sudo root
+    DenyGroups sudo root sftponly sshonly
     ChrootDirectory {{ chroot_users_dir | default('/users') }}/%u
     X11Forwarding no
     AllowTcpForwarding no
@@ -149,10 +150,9 @@ Match group chroot
 {% endif %}
 
 {% if 'sshonly' in ssh_groups %}
-# WSH Stretch servers
 Match group sshonly
     AllowGroups sshonly
-    DenyGroups sftponly sudo root
+    DenyGroups chroot sftponly sudo root
     ChrootDirectory /sshonly/%u
     X11Forwarding no
     AllowTcpForwarding no
@@ -164,10 +164,9 @@ Match group sshonly
 {% endif %}
 
 {% if 'sftponly' in ssh_groups %}
-# WSH Stretch and Jessie servers
 Match group sftponly
     AllowGroups sftponly
-    DenyGroups sshonly sudo root
+    DenyGroups chroot sshonly sudo root
     ChrootDirectory %h
     X11Forwarding no
     AllowTcpForwarding no
