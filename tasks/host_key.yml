@@ -6,7 +6,7 @@
       stat:
         path: "{{ ssh_host_key_path }}"
       register: ssh_host_key_state
-      notify: "{% if not ssh_host_key_state.stat.exists %}reconfigure ssh{% else %}[]{% endif %}"
+      notify: "{% if ssh_host_key_state is defined and not ssh_host_key_state.stat.exists %}reconfigure ssh{% else %}[]{% endif %}"
 
   tags:
     - ssh
