@@ -138,7 +138,7 @@ Subsystem       sftp    internal-sftp
 #	PermitTTY no
 #	ForceCommand cvs server
 
-{% if 'chroot' in ssh_groups %}
+{% if 'chroot' in ssh_allow_groups %}
 Match group chroot
     AllowGroups chroot
     DenyGroups sudo root sftponly sshonly
@@ -152,7 +152,7 @@ Match group chroot
     PermitRootLogin No
 {% endif %}
 
-{% if 'sshonly' in ssh_groups %}
+{% if 'sshonly' in ssh_allow_groups %}
 Match group sshonly
     AllowGroups sshonly
     DenyGroups chroot sftponly sudo root
@@ -166,7 +166,7 @@ Match group sshonly
     PermitRootLogin No
 {% endif %}
 
-{% if 'sftponly' in ssh_groups %}
+{% if 'sftponly' in ssh_allow_groups %}
 Match group sftponly
     AllowGroups sftponly
     DenyGroups chroot sshonly sudo root
