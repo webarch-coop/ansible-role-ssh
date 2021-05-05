@@ -1,0 +1,18 @@
+---
+- name: Check that SSH host keys are present
+  block:
+
+    - name: "Stat {{ ssh_host_key_path }}"
+      stat:
+        path: "{{ ssh_host_key_path }}"
+      register: ssh_host_key_state
+
+    - name: "SSH host key missing"
+      debug:
+        msg: "SSH host key {{ ssh_host_key_path }} is missing"
+      notify: reconfigure ssh
+      when: not ssh_host_key_state.stat.exists
+
+  tags:
+    - ssh
+...

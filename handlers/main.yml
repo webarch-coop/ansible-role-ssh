@@ -1,4 +1,10 @@
 ---
+- name: SSH reconfigured
+  command: dpkg-reconfigure openssh-server
+  listen: reconfigure ssh
+  tags:
+    - ssh
+
 - name: SSH restarted
   service:
     name: ssh

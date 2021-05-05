@@ -56,6 +56,12 @@
         backup: true
       notify: restart ssh
 
+    - name: Loop through the host keys
+      include_tasks: host_key.yml
+      loop: ssh_host_keys
+      loop_control:
+        loop_var: ssh_host_key_path
+
   tags:
     - ssh
 ...
