@@ -150,6 +150,7 @@ Match group chroot
     PasswordAuthentication yes
     PubkeyAuthentication yes
     PermitUserRC no
+    PermitTTY yes
     PermitRootLogin No
 {% endif %}
 
@@ -165,6 +166,7 @@ Match group sftponly
     PubkeyAuthentication yes
     PermitUserRC no
     PermitRootLogin No
+    PermitTTY yes
     ForceCommand internal-sftp
 {% endif %}
 
@@ -179,6 +181,7 @@ Match group sshonly
     PasswordAuthentication no
     PubkeyAuthentication yes
     PermitUserRC no
+    PermitTTY yes
     PermitRootLogin No
 {% endif %}
 
@@ -192,7 +195,7 @@ Match group xenshell
     PasswordAuthentication no
     PubkeyAuthentication yes
     PermitUserRC no
-    PermitTTY no
+    PermitTTY yes
     PermitRootLogin No
 {% endif %}
 
