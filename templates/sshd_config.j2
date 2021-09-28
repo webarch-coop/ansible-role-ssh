@@ -142,7 +142,7 @@ Subsystem       sftp    internal-sftp
 {% if 'chroot' in ssh_allow_groups %}
 Match group chroot
     AllowGroups chroot
-    DenyGroups sudo root sftponly sshonly
+    DenyGroups sudo root sftponly sshonly xenshell
     ChrootDirectory {{ chroot_users_dir | default('/users') }}/%u
     X11Forwarding no
     AllowTcpForwarding no
@@ -153,10 +153,25 @@ Match group chroot
     PermitRootLogin No
 {% endif %}
 
+{% if 'sftponly' in ssh_allow_groups %}
+Match group sftponly
+    AllowGroups sftponly
+    DenyGroups chroot sshonly sudo root xenshell
+    ChrootDirectory %h
+    X11Forwarding no
+    AllowTcpForwarding no
+    AuthenticationMethods publickey password
+    PasswordAuthentication yes
+    PubkeyAuthentication yes
+    PermitUserRC no
+    PermitRootLogin No
+    ForceCommand internal-sftp
+{% endif %}
+
 {% if 'sshonly' in ssh_allow_groups %}
 Match group sshonly
     AllowGroups sshonly
-    DenyGroups chroot sftponly sudo root
+    DenyGroups chroot sftponly sudo root xenshell
     ChrootDirectory /sshonly/%u
     X11Forwarding no
     AllowTcpForwarding no
@@ -167,19 +182,18 @@ Match group sshonly
     PermitRootLogin No
 {% endif %}
 
-{% if 'sftponly' in ssh_allow_groups %}
-Match group sftponly
-    AllowGroups sftponly
-    DenyGroups chroot sshonly sudo root
-    ChrootDirectory %h
+{% if 'xenshell' in ssh_allow_groups %}
+Match group xenshell
+    AllowGroups xenshell
+    DenyGroups chroot sftponly sshonly sudo root
     X11Forwarding no
     AllowTcpForwarding no
-    AuthenticationMethods publickey password
-    PasswordAuthentication yes
+    AuthenticationMethods publickey
+    PasswordAuthentication no
     PubkeyAuthentication yes
     PermitUserRC no
+    PermitTTY no
     PermitRootLogin No
-    ForceCommand internal-sftp
 {% endif %}
 
 {% endif %}
