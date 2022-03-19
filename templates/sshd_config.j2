@@ -52,7 +52,9 @@ AllowGroups{% for g in ssh_allow_groups %} {{ g }}{% endfor %}
 #MaxSessions 10
 
 AuthenticationMethods {{ ssh_authentication_methods | default('publickey') }}
+
 PasswordAuthentication {% if ssh_password_authentication %}yes{% else %}no{% endif %}
+
 PubkeyAuthentication {% if ssh_pubkey_authentication %}yes{% else %}no{% endif %}
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
@@ -103,7 +105,9 @@ ChallengeResponseAuthentication no
 UsePAM yes
 
 AllowAgentForwarding {% if ssh_allow_agent_forwarding %}yes{% else %}no{% endif %}
+
 AllowTcpForwarding {% if ssh_allow_tcp_forwarding %}yes{% else %}no{% endif %} 
+
 #GatewayPorts no
 X11Forwarding no
 #X11DisplayOffset 10
