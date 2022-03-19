@@ -47,10 +47,14 @@
       stat:
         path: ssh_chroot_users_dir
         register: ssh_chroot_users_dir_check
-      failed_when:
-        - not ssh_chroot_users_dir_check.stat.exist
-        - not ssh_chroot_users_dir_check.stat.is_dir
       when: ssh_chroot_users_dir is defined
+
+    - name: Ensure that ssh_chroot_users_dir exists when defined
+      assert:
+        that:
+          - ssh_chroot_users_dir_check.stat.exist
+          - ssh_chroot_users_dir_check.stat.is_dir
+        when: ssh_chroot_users_dir_check is defined
 
     - name: SSH packages present
       apt:
