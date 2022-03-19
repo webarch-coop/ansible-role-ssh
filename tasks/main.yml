@@ -12,7 +12,7 @@
           - "ssh_permit_root_login: {{ ssh_permit_root_login }}"
           - "ssh_permit_root_login type: {{ ssh_permit_root_login | type_debug }}"
           - "ssh_deny_users:{% if ssh_deny_users is defined %}{% for u in ssh_deny_users %} {{ u }}{% endfor %}{% endif %}"
-          - "ssh_allow_groups: {% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %}"
+          - "ssh_allow_groups:{% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %}"
           - "ssh_authentication_methods: {{ ssh_authentication_methods }}"
           - "ssh_password_authentication: {{ ssh_password_authentication }}"
           - "ssh_pubkey_authentication: {{ ssh_pubkey_authentication }}"
