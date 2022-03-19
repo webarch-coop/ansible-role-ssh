@@ -19,9 +19,9 @@
           - "ssh_allow_agent_forwarding: {{ ssh_allow_agent_forwarding }}"
           - "ssh_allow_tcp_forwarding: {{ ssh_allow_tcp_forwarding }}"
           - "ssh_chroot_users_dir:{% if ssh_chroot_users_dir is defined %} {{ ssh_chroot_users_dir }}{% endif %}"
-          - "ssh_kex_algorithms:{% if ssh_kex_algorithms | type_debug == 'list' %}{% for k in ssh_kex_algorithms %} {{ k }}{% endfor %}{% else %}{{ ssh_kex_algorithms }}{% endif %}"
-          - "ssh_ciphers:{% if ssh_ciphers | type_debug == 'list' %}{% for c in ssh_ciphers %} {{ c }}{% endfor %}{% else %}{{ ssh_ciphers }}{% endif %}"
-          - "ssh_macs:{% if ssh_macs | type_debug == 'list' %}{% for m in ssh_macs %} {{ m }}{% endfor %}{% else %}{{ ssh_macs }}{% endif %}"
+          - "ssh_kex_algorithms: {% if ssh_kex_algorithms | type_debug == 'list' %}{% for k in ssh_kex_algorithms %}{{ k }}{{ ',' if not loop.last else '' }}{% endfor %}{% else %}{{ ssh_kex_algorithms }}{% endif %}"
+          - "ssh_ciphers: {% if ssh_ciphers | type_debug == 'list' %}{% for c in ssh_ciphers %}{{ c }}{{ ',' if not loop.last else '' }}{% endfor %}{% else %}{{ ssh_ciphers }}{% endif %}"
+          - "ssh_macs: {% if ssh_macs | type_debug == 'list' %}{% for m in ssh_macs %}{{ m }}{{ ',' if not loop.last else '' }}{% endfor %}{% else %}{{ ssh_macs }}{% endif %}"
         verbosity: 2
 
     - name: Check variables
