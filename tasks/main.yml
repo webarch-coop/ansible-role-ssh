@@ -54,7 +54,7 @@
         that:
           - ssh_chroot_users_dir_check.stat.exist
           - ssh_chroot_users_dir_check.stat.is_dir
-        when: ssh_chroot_users_dir_check is defined
+      when: ssh_chroot_users_dir_check is defined
 
     - name: SSH packages present
       apt:
