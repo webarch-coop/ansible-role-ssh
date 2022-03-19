@@ -1,12 +1,17 @@
 ---
-# See https://infosec.mozilla.org/guidelines/openssh
+# See https://man.openbsd.org/sshd_config
+# and https://infosec.mozilla.org/guidelines/openssh
 
-# Options for PermitRootLogin are "yes", "no" and "prohibit-password"
+# Options for PermitRootLogin are "yes", "no" and "prohibit-password", however
+# for ssh_permit_root_login use true, false or "prohibit-password"
 ssh_permit_root_login: "prohibit-password"
 
 ssh_allow_groups:
   - root
   - sudo
+  # - chroot
+  # - sftponly
+  # - xenshell
 
 # DenyUsers will only be used if ssh_deny_users is defined
 # ssh_deny_users:
@@ -18,10 +23,10 @@ ssh_allow_groups:
 # "publickey,password" is both required
 ssh_authentication_methods: "publickey"
 
-ssh_password_authentication: "no"
-ssh_pubkey_authentication: "yes"
-ssh_allow_agent_forwarding: "no"
-ssh_allow_tcp_forwarding: "no"
+ssh_password_authentication: false
+ssh_pubkey_authentication: true
+ssh_allow_agent_forwarding: false
+ssh_allow_tcp_forwarding: false
 
 ssh_host_keys:
   - /etc/ssh/ssh_host_ed25519_key
@@ -31,6 +36,10 @@ ssh_host_keys:
 ssh_kex_algorithms: "curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256"
 ssh_ciphers: "chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
 ssh_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com"
+
+# Directory under which users in the chroot will be chrooted to a directory
+# matching their user name, for example /chroots/%u
+# ssh_chroot_users_dir: /chroots
 
 # If the ssh_ci_ips array is defined and not empty then a key pair will be
 # generated in /root/.ssh/ci and the public key will be added to

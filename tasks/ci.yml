@@ -42,8 +42,12 @@
       assemble:
         src: /root/.ssh/authorized_keys.d
         dest: /root/.ssh/authorized_keys
+        mode: "0600"
+        owner: root
+        group: root
         remote_src: true
         validate: ssh-keygen -lf %s
+
 
     - name: "Generate a known_hosts file for {{ inventory_hostname }}"
       shell: "ssh-keyscan -t ecdsa -H {{ inventory_hostname }} > /root/.ssh/ci/known_hosts"

@@ -35,7 +35,9 @@ LogLevel VERBOSE
 # Authentication:
 
 #LoginGraceTime 2m
-PermitRootLogin {{ ssh_permit_root_login | default('prohibit-password') }} 
+PermitRootLogin {% if ssh_permit_root_login == "prohibit-password" %}prohibit-password{% elif ssh_permit_root_login %}yes{% else %}no{% endif %}
+
+{{ ssh_permit_root_login | default('prohibit-password') }} 
 
 {% if ssh_deny_users is defined and ssh_deny_users != [] %}
 DenyUsers{% for u in ssh_deny_users %} {{ u }}{% endfor %}
@@ -50,8 +52,8 @@ AllowGroups{% for g in ssh_allow_groups %} {{ g }}{% endfor %}
 #MaxSessions 10
 
 AuthenticationMethods {{ ssh_authentication_methods | default('publickey') }}
-PasswordAuthentication {{ ssh_password_authentication | default('no') }}
-PubkeyAuthentication {{ ssh_pubkey_authentication | default('yes') }}
+PasswordAuthentication {% if ssh_password_authentication %}yes{% else %}no{% endif %}
+PubkeyAuthentication {% if ssh_pubkey_authentication %}yes{% else %}no{% endif %}
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
 #AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
@@ -100,8 +102,8 @@ ChallengeResponseAuthentication no
 # and ChallengeResponseAuthentication to 'no'.
 UsePAM yes
 
-AllowAgentForwarding {{ ssh_allow_agent_forwarding | default('no') }}
-AllowTcpForwarding {{ ssh_allow_tcp_forwarding | default('no') }}
+AllowAgentForwarding {% if ssh_allow_agent_forwarding %}yes{% else %}no{% endif %}
+AllowTcpForwarding {% ssh_allow_tcp_forwarding%}yes{% else %}no{% endif %} 
 #GatewayPorts no
 X11Forwarding no
 #X11DisplayOffset 10
@@ -139,11 +141,11 @@ Subsystem       sftp    internal-sftp
 
 {% if ssh_allow_groups is defined and ssh_allow_groups != [] %}
 
-{% if 'chroot' in ssh_allow_groups %}
+{% if 'chroot' in ssh_allow_groups and ssh_chroot_users_dir is defined %}
 Match group chroot
     AllowGroups chroot
     DenyGroups sudo root sftponly sshonly xenshell
-    ChrootDirectory {{ chroot_users_dir | default('/users') }}/%u
+    ChrootDirectory {{ ssh_chroot_users_dir }}/%u
     X11Forwarding no
     AllowTcpForwarding no
     AuthenticationMethods publickey password
