@@ -33,7 +33,7 @@ ssh_host_keys:
   - /etc/ssh/ssh_host_rsa_key
   - /etc/ssh/ssh_host_ecdsa_key
 
-ssh_kex_algorithms: 
+ssh_kex_algorithms:
   - curve25519-sha256@libssh.org
   - ecdh-sha2-nistp521
   - ecdh-sha2-nistp384
