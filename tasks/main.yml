@@ -12,6 +12,25 @@
           - ssh-import-id
         state: present
 
+    - name: Debug variables
+      debug:
+        msg:
+          - "ssh_host_keys:{% for key in ssh_host_keys %} {{ key }}{% endfor %}"
+          - "ssh_kex_algorithms: {{ ssh_kex_algorithms }}"
+          - "ssh_ciphers: {{ ssh_ciphers }}"
+          - "ssh_macs: {{ ssh_macs }}"
+          - "ssh_permit_root_login: {{ ssh_permit_root_login }}"
+          - "ssh_permit_root_login type: {{ ssh_permit_root_login | type_debug }}"
+          - "ssh_deny_users:{% if ssh_deny_users is defined %}{% for u in ssh_deny_users %} {{ u }}{% endfor %}{% endif %}"
+          - "ssh_allow_groups: {% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %}"
+          - "ssh_authentication_methods: {{ ssh_authentication_methods }}"
+          - "ssh_password_authentication: {{ ssh_password_authentication }}"
+          - "ssh_pubkey_authentication: {{ ssh_pubkey_authentication }}"
+          - "ssh_allow_agent_forwarding: {{ ssh_allow_agent_forwarding }}"
+          - "ssh_allow_tcp_forwarding: {{ ssh_allow_tcp_forwarding }}"
+          - "ssh_chroot_users_dir: {% if ssh_chroot_users_dir is defined %}{{ ssh_chroot_users_dir }}{% endif %}"
+      verbosity: 2
+
     - name: Check variables
       assert:
         that:
