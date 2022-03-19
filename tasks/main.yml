@@ -2,16 +2,6 @@
 - name: Configure OpenSSH server
   block:
 
-    - name: SSH packages present
-      apt:
-        pkg:
-          - libc-bin
-          - openssh-client
-          - openssh-server
-          - openssh-sftp-server
-          - ssh-import-id
-        state: present
-
     - name: Debug variables
       debug:
         msg:
@@ -61,6 +51,16 @@
         - not ssh_chroot_users_dir.stat.exist
         - not ssh_chroot_users_dir.stat.is_dir
       when: ssh_chroot_users_dir is defined
+
+    - name: SSH packages present
+      apt:
+        pkg:
+          - libc-bin
+          - openssh-client
+          - openssh-server
+          - openssh-sftp-server
+          - ssh-import-id
+        state: present
 
     - name: SSH allow groups present
       group:
