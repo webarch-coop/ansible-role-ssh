@@ -20,7 +20,7 @@
           - ssh_pubkey_authentication | type_debug == "bool"
           - ssh_allow_agent_forwarding | type_debug == "bool"
           - ssh_allow_tcp_forwarding | type_debug == "bool"
-        fail_msg: "Please check your variables, some which were previously strings are not expected to be booleans"
+        fail_msg: "Please check your variables, some which were previously strings are now expected to be booleans"
 
     - name: Check ssh_allow_groups variable
       assert:
