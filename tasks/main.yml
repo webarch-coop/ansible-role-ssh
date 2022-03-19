@@ -54,16 +54,35 @@
         group: root
       notify: restart ssh
 
-    - name: sshd_config in place
-      template:
-        src: templates/sshd_config.j2
-        dest: /etc/ssh/sshd_config
-        mode: "0644"
-        owner: root
-        group: root
-        validate: sshd -t -f %s
-        backup: true
-      notify: restart ssh
+    - name: Check and conditional apply the SSH server configuration
+      block:
+
+        - name: sshd_config in place
+          template:
+            src: templates/sshd_config.j2
+            dest: /etc/ssh/sshd_config
+            mode: "0644"
+            owner: root
+            group: root
+            validate: sshd -t -f %s
+            backup: true
+          notify: restart ssh
+
+      rescue:
+
+        - name: Non-valid sshd_config written to /etc/ssh/.sshd_config.broken
+          template:
+            src: templates/sshd_config.j2
+            dest: /etc/ssh/.sshd_config.broken
+            mode: "0600"
+            owner: root
+            group: root
+
+        - name: Fail because the generated sshd_config does not validate
+          fail:
+            msg:
+              - "/etc/ssh/sshd_config has not been updated, a non-valid SSH server config has not been applied."
+              - "The non-valid SSH server config has been written to /etc/ssh/.sshd_config.broken"
 
     - name: Loop through the SSH host keys
       include_tasks: host_key.yml
