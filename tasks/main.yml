@@ -2,12 +2,24 @@
 - name: Configure OpenSSH server
   block:
 
-    - name: Packages present
+    - name: SSH packages present
       apt:
         pkg:
           - libc-bin
+          - openssh-client
+          - openssh-server
+          - openssh-sftp-server
           - ssh-import-id
         state: present
+
+    - name: Check variables
+      assert:
+        that:
+          - ( ssh_authentication_methods == "ssh_authentication_methods" ) or ( ssh_authentication_methods | type_debug == "bool" )
+          - ssh_password_authentication | type_debug == "bool"
+          - ssh_pubkey_authentication | type_debug == "bool"
+          - ssh_allow_agent_forwarding | type_debug == "bool"
+          - ssh_allow_tcp_forwarding | type_debug == "bool"
 
     - name: Check ssh_allow_groups variable
       assert:
@@ -20,6 +32,15 @@
         that:
           - ssh_deny_users | type_debug == "list"
       when: ssh_deny_users is defined
+
+    - name: "Check that {{ ssh_chroot_users_dir }} is a directory when it is defined"
+      stat:
+        path: ssh_chroot_users_dir
+        register: ssh_chroot_users_dir_check
+      failed_when:
+        - not ssh_chroot_users_dir.stat.exist
+        - not ssh_chroot_users_dir.stat.is_dir
+      when: ssh_chroot_users_dir is defined
 
     - name: SSH allow groups present
       group:
