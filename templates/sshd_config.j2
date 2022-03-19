@@ -24,9 +24,12 @@ HostKey {{ key }}
 
 # Ciphers and keying
 #RekeyLimit default none
-KexAlgorithms {{ ssh_kex_algorithms }}
-Ciphers {{ ssh_ciphers }}
-MACs {{ ssh_macs }}
+
+KexAlgorithms{% for k in ssh_kex_algorithms %} {{ k }}{% endfor %}
+
+Ciphers{% for c in ssh_ciphers %} {{ c }}{% endfor %}
+
+MACs{% for m in ssh_macs %} {{ m }}{% endfor %}
 
 # Logging
 #SyslogFacility AUTH
