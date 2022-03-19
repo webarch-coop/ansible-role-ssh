@@ -15,7 +15,7 @@
     - name: Check variables
       assert:
         that:
-          - ( ssh_authentication_methods == "ssh_authentication_methods" ) or ( ssh_authentication_methods | type_debug == "bool" )
+          - ( ssh_authentication_methods == "publickey" ) or ( ssh_authentication_methods | type_debug == "bool" )
           - ssh_password_authentication | type_debug == "bool"
           - ssh_pubkey_authentication | type_debug == "bool"
           - ssh_allow_agent_forwarding | type_debug == "bool"
