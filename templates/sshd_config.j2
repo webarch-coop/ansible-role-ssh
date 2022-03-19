@@ -37,8 +37,6 @@ LogLevel VERBOSE
 #LoginGraceTime 2m
 PermitRootLogin {% if ssh_permit_root_login == "prohibit-password" %}prohibit-password{% elif ssh_permit_root_login %}yes{% else %}no{% endif %}
 
-{{ ssh_permit_root_login | default('prohibit-password') }} 
-
 {% if ssh_deny_users is defined and ssh_deny_users != [] %}
 DenyUsers{% for u in ssh_deny_users %} {{ u }}{% endfor %}
 {% endif %}
