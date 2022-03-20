@@ -1,4 +1,6 @@
-# Ansible role to configure OpenSSH on Debian
+# Webarchitects Ansible role to configure OpenSSH on Debian
+
+[![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
 See the the variables in the [defaults/main.yml](defaults/main.yml) file.
 
