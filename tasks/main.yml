@@ -67,6 +67,25 @@
           - ssh_chroot_users_dir_check.stat.isdir
       when: ssh_chroot_users_dir_check is defined
 
+    - name: Update apt cache
+      apt:
+        update_cache: true
+
+    - name: Use OpenSSH from buster-backports when available
+      block:
+
+        - name: OpenSSH server present from buster-backports
+          apt:
+            pkg:
+              - openssh-client
+              - openssh-server
+              - openssh-sftp-server
+            state: present
+            default_release: buster-backports
+            install_recommends: true
+
+      when: ansible_distribution_release == "buster"
+
     - name: SSH packages present
       apt:
         pkg:
