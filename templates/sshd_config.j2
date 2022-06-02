@@ -107,7 +107,7 @@ UsePAM yes
 
 AllowAgentForwarding {% if ssh_allow_agent_forwarding %}yes{% else %}no{% endif %}
 
-AllowTcpForwarding {% if ssh_allow_tcp_forwarding %}yes{% else %}no{% endif %} 
+AllowTcpForwarding {% if ssh_allow_tcp_forwarding == "all" %}all{% elif ssh_allow_tcp_forwarding == "remote" %}remote{% elif ssh_allow_tcp_forwarding | bool %}yes% else %}no{% endif %}
 
 #GatewayPorts no
 X11Forwarding no
