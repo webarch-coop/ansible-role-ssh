@@ -79,7 +79,7 @@
       block:
 
         - name: Run apt-cache policy
-          command: apt-cache policy
+          ansible.builtin.command: apt-cache policy
           register: ssh_apt_cache_policy
 
         - name: OpenSSH packages present
@@ -114,6 +114,14 @@
       loop_control:
         loop_var: ssh_allow_group
       when: ( ssh_allow_groups is defined ) and ( ssh_allow_groups != [] )
+
+    - name: Root ~/.ssh directory present
+      file:
+        path: /root/.ssh
+        state: directory
+        mode: 0700
+        owner: root
+        group: root
 
     - name: SSH ECDSA keypair for root present
       community.crypto.openssh_keypair:
