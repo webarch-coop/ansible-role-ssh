@@ -38,7 +38,6 @@ ssh_host_keys:
 
 # https://man.openbsd.org/sshd_config#KexAlgorithms
 ssh_kex_algorithms:
-  # - sntrup4591761x25519-sha512@tinyssh.org
   - curve25519-sha256
   - curve25519-sha256@libssh.org
   - ecdh-sha2-nistp521
