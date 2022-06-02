@@ -81,7 +81,7 @@
           - openssh-client
           - openssh-server
           - openssh-sftp-server
-        state: present
+        state: latest
         default_release: buster-backports
         install_recommends: true
       when: ansible_distribution_release == "buster"
