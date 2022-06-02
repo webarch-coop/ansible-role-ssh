@@ -1,11 +1,8 @@
 ---
-# See https://man.openbsd.org/sshd_config
-# and https://infosec.mozilla.org/guidelines/openssh
+# https://man.openbsd.org/sshd_config#PermitRootLogin
+ssh_permit_root_login: prohibit-password
 
-# Options for PermitRootLogin are "yes", "no" and "prohibit-password", however
-# for ssh_permit_root_login use true, false or "prohibit-password"
-ssh_permit_root_login: "prohibit-password"
-
+# https://man.openbsd.org/sshd_config#AllowGroups
 ssh_allow_groups:
   - root
   - sudo
@@ -13,32 +10,43 @@ ssh_allow_groups:
   # - sftponly
   # - xenshell
 
-# DenyUsers will only be used if ssh_deny_users is defined
+# https://man.openbsd.org/sshd_config#DenyUsers
 # ssh_deny_users:
 #  - stats
 #  - phpmyadmin
 
-# Options for AuthenticationMethods include publickey and password, use a space
-# between them for OR eg: "publickey password" this is either and
-# "publickey,password" is both required
-ssh_authentication_methods: "publickey"
+# https://man.openbsd.org/sshd_config#AuthenticationMethods
+ssh_authentication_methods: publickey
 
+# https://man.openbsd.org/sshd_config#PasswordAuthentication
 ssh_password_authentication: false
+
+# https://man.openbsd.org/sshd_config#PubkeyAuthentication
 ssh_pubkey_authentication: true
+
+# https://man.openbsd.org/sshd_config#PubkeyAuthentication
 ssh_allow_agent_forwarding: false
+
+# https://man.openbsd.org/sshd_config#AllowTcpForwarding
 ssh_allow_tcp_forwarding: false
 
+# https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
   - /etc/ssh/ssh_host_ed25519_key
   - /etc/ssh/ssh_host_rsa_key
   - /etc/ssh/ssh_host_ecdsa_key
 
+# https://man.openbsd.org/sshd_config#KexAlgorithms
 ssh_kex_algorithms:
+  - sntrup4591761x25519-sha512@tinyssh.org
+  - curve25519-sha256
   - curve25519-sha256@libssh.org
   - ecdh-sha2-nistp521
   - ecdh-sha2-nistp384
   - ecdh-sha2-nistp256
   - diffie-hellman-group-exchange-sha256
+
+# https://man.openbsd.org/sshd_config#Ciphers
 ssh_ciphers:
   - chacha20-poly1305@openssh.com
   - aes256-gcm@openssh.com
@@ -46,6 +54,8 @@ ssh_ciphers:
   - aes256-ctr
   - aes192-ctr
   - aes128-ctr
+
+# https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
   - hmac-sha2-512-etm@openssh.com
   - hmac-sha2-256-etm@openssh.com

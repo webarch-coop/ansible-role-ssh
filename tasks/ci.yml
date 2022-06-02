@@ -3,7 +3,7 @@
   block:
 
     - name: Directories present for CI key pairs
-      file:
+      ansible.builtin.file:
         path: "{{ dir }}"
         state: directory
         mode: 0700
@@ -26,12 +26,12 @@
         group: root
 
     - name: Slurp the CI public key
-      slurp:
+      ansible.builtin.slurp:
         src: "/root/.ssh/ci/id_ecdsa.pub"
       register: ssh_ci_pubkey_b64encoded
 
     - name: Public SSH CI key written to ~/.ssh/authorized_keys.d/authorized_keys_ci
-      authorized_key:
+      ansible.posix.authorized_key:
         user: root
         state: present
         path: /root/.ssh/authorized_keys.d/authorized_keys_ci
@@ -39,7 +39,7 @@
         key_options: 'from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %}"'
 
     - name: Assemble SSH public keys
-      assemble:
+      ansible.builtin.assemble:
         src: /root/.ssh/authorized_keys.d
         dest: /root/.ssh/authorized_keys
         mode: "0600"
@@ -48,10 +48,23 @@
         remote_src: true
         validate: ssh-keygen -lf %s
 
+    - name: Run which bash
+      ansible.builtin.command: which bash
+      check_mode: false
+      changed_when: false
+      register: which_bash
+      failed_when: which_bash.stdout is not regex('\/bash$')
+
+    - name: Set a variable for the path to Bash
+      ansible.builtin.set_fact:
+        bash: "{{ which_bash.stdout }}"
 
     - name: "Generate a known_hosts file for {{ inventory_hostname }}"
-      shell: "ssh-keyscan -t ecdsa -H {{ inventory_hostname }} > /root/.ssh/ci/known_hosts"
+      ansible.builtin.shell: |
+        set -e -o pipefail
+        ssh-keyscan -t ecdsa -H {{ inventory_hostname }} > /root/.ssh/ci/known_hosts
       args:
+        executable: "{{ bash }}"
         creates: /root/.ssh/ci/known_hosts
 
   tags:

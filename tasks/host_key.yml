@@ -3,12 +3,12 @@
   block:
 
     - name: "Stat {{ ssh_host_key_path }}"
-      stat:
+      ansible.builtin.stat:
         path: "{{ ssh_host_key_path }}"
       register: ssh_host_key_state
 
     - name: Reconfigure SSH
-      command: dpkg-reconfigure openssh-server
+      ansible.builtin.command: dpkg-reconfigure openssh-server
       when: not ssh_host_key_state.stat.exists
       notify: restart ssh
 

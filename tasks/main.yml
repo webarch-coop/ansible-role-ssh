@@ -3,7 +3,7 @@
   block:
 
     - name: Debug variables
-      debug:
+      ansible.builtin.debug:
         msg:
           - "ssh_host_keys:{% for key in ssh_host_keys %} {{ key }}{% endfor %}"
           - "ssh_kex_algorithms: {{ ssh_kex_algorithms }}"
@@ -25,69 +25,64 @@
         verbosity: 2
 
     - name: Check variables
-      assert:
+      ansible.builtin.assert:
         that:
           - ( ssh_authentication_methods == "publickey" ) or ( ssh_authentication_methods | type_debug == "bool" )
           - ssh_password_authentication | type_debug == "bool"
           - ssh_pubkey_authentication | type_debug == "bool"
           - ssh_allow_agent_forwarding | type_debug == "bool"
-          - ssh_allow_tcp_forwarding | type_debug == "bool"
+          - ( ssh_allow_tcp_forwarding | type_debug == "bool" ) or ( ssh_allow_tcp_forwarding == "all" ) or ( ssh_allow_tcp_forwarding == "remote" )
           - ssh_kex_algorithms | type_debug == "list"
           - ssh_ciphers | type_debug == "list"
           - ssh_macs | type_debug == "list"
         fail_msg: "Please check your variables, some which were previously strings are now expected to be booleans"
 
     - name: Check ssh_allow_groups variable
-      assert:
+      ansible.builtin.assert:
         that:
           - ssh_allow_groups | type_debug == "list"
       when: ssh_allow_groups is defined
 
     - name: Check ssh_deny_users variable
-      assert:
+      ansible.builtin.assert:
         that:
           - ssh_deny_users | type_debug == "list"
       when: ssh_deny_users is defined
 
     - name: "Check that {{ ssh_chroot_users_dir }} is a directory when it is defined"
-      stat:
+      ansible.builtin.stat:
         path: "{{ ssh_chroot_users_dir }}"
       register: ssh_chroot_users_dir_check
       when: ssh_chroot_users_dir is defined
 
     - name: Debug ssh_chroot_users_dir_check when defined
-      debug:
+      ansible.builtin.debug:
         var: ssh_chroot_users_dir_check
       when: ssh_chroot_users_dir_check is defined
 
     - name: Ensure that ssh_chroot_users_dir exists when defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ssh_chroot_users_dir_check.stat.exists
           - ssh_chroot_users_dir_check.stat.isdir
       when: ssh_chroot_users_dir_check is defined
 
-    - name: Update apt cache
-      apt:
+      ansible.builtin.apt:
         update_cache: true
 
-    - name: Use OpenSSH from buster-backports when available
-      block:
-
-        - name: OpenSSH server present from buster-backports
-          apt:
-            pkg:
-              - openssh-client
-              - openssh-server
-              - openssh-sftp-server
-            state: present
-            default_release: buster-backports
-            install_recommends: true
-
+    - name: OpenSSH server present from buster-backports
+      ansible.builtin.apt:
+        pkg:
+          - openssh-client
+          - openssh-server
+          - openssh-sftp-server
+        state: present
+        default_release: buster-backports
+        install_recommends: true
       when: ansible_distribution_release == "buster"
 
-    - name: SSH packages present
-      apt:
+    - name: OpenSSH packages present
+      ansible.builtin.apt:
         pkg:
           - libc-bin
           - openssh-client
@@ -95,9 +90,10 @@
           - openssh-sftp-server
           - ssh-import-id
         state: present
+      when: ansible_distribution_release != "buster"
 
     - name: SSH allow groups present
-      group:
+      ansible.builtin.group:
         name: "{{ ssh_allow_group }}"
         state: present
       loop: "{{ ssh_allow_groups }}"
@@ -106,7 +102,7 @@
       when: ( ssh_allow_groups is defined ) and ( ssh_allow_groups != [] )
 
     - name: SSH ECDSA keypair for root present
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: /root/.ssh/id_ed25519
         type: ed25519
         comment: "root@{{ inventory_hostname }}"
@@ -116,11 +112,11 @@
         group: root
 
     - name: Include SSH key pair generation for CI
-      include_tasks: ci.yml
+      ansible.builtin.include_tasks: ci.yml
       when: ( ssh_ci_ips is defined ) and ( ssh_ci_ips != [] )
 
     - name: Remove Diffie-Hellman moduli which are less than 4000 bits
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/moduli
         regexp: '^[0-9]{14}\ 2\ 6\ 100\ [1|2|3][0-9]{3}\ .*$'
         state: absent
@@ -133,7 +129,7 @@
       block:
 
         - name: sshd_config in place
-          template:
+          ansible.builtin.template:
             src: templates/sshd_config.j2
             dest: /etc/ssh/sshd_config
             mode: "0644"
@@ -146,7 +142,7 @@
       rescue:
 
         - name: Non-valid sshd_config written to /etc/ssh/.sshd_config.broken
-          template:
+          ansible.builtin.template:
             src: templates/sshd_config.j2
             dest: /etc/ssh/.sshd_config.broken
             mode: "0600"
@@ -154,13 +150,13 @@
             group: root
 
         - name: Fail because the generated sshd_config does not validate
-          fail:
+          ansible.builtin.fail:
             msg:
               - "/etc/ssh/sshd_config has not been updated, a non-valid SSH server config has not been applied."
               - "The non-valid SSH server config has been written to /etc/ssh/.sshd_config.broken"
 
     - name: Loop through the SSH host keys
-      include_tasks: host_key.yml
+      ansible.builtin.include_tasks: host_key.yml
       loop: "{{ ssh_host_keys }}"
       loop_control:
         loop_var: ssh_host_key_path
