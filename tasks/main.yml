@@ -76,14 +76,23 @@
         update_cache: true
 
     - name: OpenSSH server present from buster-backports
-      ansible.builtin.apt:
-        pkg:
-          - openssh-client
-          - openssh-server
-          - openssh-sftp-server
-        state: latest
-        default_release: buster-backports
-        install_recommends: true
+      block:
+
+        - name: Run apt-cache policy
+          command: apt-cache policy
+          register: ssh_apt_cache_policy
+
+        - name: OpenSSH packages present
+          ansible.builtin.apt:
+            pkg:
+              - openssh-client
+              - openssh-server
+              - openssh-sftp-server
+            state: latest
+            default_release: buster-backports
+            install_recommends: true
+          when: ( "buster-backports" in ssh_apt_cache_policy.stdout )
+
       when: ansible_distribution_release == "buster"
 
     - name: OpenSSH packages present
