@@ -49,23 +49,27 @@
           - ssh_deny_users | type_debug == "list"
       when: ssh_deny_users is defined
 
-    - name: "Check that {{ ssh_chroot_users_dir }} is a directory when it is defined"
-      ansible.builtin.stat:
-        path: "{{ ssh_chroot_users_dir }}"
-      register: ssh_chroot_users_dir_check
-      when: ssh_chroot_users_dir is defined
+    - name: Chroot checks
+      block:
 
-    - name: Debug ssh_chroot_users_dir_check when defined
-      ansible.builtin.debug:
-        var: ssh_chroot_users_dir_check
-      when: ssh_chroot_users_dir_check is defined
+        - name: "Check that {{ ssh_chroot_users_dir }} is a directory when it is defined"
+          ansible.builtin.stat:
+            path: "{{ ssh_chroot_users_dir }}"
+          register: ssh_chroot_users_dir_check
 
-    - name: Ensure that ssh_chroot_users_dir exists when defined
-      ansible.builtin.assert:
-        that:
-          - ssh_chroot_users_dir_check.stat.exists | bool
-          - ssh_chroot_users_dir_check.stat.isdir | bool
-      when: ssh_chroot_users_dir_check is defined
+        - name: Debug ssh_chroot_users_dir_check when defined
+          ansible.builtin.debug:
+            var: ssh_chroot_users_dir_check
+          when: ssh_chroot_users_dir_check is defined
+
+        - name: Ensure that ssh_chroot_users_dir exists when defined
+          ansible.builtin.assert:
+            that:
+              - ssh_chroot_users_dir_check.stat.exists | bool
+              - ssh_chroot_users_dir_check.stat.isdir | bool
+          when: ssh_chroot_users_dir_check is defined
+
+      when: ( ssh_chroot_users_dir is defined ) and ( ssh_chroot_users_dir | length > 0 )
 
     - name: Update apt cache
       ansible.builtin.apt:
