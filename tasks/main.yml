@@ -63,10 +63,11 @@
     - name: Ensure that ssh_chroot_users_dir exists when defined
       ansible.builtin.assert:
         that:
-          - ssh_chroot_users_dir_check.stat.exists
-          - ssh_chroot_users_dir_check.stat.isdir
+          - ssh_chroot_users_dir_check.stat.exists | bool
+          - ssh_chroot_users_dir_check.stat.isdir | bool
       when: ssh_chroot_users_dir_check is defined
 
+    - name: Update apt cache
       ansible.builtin.apt:
         update_cache: true
 
