@@ -36,3 +36,10 @@ See the [chroot role](https://git.coop/webarch/chroot) for the Debian chroot imp
 ## CI keys
 
 The content of the private key and the known hosts files can use used as GitLab CI env vars for SSH'ing to the server as root but only from the listed IP addresses.
+
+## Repo
+
+The primary URL of this repo is [`https://git.coop/webarch/ssh`](https://git.coop/webarch/ssh) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-ssh) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/ssh).
+
+If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/ssh/-/releases).
+
