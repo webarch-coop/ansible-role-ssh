@@ -77,6 +77,8 @@
 
     - name: Run apt-cache policy
       ansible.builtin.command: apt-cache policy
+      check_mode: false
+      changed_when: false
       register: ssh_apt_cache_policy
 
     - name: OpenSSH packages present from backport
