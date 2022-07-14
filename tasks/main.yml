@@ -75,25 +75,20 @@
       ansible.builtin.apt:
         update_cache: true
 
-    - name: OpenSSH server present from buster-backports
-      block:
+    - name: Run apt-cache policy
+      ansible.builtin.command: apt-cache policy
+      register: ssh_apt_cache_policy
 
-        - name: Run apt-cache policy
-          ansible.builtin.command: apt-cache policy
-          register: ssh_apt_cache_policy
-
-        - name: OpenSSH packages present
-          ansible.builtin.apt:
-            pkg:
-              - openssh-client
-              - openssh-server
-              - openssh-sftp-server
-            state: latest
-            default_release: buster-backports
-            install_recommends: true
-          when: ( "buster-backports" in ssh_apt_cache_policy.stdout )
-
-      when: ansible_distribution_release == "buster"
+    - name: OpenSSH packages present from backport
+      ansible.builtin.apt:
+        pkg:
+          - openssh-client
+          - openssh-server
+          - openssh-sftp-server
+        state: latest
+        default_release: buster-backports
+        install_recommends: true
+      when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
     - name: OpenSSH packages present
       ansible.builtin.apt:
@@ -104,7 +99,7 @@
           - openssh-sftp-server
           - ssh-import-id
         state: present
-      when: ansible_distribution_release != "buster"
+      when: ssh_apt_backports not in ssh_apt_cache_policy.stdout
 
     - name: SSH allow groups present
       ansible.builtin.group:
@@ -115,23 +110,28 @@
         loop_var: ssh_allow_group
       when: ( ssh_allow_groups is defined ) and ( ssh_allow_groups != [] )
 
-    - name: Root ~/.ssh directory present
-      file:
-        path: /root/.ssh
-        state: directory
-        mode: 0700
-        owner: root
-        group: root
+    - name: Generate keypair for root user
+      block:
 
-    - name: SSH ECDSA keypair for root present
-      community.crypto.openssh_keypair:
-        path: /root/.ssh/id_ed25519
-        type: ed25519
-        comment: "root@{{ inventory_hostname }}"
-        state: present
-        mode: "0600"
-        owner: root
-        group: root
+        - name: Root ~/.ssh directory present
+          ansible.builtin.file:
+            path: /root/.ssh
+            state: directory
+            mode: 0700
+            owner: root
+            group: root
+
+        - name: SSH ECDSA keypair for root present
+          community.crypto.openssh_keypair:
+            path: /root/.ssh/id_ed25519
+            type: ed25519
+            comment: "root@{{ inventory_hostname }}"
+            state: present
+            mode: "0600"
+            owner: root
+            group: root
+
+      when: ( ssh_root_keypair is defined ) and ( ssh_root_keypair | bool )
 
     - name: Include SSH key pair generation for CI
       ansible.builtin.include_tasks: ci.yml

@@ -63,6 +63,9 @@ ssh_macs:
   - hmac-sha2-256
   - umac-128@openssh.com
 
+# Gerate a SSH keypair for the root user
+ssh_root_keypair: true
+
 # Directory under which users in the chroot will be chrooted to a directory
 # matching their user name, for example /chroots/%u
 # ssh_chroot_users_dir: /chroots
