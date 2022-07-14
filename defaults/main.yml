@@ -76,4 +76,6 @@ ssh_root_keypair: true
 # and the IP addresses:
 # ssh_ci_ips:
 #   - 81.95.52.70
+
+ssh_gitlab: false
 ...
