@@ -88,7 +88,7 @@
           - openssh-server
           - openssh-sftp-server
         state: latest
-        default_release: buster-backports
+        default_release: "{{ ansible_distribution_release }}-backports"
         install_recommends: true
       when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
