@@ -115,7 +115,7 @@
           loop: "{{ ssh_host_keys_stat.results }}"
           loop_control:
             loop_var: file
-            label: "{{ file.stat.path | basedir }}"
+            label: "{{ file.stat.path | basename }}"
 
       when: ssh_host_keys is defined
 
