@@ -25,11 +25,11 @@ HostKey {{ key }}
 # Ciphers and keying
 #RekeyLimit default none
 
-KexAlgorithms {% for k in ssh_kex_algorithms %}{{ k }}{{ ',' if not loop.last else '' }}{% endfor %}
+KexAlgorithms {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}
 
-Ciphers {% for c in ssh_ciphers %}{{ c }}{{ ',' if not loop.last else '' }}{% endfor %}
+Ciphers {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}
 
-MACs {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == "append" %}+{% elif ssh_mac_list_strategy == "head" %}^{% elif ssh_mac_list_strategy == "remove" %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{{ ',' if not loop.last else '' }}{% endfor %}
+MACs {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == "append" %}+{% elif ssh_mac_list_strategy == "head" %}^{% elif ssh_mac_list_strategy == "remove" %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{% if not loop.last %},{% endif %}{% endfor %}
 
 # Logging
 #SyslogFacility AUTH
