@@ -15,19 +15,23 @@
 #ListenAddress 0.0.0.0
 #ListenAddress ::
 
-# HostKey and Cipher defaults from https://infosec.mozilla.org/guidelines/openssh
-
+{% if ssh_host_keys is defined %}
 # Supported HostKey algorithms by order of preference.
 {% for key in ssh_host_keys %}
 HostKey {{ key }}
 {% endfor %}
+{% endif %}
 
 # Ciphers and keying
 #RekeyLimit default none
 
+{% if ssh_kex_algorithms is defined %}
 KexAlgorithms {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}
+{% endif %}
 
+{% if ssh_ciphers is defined %}
 Ciphers {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}
+{% endif %}
 
 MACs {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == "append" %}+{% elif ssh_mac_list_strategy == "head" %}^{% elif ssh_mac_list_strategy == "remove" %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{% if not loop.last %},{% endif %}{% endfor %}
 

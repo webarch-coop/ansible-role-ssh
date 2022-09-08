@@ -38,7 +38,7 @@
               - ssh_chroot_users_dir_check.stat.isdir | bool
           when: ssh_chroot_users_dir_check is defined
 
-      when: ( ssh_chroot_users_dir is defined ) and ( ssh_chroot_users_dir | length > 0 )
+      when: ssh_chroot_users_dir is defined
 
     - name: Check that ssh_ci_ips are IP addresses when defined
       ansible.builtin.assert:
@@ -47,25 +47,30 @@
       loop: "{{ ssh_ci_ips }}"
       loop_control:
         loop_var: ip
-      when: ( ssh_ci_ips is defined ) and ( ssh_ci_ips | length > 0 )
+      when: ssh_ci_ips is defined
 
-    - name: Get a list of available ciphers
-      ansible.builtin.command: ssh -Q cipher
-      check_mode: false
-      changed_when: false
-      register: ssh_q_cipher
+    - name: Check the ciphers if specified
+      block:
 
-    - name: Set a fact for the list of available ciphers
-      ansible.builtin.set_fact:
-        ssh_ciphers_available: "{{ ssh_q_cipher.stdout_lines | list }}"
+        - name: Get a list of available ciphers
+          ansible.builtin.command: ssh -Q cipher
+          check_mode: false
+          changed_when: false
+          register: ssh_q_cipher
 
-    - name: Check that the ciphers wanted are available
-      ansible.builtin.assert:
-        that:
-          - cipher in ssh_ciphers_available
-      loop: "{{ ssh_ciphers }}"
-      loop_control:
-        loop_var: cipher
+        - name: Set a fact for the list of available ciphers
+          ansible.builtin.set_fact:
+            ssh_ciphers_available: "{{ ssh_q_cipher.stdout_lines | list }}"
+
+        - name: Check that the ciphers wanted are available
+          ansible.builtin.assert:
+            that:
+              - cipher in ssh_ciphers_available
+          loop: "{{ ssh_ciphers }}"
+          loop_control:
+            loop_var: cipher
+
+      when: ssh_ciphers is defined
 
     - name: Check that the users in ssh_deny_users are present
       ansible.builtin.getent:
@@ -77,18 +82,69 @@
         loop_var: user
       when: ssh_deny_users is defined
 
-    - name: Check that the ssh_host_keys are present
-      ansible.builtin.stat:
-        path: "{{ file }}"
-      loop: "{{ ssh_host_keys }}"
-      loop_control:
-        loop_var: file
-      register: ssh_host_keys_stat
+    - name: Host keys checks
+      block:
 
-    - name: Debug the results of the host key check
-      ansible.builtin.debug:
-        var: ssh_host_keys_stat
-        verbosity: 2
+        - name: Check that the ssh_host_keys are present
+          ansible.builtin.stat:
+            path: "{{ file }}"
+          loop: "{{ ssh_host_keys }}"
+          loop_control:
+            loop_var: file
+          register: ssh_host_keys_stat
+
+        - name: Debug the results of the host key check
+          ansible.builtin.debug:
+            var: ssh_host_keys_stat
+            verbosity: 2
+
+      when: ssh_host_keys is defined
+
+    - name: Kex algorithm checks
+      block:
+
+        - name: Get a list of available kex algorithms
+          ansible.builtin.command: ssh -Q KexAlgorithms
+          check_mode: false
+          changed_when: false
+          register: ssh_q_kex_algorithms
+
+        - name: Set a fact for the list of available kex algorithms
+          ansible.builtin.set_fact:
+            ssh_kex_algorithms_available: "{{ ssh_q_kex_algorithms.stdout_lines | list }}"
+
+        - name: Check that the ciphers wanted are available
+          ansible.builtin.assert:
+            that:
+              - algo in ssh_kex_algorithms_available
+          loop: "{{ ssh_kex_algorithms }}"
+          loop_control:
+            loop_var: algo
+
+      when: ssh_kex_algorithms is defined
+
+    - name: Mac checks
+      block:
+
+        - name: Get a list of available macs
+          ansible.builtin.command: ssh -Q mac
+          check_mode: false
+          changed_when: false
+          register: ssh_q_mac
+
+        - name: Set a fact for the list of available macs
+          ansible.builtin.set_fact:
+            ssh_macs_available: "{{ ssh_q_mac.stdout_lines | list }}"
+
+        - name: Check that the macs wanted are available
+          ansible.builtin.assert:
+            that:
+              - mac in ssh_macs_available
+          loop: "{{ ssh_macs }}"
+          loop_control:
+            loop_var: mac
+
+      when: ssh_macs is defined
 
     - name: Check ssh_deny_users variable
       ansible.builtin.assert:

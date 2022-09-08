@@ -33,8 +33,7 @@ argument_specs:
       ssh_ciphers:
         type: list
         elements: str
-        description: Ciphers, a list of allowed ciphers
-        required: true
+        description: An optional list of Ciphers
       ssh_deny_users:
         type: list
         elements: str
@@ -48,12 +47,10 @@ argument_specs:
         type: list
         elements: str
         description: A list of algorithms for KexAlgorithms
-        required: true
       ssh_macs:
         type: list
         elements: str
         description: A list of message authentication code algorithms for MACs
-        required: true
       ssh_mac_list_strategy:
         type: str
         description: An optional prefix for the list of MACs
