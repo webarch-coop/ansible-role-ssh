@@ -30,6 +30,7 @@
         - name: Debug ssh_chroot_users_dir_check when defined
           ansible.builtin.debug:
             var: ssh_chroot_users_dir_check
+            verbosity: 3
           when: ssh_chroot_users_dir_check is defined
 
         - name: Ensure that ssh_chroot_users_dir exists when defined
@@ -37,6 +38,9 @@
             that:
               - ssh_chroot_users_dir_check.stat.exists | bool
               - ssh_chroot_users_dir_check.stat.isdir | bool
+              - ssh_chroot_users_dir_check.stat.uid == 0
+              - ssh_chroot_users_dir_check.stat.gid == 0
+              - ( ssh_chroot_users_dir_check.stat.mode == "0755" ) or ( ssh_chroot_users_dir_check.stat.mode == "0750" )
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ssh_chroot_users_dir_check is defined
 
