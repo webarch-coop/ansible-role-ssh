@@ -95,6 +95,23 @@
         loop_var: user
       when: ssh_deny_users is defined
 
+    - name: GitLab checks
+      block:
+
+        - name: Check that the git user is present for GitLab
+          ansible.builtin.getent:
+            database: passwd
+            key: git
+            fail_key: true
+
+        - name: Check that the git user is in ssh_allow_groups
+          ansible.builtin.assert:
+            that:
+              - ( "git" in ssh_allow_groups )  
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+      when: ( ssh_gitlab is defined ) and ( ssh_gitlab | bool )
+
     - name: Host keys checks
       block:
 

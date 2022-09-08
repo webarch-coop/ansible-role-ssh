@@ -1,6 +1,8 @@
 ---
-# https://man.openbsd.org/sshd_config#PermitRootLogin
-ssh_permit_root_login: prohibit-password
+# See also meta/argument_specs.yml
+
+# https://man.openbsd.org/sshd_config#PubkeyAuthentication
+ssh_allow_agent_forwarding: false
 
 # https://man.openbsd.org/sshd_config#AllowGroups
 ssh_allow_groups:
@@ -10,25 +12,35 @@ ssh_allow_groups:
   # - sftponly
   # - xenshell
 
-# https://man.openbsd.org/sshd_config#DenyUsers
-# ssh_deny_users:
-#  - stats
-#  - phpmyadmin
+# https://man.openbsd.org/sshd_config#AllowTcpForwarding
+ssh_allow_tcp_forwarding: "no"
 
 # https://man.openbsd.org/sshd_config#AuthenticationMethods
 ssh_authentication_methods: publickey
 
-# https://man.openbsd.org/sshd_config#PasswordAuthentication
-ssh_password_authentication: false
+# Directory under which users in the chroot will be chrooted to a directory
+# matching their user name, for example /chroots/%u
+# ssh_chroot_users_dir: /chroots
 
-# https://man.openbsd.org/sshd_config#PubkeyAuthentication
-ssh_pubkey_authentication: true
+# If the ssh_ci_ips array is defined and not empty then a key pair will be
+# generated in /root/.ssh/ci and the public key will be added to
+# /root/.ssh/authorized_keys prefixed with a from="" containing the public key
+# and the IP addresses:
+# ssh_ci_ips:
+#   - 192.168.0.1
 
-# https://man.openbsd.org/sshd_config#PubkeyAuthentication
-ssh_allow_agent_forwarding: false
+# https://man.openbsd.org/sshd_config#Ciphers
+ssh_ciphers:
+  - chacha20-poly1305@openssh.com
+  - aes256-gcm@openssh.com
+  - aes128-gcm@openssh.com
+  - aes256-ctr
+  - aes192-ctr
+  - aes128-ctr
 
-# https://man.openbsd.org/sshd_config#AllowTcpForwarding
-ssh_allow_tcp_forwarding: false
+# https://man.openbsd.org/sshd_config#DenyUsers
+# ssh_deny_users:
+#  - www-data
 
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
@@ -45,15 +57,6 @@ ssh_kex_algorithms:
   - ecdh-sha2-nistp256
   - diffie-hellman-group-exchange-sha256
 
-# https://man.openbsd.org/sshd_config#Ciphers
-ssh_ciphers:
-  - chacha20-poly1305@openssh.com
-  - aes256-gcm@openssh.com
-  - aes128-gcm@openssh.com
-  - aes256-ctr
-  - aes192-ctr
-  - aes128-ctr
-
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
   - hmac-sha2-512-etm@openssh.com
@@ -63,19 +66,21 @@ ssh_macs:
   - hmac-sha2-256
   - umac-128@openssh.com
 
+# https://man.openbsd.org/sshd_config#PasswordAuthentication
+ssh_password_authentication: false
+
+# https://man.openbsd.org/sshd_config#PermitRootLogin
+ssh_permit_root_login: prohibit-password
+
+# https://man.openbsd.org/sshd_config#PubkeyAuthentication
+ssh_pubkey_authentication: true
+  - /etc/ssh/ssh_host_ed25519_key
+  - /etc/ssh/ssh_host_rsa_key
+  - /etc/ssh/ssh_host_ecdsa_key
+
 # Generate a SSH keypair for the root user
 ssh_root_keypair: true
-
-# Directory under which users in the chroot will be chrooted to a directory
-# matching their user name, for example /chroots/%u
-# ssh_chroot_users_dir: /chroots
-
-# If the ssh_ci_ips array is defined and not empty then a key pair will be
-# generated in /root/.ssh/ci and the public key will be added to
-# /root/.ssh/authorized_keys prefixed with a from="" containing the public key
-# and the IP addresses:
-# ssh_ci_ips:
-#   - 81.95.52.70
-
+ 
+# Add SSH configuration for git user for GitLab
 ssh_gitlab: false
 ...
