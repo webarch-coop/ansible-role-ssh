@@ -16,6 +16,7 @@
       ansible.builtin.assert:
         that:
           - ssh_chroot_users_dir is defined
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ( ssh_allow_groups is defined ) and ( "chroot" in ssh_allow_groups )
 
     - name: Chroot checks
@@ -36,6 +37,7 @@
             that:
               - ssh_chroot_users_dir_check.stat.exists | bool
               - ssh_chroot_users_dir_check.stat.isdir | bool
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ssh_chroot_users_dir_check is defined
 
       when: ssh_chroot_users_dir is defined
@@ -71,6 +73,7 @@
           ansible.builtin.assert:
             that:
               - cipher in ssh_ciphers_available
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_ciphers }}"
           loop_control:
             loop_var: cipher
@@ -112,6 +115,7 @@
               - file.stat.gid == 0
               - file.stat.gr_name == "root"
               - file.stat.uid == 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_host_keys_stat.results }}"
           loop_control:
             loop_var: file
@@ -141,6 +145,7 @@
           ansible.builtin.assert:
             that:
               - algo in ssh_kex_algorithms_available
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_kex_algorithms }}"
           loop_control:
             loop_var: algo
@@ -169,6 +174,7 @@
           ansible.builtin.assert:
             that:
               - mac in ssh_macs_available
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_macs }}"
           loop_control:
             loop_var: mac
