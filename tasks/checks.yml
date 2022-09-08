@@ -62,6 +62,11 @@
           ansible.builtin.set_fact:
             ssh_ciphers_available: "{{ ssh_q_cipher.stdout_lines | list }}"
 
+        - name: Debug the list of available ciphers
+          ansible.builtin.debug:
+            var: ssh_ciphers_available
+            verbosity: 2
+
         - name: Check that the ciphers wanted are available
           ansible.builtin.assert:
             that:
@@ -98,6 +103,20 @@
             var: ssh_host_keys_stat
             verbosity: 2
 
+        - name: Check that all the host keys exist
+          ansible.builtin.assert:
+            that:
+              - file.stat.exists | bool
+              - file.stat.isreg | bool
+              - file.stat.mode == 0600
+              - file.stat.gid == 0
+              - file.stat.gr_name == "root"
+              - file.stat.uid == 0
+          loop: ssh_host_keys_stat.results
+          loop_control:
+            loop_var: file
+            label: "{{ file.stat.path | basedir }}"
+
       when: ssh_host_keys is defined
 
     - name: Kex algorithm checks
@@ -112,6 +131,11 @@
         - name: Set a fact for the list of available kex algorithms
           ansible.builtin.set_fact:
             ssh_kex_algorithms_available: "{{ ssh_q_kex_algorithms.stdout_lines | list }}"
+
+        - name: Debug the list of available kex algorithms
+          ansible.builtin.debug:
+            var: ssh_kex_algorithms_available
+            verbosity: 2
 
         - name: Check that the ciphers wanted are available
           ansible.builtin.assert:
@@ -136,6 +160,11 @@
           ansible.builtin.set_fact:
             ssh_macs_available: "{{ ssh_q_mac.stdout_lines | list }}"
 
+        - name: Debug the list of available macs
+          ansible.builtin.debug:
+            var: ssh_macs_available
+            verbosity: 2
+
         - name: Check that the macs wanted are available
           ansible.builtin.assert:
             that:
@@ -145,12 +174,6 @@
             loop_var: mac
 
       when: ssh_macs is defined
-
-    - name: Check ssh_deny_users variable
-      ansible.builtin.assert:
-        that:
-          - ssh_deny_users | type_debug == "list"
-      when: ssh_deny_users is defined
 
   tags:
     - ssh
