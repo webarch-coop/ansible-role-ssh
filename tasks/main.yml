@@ -18,7 +18,7 @@
           - "ssh_password_authentication: {{ ssh_password_authentication | lower }}"
           - "ssh_permit_root_login: {% if not ssh_permit_root_login | bool %}no{% elif ssh_permit_root_login | bool %}yes{% else %}{{ ssh_permit_root_login }}{% endif %}"
           - "ssh_pubkey_authentication: {% if ssh_password_authentication | bool %}yes{% else %}no{% endif %}"
-       verbosity: 1
+        verbosity: 1
 
     - name: Check variables
       ansible.builtin.include_tasks: checks.yml
