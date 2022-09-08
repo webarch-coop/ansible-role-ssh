@@ -64,7 +64,7 @@ AuthenticationMethods {{ ssh_authentication_methods }}
 
 PasswordAuthentication {% if ssh_password_authentication %}yes{% else %}no{% endif %}
 
-PubkeyAuthentication {% if ssh_pubkey_authentication %}yes{% else %}no{% endif %}
+PubkeyAuthentication {% if ssh_pubkey_authentication | bool %}yes{% else %}no{% endif %}
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
 #AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2

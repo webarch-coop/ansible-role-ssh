@@ -17,7 +17,7 @@
           - "ssh_macs and ssh_mac_list_strategy:{% if ssh_macs is defined %} {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == 'append' %}+{% elif ssh_mac_list_strategy == 'head' %}^{% elif ssh_mac_list_strategy == 'remove' %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
           - "ssh_password_authentication: {{ ssh_password_authentication | lower }}"
           - "ssh_permit_root_login: {% if not ssh_permit_root_login | bool %}no{% elif ssh_permit_root_login | bool %}yes{% else %}{{ ssh_permit_root_login }}{% endif %}"
-          - "ssh_pubkey_authentication: {% if ssh_password_authentication %}yes{% else %}no{% endif %}"
+          - "ssh_pubkey_authentication: {% if ssh_password_authentication | bool %}yes{% else %}no{% endif %}"
        verbosity: 1
 
     - name: Check variables
