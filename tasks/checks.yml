@@ -108,7 +108,7 @@
             that:
               - file.stat.exists | bool
               - file.stat.isreg | bool
-              - file.stat.mode == 0600
+              - file.stat.mode == "0600"
               - file.stat.gid == 0
               - file.stat.gr_name == "root"
               - file.stat.uid == 0
