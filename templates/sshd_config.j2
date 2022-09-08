@@ -29,7 +29,7 @@ KexAlgorithms {% for k in ssh_kex_algorithms %}{{ k }}{{ ',' if not loop.last el
 
 Ciphers {% for c in ssh_ciphers %}{{ c }}{{ ',' if not loop.last else '' }}{% endfor %}
 
-MACs {% for m in ssh_macs %}{{ m }}{{ ',' if not loop.last else '' }}{% endfor %}
+MACs {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == "append" %}+{% elif ssh_mac_list_strategy == "head" %}^{% elif ssh_mac_list_strategy == "remove" %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{{ ',' if not loop.last else '' }}{% endfor %}
 
 # Logging
 #SyslogFacility AUTH
@@ -38,7 +38,7 @@ LogLevel VERBOSE
 # Authentication:
 
 #LoginGraceTime 2m
-PermitRootLogin {% if ssh_permit_root_login | type_debug != "bool" and ssh_permit_root_login == "prohibit-password" %}prohibit-password{% elif ssh_permit_root_login %}yes{% else %}no{% endif %}
+PermitRootLogin {{ ssh_permit_root_login }}
 
 {% if ssh_deny_users is defined and ssh_deny_users != [] %}
 DenyUsers{% for u in ssh_deny_users %} {{ u }}{% endfor %}
@@ -52,7 +52,7 @@ AllowGroups{% for g in ssh_allow_groups %} {{ g }}{% endfor %}
 #MaxAuthTries 6
 #MaxSessions 10
 
-AuthenticationMethods {{ ssh_authentication_methods | default('publickey') }}
+AuthenticationMethods {{ ssh_authentication_methods }}
 
 PasswordAuthentication {% if ssh_password_authentication %}yes{% else %}no{% endif %}
 
@@ -105,9 +105,13 @@ ChallengeResponseAuthentication no
 # and ChallengeResponseAuthentication to 'no'.
 UsePAM yes
 
-AllowAgentForwarding {% if ssh_allow_agent_forwarding %}yes{% else %}no{% endif %}
+{% if ssh_allow_agent_forwarding is defined %}
+AllowAgentForwarding {{ ssh_allow_agent_forwarding }}
+{% endif %}
 
-AllowTcpForwarding {% if ssh_allow_tcp_forwarding == "all" %}all{% elif ssh_allow_tcp_forwarding == "remote" %}remote{% elif ssh_allow_tcp_forwarding | bool %}yes{% else %}no{% endif %}
+{% if ssh_allow_tcp_forwarding is defioned %}
+AllowTcpForwarding {{ ssh_allow_tcp_forwarding }}
+{% endif %}
 
 #GatewayPorts no
 X11Forwarding no

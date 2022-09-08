@@ -1,0 +1,101 @@
+---
+- name: Check OpenSSH server variables
+  block:
+
+    - name: Check that the groups in ssh_allow_groups are present
+      ansible.builtin.getent:
+        database: group
+        key: "{{ group }}"
+        fail_key: true
+      loop: "{{ ssh_allow_groups }}"
+      loop_control:
+        loop_var: group
+      when: ssh_allow_groups is defined
+
+    - name: Check that ssh_chroot_users_dir is defined when chroot is in ssh_allow_groups
+      ansible.builtin.assert:
+        that:
+          - ssh_chroot_users_dir is defined
+      when: ( ssh_allow_groups is defined ) and ( "chroot" in ssh_allow_groups )
+
+    - name: Chroot checks
+      block:
+
+        - name: "Check that {{ ssh_chroot_users_dir }} is a directory when it is defined"
+          ansible.builtin.stat:
+            path: "{{ ssh_chroot_users_dir }}"
+          register: ssh_chroot_users_dir_check
+
+        - name: Debug ssh_chroot_users_dir_check when defined
+          ansible.builtin.debug:
+            var: ssh_chroot_users_dir_check
+          when: ssh_chroot_users_dir_check is defined
+
+        - name: Ensure that ssh_chroot_users_dir exists when defined
+          ansible.builtin.assert:
+            that:
+              - ssh_chroot_users_dir_check.stat.exists | bool
+              - ssh_chroot_users_dir_check.stat.isdir | bool
+          when: ssh_chroot_users_dir_check is defined
+
+      when: ( ssh_chroot_users_dir is defined ) and ( ssh_chroot_users_dir | length > 0 )
+
+    - name: Check that ssh_ci_ips are IP addresses when defined
+      ansible.builtin.assert:
+        that:
+          - ip | ansible.utils.ipaddr
+      loop: "{{ ssh_ci_ips }}"
+      loop_control:
+        loop_var: ip
+      when: ( ssh_ci_ips is defined ) and ( ssh_ci_ips | length > 0 )
+
+    - name: Get a list of available ciphers
+      ansible.builtin.command: ssh -Q cipher
+      check_mode: false
+      changed_when: false
+      register: ssh_q_cipher
+
+    - name: Set a fact for the list of available ciphers
+      ansible.builtin.set_fact:
+        ssh_ciphers_available: "{{ ssh_q_cipher.stdout_lines | list }}"
+
+    - name: Check that the ciphers wanted are available
+      ansible.builtin.assert:
+        that:
+          - cipher in ssh_ciphers_available
+      loop: "{{ ssh_ciphers }}"
+      loop_control:
+        loop_var: cipher
+
+    - name: Check that the users in ssh_deny_users are present
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ user }}"
+        fail_key: true
+      loop: "{{ ssh_deny_users }}"
+      loop_control:
+        loop_var: user
+      when: ssh_deny_users is defined
+
+    - name: Check that the ssh_host_keys are present
+      ansible.builtin.stat:
+        path: "{{ file }}"
+      loop: "{{ ssh_host_keys }}"
+      loop_control:
+        loop_var: file
+      register: ssh_host_keys_stat
+
+    - name: Debug the results of the host key check
+      ansible.builtin.debug:
+        var: ssh_host_keys_stat
+        verbosity: 2
+
+    - name: Check ssh_deny_users variable
+      ansible.builtin.assert:
+        that:
+          - ssh_deny_users | type_debug == "list"
+      when: ssh_deny_users is defined
+
+  tags:
+    - ssh
+...
