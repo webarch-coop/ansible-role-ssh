@@ -16,9 +16,8 @@
           - "ssh_kex_algorithms: {% if ssh_kex_algorithms is defined %}{% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
           - "ssh_macs and ssh_mac_list_strategy:{% if ssh_macs is defined %}{% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == 'append' %}+{% elif ssh_mac_list_strategy == 'head' %}^{% elif ssh_mac_list_strategy == 'remove' %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}"
           - "ssh_password_authentication: {{ ssh_password_authentication | lower }}"
-          - "ssh_permit_root_login: {{ ssh_permit_root_login }}"
+          - "ssh_permit_root_login: {% if ssh_permit_root_login | bool %}yes{% elif not ssh_permit_root_login | bool %}no{% else %}{{ ssh_permit_root_login }}"
           - "ssh_pubkey_authentication: {{ ssh_pubkey_authentication | lower }}"
-        verbosity: 2
 
     - name: Check variables
       ansible.builtin.include_tasks: checks.yml
