@@ -107,7 +107,7 @@
         - name: Check that the git user is in ssh_allow_groups
           ansible.builtin.assert:
             that:
-              - ( "git" in ssh_allow_groups )  
+              - ( "git" in ssh_allow_groups )
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
       when: ( ssh_gitlab is defined ) and ( ssh_gitlab | bool )
