@@ -36,7 +36,7 @@
         state: present
         path: /root/.ssh/authorized_keys.d/authorized_keys_ci
         key: "{{ ssh_ci_pubkey_b64encoded['content'] | b64decode | trim }}"
-        key_options: 'from="{% for ip in ssh_ci_ips %}{{ ip }}{{ " " if not loop.last else "" }}"{% endfor %}"'
+        key_options: 'from="{% for ip in ssh_ci_ips %}{{ ip }}{% if not loop.last %} {% endif %}"{% endfor %}"'
 
     - name: Assemble SSH public keys
       ansible.builtin.assemble:
