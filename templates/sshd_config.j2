@@ -115,7 +115,7 @@ UsePAM yes
 AllowAgentForwarding {{ ssh_allow_agent_forwarding }}
 {% endif %}
 
-{% if ssh_allow_tcp_forwarding is defioned %}
+{% if ssh_allow_tcp_forwarding is defined %}
 AllowTcpForwarding {{ ssh_allow_tcp_forwarding }}
 {% endif %}
 
