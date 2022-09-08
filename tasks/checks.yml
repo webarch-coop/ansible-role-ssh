@@ -50,6 +50,7 @@
       ansible.builtin.assert:
         that:
           - ip | ansible.utils.ipaddr
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       loop: "{{ ssh_ci_ips }}"
       loop_control:
         loop_var: ip
