@@ -112,7 +112,7 @@
               - file.stat.gid == 0
               - file.stat.gr_name == "root"
               - file.stat.uid == 0
-          loop: ssh_host_keys_stat.results
+          loop: "{{ ssh_host_keys_stat.results }}"
           loop_control:
             loop_var: file
             label: "{{ file.stat.path | basedir }}"
