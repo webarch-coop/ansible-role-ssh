@@ -107,7 +107,32 @@
         group: root
       notify: restart ssh
 
-    - name: Check and conditional apply the SSH server configuration
+    - name: Test the SSH server configuration
+      block:
+
+        - name: Write the proposed config to a test file
+          ansible.builtin.template:
+            src: templates/sshd_config.j2
+            dest: /etc/ssh/.sshd_config.new
+            mode: "0600"
+            owner: root
+            group: root
+            validate: sshd -t -dd -f %s
+          register: ssh_config_test
+
+      rescue:
+
+        - name: Print standard error from the test of the proposed configuration
+          ansible.builtin.debug:
+            var: ssh_config_test.stderr
+
+        - name: Fail because the generated test sshd_config does not validate
+          ansible.builtin.fail:
+            msg:
+              - "The proposed new SSH configuration did not validate, see the errors above."
+              - "The failed configuration has been written to /etc/ssh/.sshd_config.new"
+
+    - name: Apply the SSH server configuration
       block:
 
         - name: sshd_config in place
@@ -119,6 +144,7 @@
             group: root
             validate: sshd -t -f %s
             backup: true
+          register: ssh_config
           notify: restart ssh
 
       rescue:
@@ -130,6 +156,10 @@
             mode: "0600"
             owner: root
             group: root
+
+        - name: Print standard error from the test of the proposed configuration
+          ansible.builtin.debug:
+            var: ssh_config.stderr
 
         - name: Fail because the generated sshd_config does not validate
           ansible.builtin.fail:
