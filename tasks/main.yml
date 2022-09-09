@@ -7,7 +7,7 @@
         msg:
           - "AllowAgentForwarding (ssh_allow_agent_forwarding){% if ssh_allow_agent_forwarding is defined and ssh_allow_agent_forwarding | bool %} yes{% else %} no{% endif %}"
           - "AllowGroups (ssh_allow_groups){% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %}"
-          - "AllowTcpForwarding (ssh_allow_tcp_forwarding){% if ssh_allow_tcp_forwarding is defined and ssh_allow_tcp_forwarding | bool %} yes{% else %} no{% endif %}{% endif %}"
+          - "AllowTcpForwarding (ssh_allow_tcp_forwarding){% if ssh_allow_tcp_forwarding is defined and ssh_allow_tcp_forwarding | bool %} yes{% else %} no{% endif %}"
           - "AuthenticationMethods (ssh_authentication_methods) {{ ssh_authentication_methods }}"
           - "ChrootDirectory (ssh_chroot_users_dir{)% if ssh_chroot_users_dir is defined %} {{ ssh_chroot_users_dir }}{% endif %}"
           - "ssh_ci_ips{% if ssh_ci_ips is defined %}{% for ip in ssh_ci_ips %} {{ ip %}{% endfor %}{% endif %}"
