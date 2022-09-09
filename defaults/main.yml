@@ -74,9 +74,6 @@ ssh_permit_root_login: prohibit-password
 
 # https://man.openbsd.org/sshd_config#PubkeyAuthentication
 ssh_pubkey_authentication: true
-  - /etc/ssh/ssh_host_ed25519_key
-  - /etc/ssh/ssh_host_rsa_key
-  - /etc/ssh/ssh_host_ecdsa_key
 
 # Generate a SSH keypair for the root user
 ssh_root_keypair: true
