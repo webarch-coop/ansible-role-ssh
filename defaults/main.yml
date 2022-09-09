@@ -80,7 +80,7 @@ ssh_pubkey_authentication: true
 
 # Generate a SSH keypair for the root user
 ssh_root_keypair: true
- 
+
 # Add SSH configuration for git user for GitLab
 ssh_gitlab: false
 ...
