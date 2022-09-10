@@ -42,6 +42,9 @@ ssh_ciphers:
 # ssh_deny_users:
 #  - www-data
 
+# Add SSH configuration for git user for GitLab
+ssh_gitlab: false
+
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
   - /etc/ssh/ssh_host_ed25519_key
@@ -78,6 +81,6 @@ ssh_pubkey_authentication: true
 # Generate a SSH keypair for the root user
 ssh_root_keypair: true
 
-# Add SSH configuration for git user for GitLab
-ssh_gitlab: false
+# Allow X11 forwarding
+ssh_x11_forwarding: false
 ...

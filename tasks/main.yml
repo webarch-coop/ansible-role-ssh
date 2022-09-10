@@ -21,6 +21,7 @@
           - "PermitRootLogin {{ ssh_permit_root_login }} # ssh_permit_root_login"
           - "PubkeyAuthentication {% if ssh_password_authentication | bool %}yes{% else %}no{% endif %} # ssh_pubkey_authentication"
           - "ssh_root_keypair{% if ssh_root_keypair is defined %} {{ ssh_root_keypair | lower }}{% endif %}"
+          - "X11Forwarding{% if ssh_x11_forwarding is defined and ssh_x11_forwarding | bool %} yes{% else %} no{% endif %} # ssh_x11_forwarding"
 
     - name: Check variables
       ansible.builtin.include_tasks: checks.yml

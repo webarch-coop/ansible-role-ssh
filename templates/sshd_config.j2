@@ -1,21 +1,25 @@
-#	$OpenBSD: sshd_config,v 1.103 2018/04/09 20:41:22 tj Exp $
+# {{ ansible_managed }}
 
 # This is the sshd server system-wide configuration file.  See
 # sshd_config(5) for more information.
 
-# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+# This sshd was compiled with PATH=/usr/local/bin:/usr/bin:/bin:/usr/games
 
 # The strategy used for options in the default sshd_config shipped with
 # OpenSSH is to specify options with their default value where
 # possible, but leave them commented.  Uncommented options override the
 # default value.
 
+Include /etc/ssh/sshd_config.d/*.conf
+
 #Port 22
 #AddressFamily any
 #ListenAddress 0.0.0.0
 #ListenAddress ::
 
-# HostKey and Cipher defaults from https://infosec.mozilla.org/guidelines/openssh
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
 
 {% if ssh_host_keys is defined %}
 # Supported HostKey algorithms by order of preference.
@@ -41,11 +45,13 @@ MACs {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == "ap
 
 # Logging
 #SyslogFacility AUTH
+#LogLevel INFO
 LogLevel VERBOSE
 
 # Authentication:
 
 #LoginGraceTime 2m
+#PermitRootLogin prohibit-password
 PermitRootLogin {% if not ssh_permit_root_login | bool %}no{% elif ssh_permit_root_login | bool %}yes{% else %}{{ ssh_permit_root_login }}{% endif %}
 
 {% if ssh_deny_users is defined and ssh_deny_users != [] %}
@@ -64,10 +70,11 @@ AuthenticationMethods {{ ssh_authentication_methods }}
 
 PasswordAuthentication {% if ssh_password_authentication %}yes{% else %}no{% endif %}
 
+#PubkeyAuthentication yes
 PubkeyAuthentication {% if ssh_pubkey_authentication | bool %}yes{% else %}no{% endif %}
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
-#AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+#AuthorizedKeysFile     .ssh/authorized_keys .ssh/authorized_keys2
 
 #AuthorizedPrincipalsFile none
 
@@ -104,25 +111,35 @@ ChallengeResponseAuthentication no
 
 # Set this to 'yes' to enable PAM authentication, account processing,
 # and session processing. If this is enabled, PAM authentication will
-# be allowed through the ChallengeResponseAuthentication and
+# be allowed through the KbdInteractiveAuthentication and
 # PasswordAuthentication.  Depending on your PAM configuration,
-# PAM authentication via ChallengeResponseAuthentication may bypass
+# PAM authentication via KbdInteractiveAuthentication may bypass
 # the setting of "PermitRootLogin without-password".
 # If you just want the PAM account and session checks to run without
 # PAM authentication, then enable this but set PasswordAuthentication
-# and ChallengeResponseAuthentication to 'no'.
+# and KbdInteractiveAuthentication to 'no'.
 UsePAM yes
+
+#AllowAgentForwarding yes
 
 {% if ssh_allow_agent_forwarding is defined %}
 AllowAgentForwarding {% if ssh_allow_agent_forwarding | bool %}yes{% else %}no{% endif %}
 {% endif %}
+
+#AllowTcpForwarding yes
 
 {% if ssh_allow_tcp_forwarding is defined %}
 AllowTcpForwarding {% if ssh_allow_tcp_forwarding | bool %}yes{% else %}no{% endif %}
 {% endif %}
 
 #GatewayPorts no
-X11Forwarding no
+
+#X11Forwarding yes
+
+{% if ssh_x11_forwarding is defined %}
+X11Forwarding {% if ssh_x11_forwarding | bool %}yes{% else %}no{% endif %}
+{% endif %}
+
 #X11DisplayOffset 10
 #X11UseLocalhost yes
 #PermitTTY yes
@@ -134,7 +151,7 @@ PrintMotd no
 #ClientAliveInterval 0
 #ClientAliveCountMax 3
 #UseDNS no
-#PidFile /var/run/sshd.pid
+#PidFile /run/sshd.pid
 #MaxStartups 10:30:100
 #PermitTunnel no
 #ChrootDirectory none
@@ -147,6 +164,7 @@ PrintMotd no
 AcceptEnv LANG LC_*
 
 # override default of no subsystems
+# Subsystem       sftp    /usr/lib/openssh/sftp-server
 Subsystem       sftp    internal-sftp
 
 # Example of overriding settings on a per-user basis
