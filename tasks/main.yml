@@ -47,21 +47,15 @@
         install_recommends: true
       when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
-    - name: OpenSSH packages present
+    - name: OpenSSH and related packages present
       ansible.builtin.apt:
         pkg:
           - libc-bin
+          - kitty-terminfo
           - openssh-client
           - openssh-server
           - openssh-sftp-server
           - ssh-import-id
-        state: present
-      when: ssh_apt_backports not in ssh_apt_cache_policy.stdout
-
-    - name: Additional packages present
-      ansible.builtin.apt:
-        pkg:
-          - kitty-terminfo
         state: present
 
     - name: SSH allow groups present
