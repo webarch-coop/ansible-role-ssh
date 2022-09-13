@@ -78,7 +78,7 @@
             state: present
             executable: /usr/bin/pip3
 
-      when: ansible_distribution_version | int is version('12', '<')
+      when: ansible_distribution_version | regex_replace("'") | is version('12', '<')
 
     - name: Debian Bookworm has a working version of ssh-audit
       block:
@@ -95,7 +95,7 @@
             state: absent
             executable: /usr/bin/pip3
 
-      when: ansible_distribution_version | int is version('11', '>')
+      when: ansible_distribution_version | regex_replace("'") | is version('11', '>')
 
     - name: SSH allow groups present
       ansible.builtin.group:
