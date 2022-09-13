@@ -324,7 +324,7 @@
               ansible.builtin.debug:
                 var: ssh_audit
 
-          when: ssh_ssh_audit_fail.stdout_lines == []
+          when: ssh_audit_fail.stdout_lines == []
 
       when: ssh_which_ssh_audit.rc == 0
 
