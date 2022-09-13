@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
-This role has been guided by the [Mozilla Modern OpenSSH server recomendations](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67), with the addition of one additonal `KexAlgorithms`, see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config).
+This role uses the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) lined from [the `ssh-audit` tool](https://github.com/jtesta/ssh-audit) and has also been guided by the [Mozilla Modern OpenSSH server recomendations](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config).
 
 ## Defaults
 
@@ -29,6 +29,14 @@ For the configurable variables see [defaults/main.yml](defaults/main.yml):
 | `ssh_pubkey_authentication`   | Yes      | `true`                                                                                                                                                        | A boolean, [PubkeyAuthentication](https://man.openbsd.org/sshd_config#PubkeyAuthentication) allows `yes` or `no`, use `true` or `false`                                                                                                         |
 | `ssh_root_keypair`            | No       | `true`                                                                                                                                                        | A boolean, optionally generate a SSH keypair for the `root` user                                                                                                                                                                                |
 | `ssh_x11_forwarding`          | No       | `false`                                                                                                                                                       | A boolean, optionally allow X11 forwarding                                                                                                                                                                                                      |
+
+## SSH hardening
+
+This role defaults to the recomendation from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11).
+
+For servers running OpenSSH older than [OpenSSH 8.4 which available from Debian Buster backports](https://packages.debian.org/buster-backports/openssh-server) the `sk` algorithms need to be omitted from the `ssh_host_key_algorithms` array.
+
+The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults/main.yml](defaults/main.yml).
 
 ## Groups
 

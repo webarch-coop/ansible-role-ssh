@@ -14,6 +14,7 @@
           - "ssh_ci_ips{% if ssh_ci_ips is defined %}{% for ip in ssh_ci_ips %} {{ ip }}{% endfor %}{% endif %}"
           - "Chipers{% if ssh_ciphers is defined %} {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_ciphers"
           - "DenyUsers{% if ssh_deny_users is defined %}{% for u in ssh_deny_users %} {{ u }}{% endfor %}{% endif %} # ssh_deny_users"
+          - "HostKeyAlgorithms{% if ssh_host_key_algorithms is defined %} {% for a in ssh_host_key_algorithms %}{{ a }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_host_key_algorithms"
           - "ssh_gitlab{% if ssh_gitlab is defined %} {{ ssh_gitlab | lower }}{% endif %}"
           - "HostKey{% if ssh_host_keys is defined %}{% for key in ssh_host_keys %} {{ key }}{% endfor %}{% endif %} # ssh_host_keys"
           - "KexAlgorithms{% if ssh_kex_algorithms is defined %} {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_kex_algorithms"
@@ -24,7 +25,7 @@
           - "ssh_root_keypair{% if ssh_root_keypair is defined %} {{ ssh_root_keypair | lower }}{% endif %}"
           - "X11Forwarding{% if ssh_x11_forwarding is defined and ssh_x11_forwarding | bool %} yes{% else %} no{% endif %} # ssh_x11_forwarding"
 
-    - name: Run Checks
+    - name: Run pre-update checks
       ansible.builtin.include_tasks: checks.yml
       vars:
         ssh_first_check: true
@@ -207,7 +208,10 @@
       loop_control:
         loop_var: ssh_host_key_path
 
-    - name: Run Checks
+    - name: Flush handlers to restart SSH if the configuration has changed
+      meta: flush_handlers
+
+    - name: Run post-update checks
       ansible.builtin.include_tasks: checks.yml
       vars:
         ssh_first_check: false

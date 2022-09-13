@@ -95,7 +95,34 @@
         loop_var: user
       when: ssh_deny_users is defined
 
-    # TODO Add a warning if a user in ssh_deny_users doesn't exist
+    - name: Host key algorithm checks
+      block:
+
+        - name: Get a list of available host key algorithms
+          ansible.builtin.command: ssh -Q hostkeyalgorithms
+          check_mode: false
+          changed_when: false
+          register: ssh_q_host_key_algorithms
+
+        - name: Set a fact for the list of available hostkeyalgorithms
+          ansible.builtin.set_fact:
+            ssh_host_key_algorithms_available: "{{ ssh_q_host_key_algorithms.stdout_lines | list }}"
+
+        - name: Debug the list of available host key algorithms
+          ansible.builtin.debug:
+            var: ssh_host_key_algorithms_available
+            verbosity: 2
+
+        - name: Check that the host key algorithms wanted are available
+          ansible.builtin.assert:
+            that:
+              - algo in ssh_ssh_host_key_algorithms_available
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          loop: "{{ ssh_host_key_algorithms }}"
+          loop_control:
+            loop_var: algo
+
+      when: ssh_host_key_algorithms is defined
 
     - name: GitLab checks
       block:
