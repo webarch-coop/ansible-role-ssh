@@ -130,21 +130,46 @@
             var: ssh_host_keys_stat
             verbosity: 2
 
-        - name: Check that all the host keys exist
+        - name: Host key checks
+          block:
+
+            - name: Check that all the host keys exist
+              ansible.builtin.assert:
+                that:
+                  - file.stat.exists | bool
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+              loop: "{{ ssh_host_keys_stat.results }}"
+              loop_control:
+                loop_var: file
+                label: "{{ file.file | basename }}"
+
+          rescue:
+
+            - name: Host keys are missing
+              ansible.builtin.debug:
+                msg:
+                  - "Please generate missing host keys"
+                  - "ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N ''"
+                  - "ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''"
+
+          when: ssh_check_fail | bool
+
+        - name: Check the host keys attributes
           ansible.builtin.assert:
             that:
-              - file.stat.exists | bool
               - file.stat.isreg | bool
               - file.stat.mode == "0600"
               - file.stat.gid == 0
               - file.stat.gr_name == "root"
               - file.stat.uid == 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when:
+            - file.stat.exists | bool
+            - ssh_check_fail | bool
           loop: "{{ ssh_host_keys_stat.results }}"
           loop_control:
             loop_var: file
-            label: "{{ file.stat.path | basename }}"
-          when: ssh_check_fail | bool
+            label: "{{ file.file | basename }}"
 
       when: ssh_host_keys is defined
 
