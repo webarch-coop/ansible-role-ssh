@@ -143,9 +143,24 @@
                 loop_var: file
                 label: "{{ file.file | basename }}"
 
+            - name: Check the host keys attributes
+              ansible.builtin.assert:
+                that:
+                  - file.stat.isreg | bool
+                  - file.stat.mode == "0600"
+                  - file.stat.gid == 0
+                  - file.stat.gr_name == "root"
+                  - file.stat.uid == 0
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+              when: file.stat.exists | bool
+              loop: "{{ ssh_host_keys_stat.results }}"
+              loop_control:
+                loop_var: file
+                label: "{{ file.file | basename }}"
+
           rescue:
 
-            - name: Host keys are missing
+            - name: It appears that some SSH host keys are missing
               ansible.builtin.fail:
                 msg:
                   - "Please generate missing host keys, for example using the following commands"
@@ -155,23 +170,6 @@
                   - "ssh-keygen -t ecdsa -b 521 -f ssh_host_ecdsa_key -N ''"
 
           when: ssh_check_fail | bool
-
-        - name: Check the host keys attributes
-          ansible.builtin.assert:
-            that:
-              - file.stat.isreg | bool
-              - file.stat.mode == "0600"
-              - file.stat.gid == 0
-              - file.stat.gr_name == "root"
-              - file.stat.uid == 0
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          when:
-            - file.stat.exists | bool
-            - ssh_check_fail | bool
-          loop: "{{ ssh_host_keys_stat.results }}"
-          loop_control:
-            loop_var: file
-            label: "{{ file.file | basename }}"
 
       when: ssh_host_keys is defined
 
@@ -243,19 +241,36 @@
     - name: Run ssh-audit
       block:
 
-        - name: Audit SSH
-          ansible.builtin.command: ssh-audit -j localhost
-          check_mode: false
-          changed_when: false
-          register: ssh_ssh_audit
+        # https://github.com/jtesta/ssh-audit/issues/41
+        # https://github.com/jtesta/ssh-audit/issues/49
+        - name: Debian prior to bookworm have ssh-audit versions less than 2.5 and these fail with JSON output
+          block:
 
-        - name: Set a fact for the SSH audit results
-          ansible.builtin.set_fact:
-            ssh_audit: "{{ ssh_ssh_audit.stdout | from_json }}"
+            - name: Audit SSH with JSON output
+              ansible.builtin.command: ssh-audit -j localhost
+              check_mode: false
+              changed_when: false
+              register: ssh_ssh_audit
 
-        - name: Debug the SSH audit results
-          ansible.builtin.debug:
-            var: ssh_audit
+            - name: Set a fact for the SSH audit results
+              ansible.builtin.set_fact:
+                ssh_audit: "{{ ssh_ssh_audit.stdout | from_json }}"
+
+            - name: Debug the SSH audit results
+              ansible.builtin.debug:
+                var: ssh_audit
+
+          rescue:
+
+            - name: Audit SSH with plain text output
+              ansible.builtin.command: ssh-audit -n localhost
+              check_mode: false
+              changed_when: false
+              register: ssh_ssh_audit
+
+            - name: Debug the SSH audit results
+              ansible.builtin.debug:
+                var: ssh_ssh_audit.stdout_lines
 
       when: ssh_which_ssh_audit.rc == 0
 
