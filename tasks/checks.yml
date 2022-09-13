@@ -308,6 +308,7 @@
             - name: Debug the SSH audit info results
               ansible.builtin.debug:
                 var: ssh_audit_info.stdout_lines
+                verbosity: 1
     
             - name: Audit SSH and generate JSON output
               ansible.builtin.command: ssh-audit -j localhost
@@ -323,6 +324,7 @@
             - name: Debug the SSH audit results
               ansible.builtin.debug:
                 var: ssh_audit
+                verbosity: 1
 
           when: ssh_audit_fail.stdout_lines == []
 
