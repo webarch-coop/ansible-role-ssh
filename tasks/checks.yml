@@ -6,7 +6,7 @@
       ansible.builtin.getent:
         database: group
         key: "{{ group }}"
-        fail_key: true
+        fail_key: "{{ ssh_check_fail }}"
       loop: "{{ ssh_allow_groups }}"
       loop_control:
         loop_var: group
@@ -89,7 +89,7 @@
       ansible.builtin.getent:
         database: passwd
         key: "{{ user }}"
-        fail_key: false
+        fail_key: "{{ ssh_check_fail }}"
       loop: "{{ ssh_deny_users }}"
       loop_control:
         loop_var: user
@@ -104,7 +104,7 @@
           ansible.builtin.getent:
             database: passwd
             key: git
-            fail_key: true
+            fail_key: "{{ ssh_check_fail }}"
 
         - name: Check that the git user is in ssh_allow_groups
           ansible.builtin.assert:
@@ -144,6 +144,7 @@
           loop_control:
             loop_var: file
             label: "{{ file.stat.path | basename }}"
+          when: ssh_check_fail | bool
 
       when: ssh_host_keys is defined
 

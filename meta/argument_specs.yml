@@ -81,6 +81,10 @@ argument_specs:
       ssh_root_keypair:
         type: bool
         description: Generate a SSH keypair for root
+      ssh_check_fail:
+        type: bool
+        description: Fail when checks for things like users and groups do not pass
+        required: true
       ssh_x11_forwarding:
         type: bool
         description: X11Forwarding, optionally enable or disable
