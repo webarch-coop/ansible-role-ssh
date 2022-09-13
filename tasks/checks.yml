@@ -232,7 +232,7 @@
       when: ssh_macs is defined
 
     - name: Check if ssh-audit is available
-      ansible.bulitin.command: which ssh-audit
+      ansible.builtin.command: which ssh-audit
       check_mode: false
       changed_when: false
       register: ssh_which_ssh_audit
