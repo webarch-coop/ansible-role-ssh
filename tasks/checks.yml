@@ -246,6 +246,8 @@
           check_mode: false
           changed_when: false
           register: ssh_ssh_audit_help
+          # Old versions exit with RC 1 when asking for help
+          failed_when: ssh_ssh_audit_help.rc is not regex('^0|1$')
 
         - name: Set a fact for the version of ssh-audit
           ansible.builtin.set_fact:
