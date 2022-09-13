@@ -18,6 +18,9 @@ ssh_allow_tcp_forwarding: "no"
 # https://man.openbsd.org/sshd_config#AuthenticationMethods
 ssh_authentication_methods: publickey
 
+# Strict checks, set this to false for checks to be allowed to fail
+ssh_check_fail: true
+
 # Directory under which users in the chroot will be chrooted to a directory
 # matching their user name, for example /chroots/%u
 # ssh_chroot_users_dir: /chroots
@@ -80,9 +83,6 @@ ssh_pubkey_authentication: true
 
 # Generate a SSH keypair for the root user
 ssh_root_keypair: true
-
-# Strict checks, set this to false for checks to be allowed to fail
-ssh_check_fail: true
 
 # Allow X11 forwarding
 ssh_x11_forwarding: false
