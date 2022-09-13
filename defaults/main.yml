@@ -51,8 +51,8 @@ ssh_gitlab: false
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
   - /etc/ssh/ssh_host_ed25519_key
-  - /etc/ssh/ssh_host_rsa_key
   # See https://www.ssh-audit.com/hardening_guides.html 
+  # - /etc/ssh/ssh_host_rsa_key
   # - /etc/ssh/ssh_host_ecdsa_key
 
 # https://man.openbsd.org/sshd_config#KexAlgorithms
