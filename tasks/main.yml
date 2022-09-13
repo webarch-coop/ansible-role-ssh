@@ -59,11 +59,39 @@
           - ssh-import-id
         state: present
 
-    # TODO install ssh-audit using 
-    # pip3 install ssh-audit
-    # when on bullseye or older, when on bookworm run
-    # pip3 uninstall ssh-audit
-    # apt install ssh-audit
+    - name: Older versions of Debian have ssh-audit less then 2.5.0 which error on JSON output
+      block:
+
+        - name: ssh-audit deb absent
+          ansible.builtin.apt:
+            pkg:
+              - ssh-audit
+            state: absent
+
+        - name: ssh-audit present via pip
+          ansible.builtin.pip:
+            name: ssh-audit
+            state: present
+            executable: /usr/bin/pip3
+
+      when: ansible_distribution_version < 12
+
+    - name: Debian Bookworm has a working version of ssh-audit
+      block:
+
+        - name: Install ssh-audit using a deb package
+          ansible.builtin.apt:
+            pkg:
+              - ssh-audit
+            state: present
+
+        - name: Pip version of ssh-audit absent
+          ansible.builtin.pip:
+            name: ssh-audit
+            state: absent
+            executable: /usr/bin/pip3
+
+      when: ansible_distribution_version > 11
 
     - name: SSH allow groups present
       ansible.builtin.group:
