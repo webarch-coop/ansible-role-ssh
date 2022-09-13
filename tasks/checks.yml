@@ -242,7 +242,7 @@
       block:
 
         - name: Audit SSH
-          ansible.builtin.command: ssh-audit -l fail localhost
+          ansible.builtin.command: ssh-audit -n -l fail localhost
           check_mode: false
           changed_when: false
           register: ssh_ssh_audit
