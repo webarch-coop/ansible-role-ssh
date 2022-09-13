@@ -165,9 +165,11 @@
                 msg:
                   - "Please generate missing host keys, for example using the following commands"
                   - "cd /etc/ssh"
+                  - "rm -i ssh_host_*"
                   - "ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N ''"
                   - "ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''"
-                  - "ssh-keygen -t ecdsa -b 521 -f ssh_host_ecdsa_key -N ''"
+                  - "For more infformation see:"
+                  - "https://www.ssh-audit.com/hardening_guides.html"
 
           when: ssh_check_fail | bool
 
