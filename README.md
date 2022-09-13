@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
-This role uses the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) lined from [the `ssh-audit` tool](https://github.com/jtesta/ssh-audit) and has also been guided by the [Mozilla Modern OpenSSH server recomendations](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config).
+This role uses the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) linked from [the `ssh-audit` tool](https://github.com/jtesta/ssh-audit), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config) for all the configuration options.
 
 ## Defaults
 
@@ -52,7 +52,7 @@ The content of the private key and the known hosts files can use used as GitLab 
 
 ## Repo
 
-The primary URL of this repo is [`https://git.coop/webarch/ssh`](https://git.coop/webarch/ssh) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-ssh) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/ssh).
+The primary URL of this repo is [`https://git.coop/webarch/ssh`](https://git.coop/webarch/ssh), it is additionally [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-ssh) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/ssh).
 
-If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/ssh/-/releases).
+If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/ssh/-/releases) as the `master` branch is used for development and testing.
 

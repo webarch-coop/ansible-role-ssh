@@ -116,7 +116,7 @@
         - name: Check that the host key algorithms wanted are available
           ansible.builtin.assert:
             that:
-              - algo in ssh_ssh_host_key_algorithms_available
+              - algo in ssh_host_key_algorithms_available
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_host_key_algorithms }}"
           loop_control:
