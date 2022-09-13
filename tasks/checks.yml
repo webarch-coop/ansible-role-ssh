@@ -248,7 +248,9 @@
           check_mode: false
           changed_when: false
           register: ssh_ssh_audit
-          failed_when: ssh_ssh_audit.rc is not regex('0|3')
+          failed_when:
+            - not ssh_first_check | bool
+            - ssh_ssh_audit.rc is not regex('0|3')
 
         - name: Debug the SSH audit results
           ansible.builtin.debug:
@@ -259,6 +261,7 @@
             msg:
               - "ssh-audit failed with the above results"
           when:
+            - not ssh_first_check | bool
             - ssh_check_fail | bool
             - ssh_ssh_audit.rc != 0
 

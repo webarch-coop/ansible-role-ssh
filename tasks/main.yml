@@ -24,8 +24,10 @@
           - "ssh_root_keypair{% if ssh_root_keypair is defined %} {{ ssh_root_keypair | lower }}{% endif %}"
           - "X11Forwarding{% if ssh_x11_forwarding is defined and ssh_x11_forwarding | bool %} yes{% else %} no{% endif %} # ssh_x11_forwarding"
 
-    - name: Check variables
+    - name: Run Checks
       ansible.builtin.include_tasks: checks.yml
+      vars:
+        ssh_first_check: true
 
     - name: Update apt cache
       ansible.builtin.apt:
@@ -204,6 +206,11 @@
       loop: "{{ ssh_host_keys }}"
       loop_control:
         loop_var: ssh_host_key_path
+
+    - name: Run Checks
+      ansible.builtin.include_tasks: checks.yml
+      vars:
+        ssh_first_check: false
 
   tags:
     - ssh
