@@ -241,13 +241,23 @@
     - name: Run ssh-audit
       block:
 
+        - name: Check the ssh-audit version
+          ansible.builtin.command: ssh-audit -h
+          check_mode: false
+          changed_when: false
+          register: ssh_ssh_audit_help
+
+        - name: Set a fact for the version of ssh-audit
+          ansible.builtin.set_fact:
+            ssh_audit_version: "{{ ssh_ssh_audit_help.stdout_lines[0] | regex_replace('^# ssh-audit v') | regex_replace(', https://github.com/jtesta/ssh-audit$') }}"
+
         # https://github.com/jtesta/ssh-audit/issues/41
         # https://github.com/jtesta/ssh-audit/issues/49
         - name: Debian prior to bookworm have ssh-audit versions less than 2.5 and these fail with JSON output
           block:
 
             - name: Audit SSH with JSON output
-              ansible.builtin.command: "ssh-audit -j --level={% if ssh_check_fail | bool %}fail{% else %}warn{% endif %} localhost"
+              ansible.builtin.command: ssh-audit -j -l fail localhost
               check_mode: false
               changed_when: false
               register: ssh_ssh_audit
@@ -260,10 +270,20 @@
               ansible.builtin.debug:
                 var: ssh_audit
 
-          rescue:
+            - ansible.builtin.fail:
+              msg:
+                - "ssh-audit failed with the above results"
+              when:
+                - ssh_check_fail | bool
+                - ssh_audit != []
+
+          when: ssh_audit_version is version('2.5.0', '>=')
+
+        - name: Generate plain text output for ssh-audit versions less than 2.5.0
+          block:
 
             - name: Audit SSH with plain text output
-              ansible.builtin.command: "ssh-audit -n --level={% if ssh_check_fail | bool %}fail{% else %}warn{% endif %} localhost"
+              ansible.builtin.command: ssh-audit -n -l fail localhost
               check_mode: false
               changed_when: false
               register: ssh_ssh_audit
@@ -271,6 +291,15 @@
             - name: Debug the SSH audit results
               ansible.builtin.debug:
                 var: ssh_ssh_audit.stdout_lines
+
+            - ansible.builtin.fail:
+              msg:
+                - "ssh-audit failed with the above results"
+              when:
+                - ssh_check_fail | bool
+                - ssh_ssh_audit.stdout | length > 0
+
+          when: ssh_audit_version is version('2.5.0', '<')
 
       when: ssh_which_ssh_audit.rc == 0
 
