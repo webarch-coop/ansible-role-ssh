@@ -248,7 +248,7 @@
           check_mode: false
           changed_when: false
           register: ssh_ssh_audit
-          failed_when: ssh_ssh_audit.rc is not regex('0|1|2|3')
+          failed_when: ssh_ssh_audit.rc is not regex('0|3')
 
         - name: Debug the SSH audit results
           ansible.builtin.debug:
@@ -267,6 +267,7 @@
           check_mode: false
           changed_when: false
           register: ssh_ssh_audit
+          failed_when: ssh_ssh_audit.rc is not regex('0|3')
 
         - name: Set a fact for the SSH audit results
           ansible.builtin.set_fact:
