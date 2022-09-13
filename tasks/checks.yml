@@ -247,7 +247,7 @@
           block:
 
             - name: Audit SSH with JSON output
-              ansible.builtin.command: ssh-audit -j localhost
+              ansible.builtin.command: "ssh-audit -j --level={% if ssh_check_fail | bool %}fail{% else %}warn{% endif %} localhost"
               check_mode: false
               changed_when: false
               register: ssh_ssh_audit
@@ -263,7 +263,7 @@
           rescue:
 
             - name: Audit SSH with plain text output
-              ansible.builtin.command: ssh-audit -n localhost
+              ansible.builtin.command: "ssh-audit -n --level={% if ssh_check_fail | bool %}fail{% else %}warn{% endif %} localhost"
               check_mode: false
               changed_when: false
               register: ssh_ssh_audit
