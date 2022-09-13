@@ -38,7 +38,7 @@ Ciphers {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% en
 {% endif %}
 
 {% if ssh_host_key_algorithms is defined %}
-HostKeyAlgorithms {% for k in ssh_host_key_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}
+HostKeyAlgorithms {% for a in ssh_host_key_algorithms %}{{ a }}{% if not loop.last %},{% endif %}{% endfor %}
 {% endif %}
 
 {% if ssh_macs is defined %}
