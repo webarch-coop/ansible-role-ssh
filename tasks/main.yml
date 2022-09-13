@@ -56,9 +56,14 @@
           - openssh-client
           - openssh-server
           - openssh-sftp-server
-          - ssh-audit
           - ssh-import-id
         state: present
+
+    # TODO install ssh-audit using 
+    # pip3 install ssh-audit
+    # when on bullseye or older, when on bookworm run
+    # pip3 uninstall ssh-audit
+    # apt install ssh-audit
 
     - name: SSH allow groups present
       ansible.builtin.group:
