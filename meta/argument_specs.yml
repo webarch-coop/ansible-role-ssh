@@ -23,6 +23,10 @@ argument_specs:
         type: str
         description: AuthenticationMethods, one or more space seperated lists of comma-separated authentication method names, or the single string any
         required: true
+      ssh_check_fail:
+        type: bool
+        description: Fail when checks for things like users and groups do not pass
+        required: true
       ssh_chroot_users_dir:
         type: str
         description: ChrootDirectory, an optional directory which users in the chroot group will be chrooted to
@@ -81,10 +85,6 @@ argument_specs:
       ssh_root_keypair:
         type: bool
         description: Generate a SSH keypair for root
-      ssh_check_fail:
-        type: bool
-        description: Fail when checks for things like users and groups do not pass
-        required: true
       ssh_x11_forwarding:
         type: bool
         description: X11Forwarding, optionally enable or disable
