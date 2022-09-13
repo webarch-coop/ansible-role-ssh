@@ -251,7 +251,7 @@
 
         - name: Set a fact for the version of ssh-audit
           ansible.builtin.set_fact:
-            ssh_audit_version: "{{ ssh_ssh_audit_help.stdout_lines[0] | regex_replace('^# ssh-audit v') | regex_replace(', https://github.com/jtesta/ssh-audit$') }}"
+            ssh_audit_version: "{{ ssh_ssh_audit_help.stdout_lines[0] | regex_replace('^# ssh-audit v') | regex_replace(', https://github.com/jtesta/ssh-audit$') | string }}"
 
         # https://github.com/jtesta/ssh-audit/issues/41
         # https://github.com/jtesta/ssh-audit/issues/49
@@ -280,7 +280,7 @@
                 - ssh_check_fail | bool
                 - ssh_audit != []
 
-          when: ssh_audit_version is version('2.5.0', '>=')
+          when: ssh_audit_version | string is version('2.5.0', '>=')
 
         - name: Generate plain text output for ssh-audit versions less than 2.5.0
           block:
@@ -303,7 +303,7 @@
                 - ssh_check_fail | bool
                 - ssh_ssh_audit.stdout | length > 0
 
-          when: ssh_audit_version is version('2.5.0', '<')
+          when: ssh_audit_version | string is version('2.5.0', '<')
 
       when: ssh_which_ssh_audit.rc == 0
 
