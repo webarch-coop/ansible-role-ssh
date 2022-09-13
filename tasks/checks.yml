@@ -146,11 +146,13 @@
           rescue:
 
             - name: Host keys are missing
-              ansible.builtin.debug:
+              ansible.builtin.fail:
                 msg:
-                  - "Please generate missing host keys"
+                  - "Please generate missing host keys, for example using the following commands"
+                  - "cd /etc/ssh"
                   - "ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N ''"
                   - "ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''"
+                  - "ssh-keygen -t ecdsa -b 521 -f ssh_host_ed25519_key -N ''"
 
           when: ssh_check_fail | bool
 
