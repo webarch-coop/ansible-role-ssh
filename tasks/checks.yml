@@ -270,9 +270,10 @@
               ansible.builtin.debug:
                 var: ssh_audit
 
-            - ansible.builtin.fail:
-              msg:
-                - "ssh-audit failed with the above results"
+            - name: Fail due to ssh-audit results
+              ansible.builtin.fail:
+                msg:
+                  - "ssh-audit failed with the above results"
               when:
                 - ssh_check_fail | bool
                 - ssh_audit != []
@@ -292,8 +293,9 @@
               ansible.builtin.debug:
                 var: ssh_ssh_audit.stdout_lines
 
-            - ansible.builtin.fail:
-              msg:
+            - name: Fail due to ssh-audit results
+              ansible.builtin.fail:
+                msg:
                 - "ssh-audit failed with the above results"
               when:
                 - ssh_check_fail | bool
