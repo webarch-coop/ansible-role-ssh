@@ -9,6 +9,7 @@
           - "AllowGroups{% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %} # ssh_allow_groups "
           - "AllowTcpForwarding{% if ssh_allow_tcp_forwarding is defined and ssh_allow_tcp_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_tcp_forwarding"
           - "AuthenticationMethods {{ ssh_authentication_methods }} # ssh_authentication_methods"
+          - "ssh_check_fail: {{ ssh_check_fail }}"
           - "ChrootDirectory{% if ssh_chroot_users_dir is defined %} {{ ssh_chroot_users_dir }}{% endif %} # ssh_chroot_users_dir"
           - "ssh_ci_ips{% if ssh_ci_ips is defined %}{% for ip in ssh_ci_ips %} {{ ip }}{% endfor %}{% endif %}"
           - "Chipers{% if ssh_ciphers is defined %} {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_ciphers"
