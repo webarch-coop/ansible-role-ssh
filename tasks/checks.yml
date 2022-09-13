@@ -250,7 +250,7 @@
 
         - name: Debug the SSH audit results
           ansible.builtin.debug:
-            var: ssh_audit.stdout_lines
+            var: ssh_ssh_audit.stdout_lines
 
         - name: Fail due to bad ssh-audit results
           ansible.builtin.fail:
