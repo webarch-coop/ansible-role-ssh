@@ -34,7 +34,7 @@ For the configurable variables see [defaults/main.yml](defaults/main.yml):
 
 This role defaults to the recomendation from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11).
 
-For servers running OpenSSH older than [OpenSSH 8.4 which available from Debian Buster backports](https://packages.debian.org/buster-backports/openssh-server) the `sk` algorithms need to be omitted from the `ssh_host_key_algorithms` array.
+For servers running OpenSSH older than [OpenSSH 8.4 (2020-09-27)](https://www.openssh.com/txt/release-8.4) which available from Debian Buster backports](https://packages.debian.org/buster-backports/openssh-server), the `sk` algorithms need to be omitted from the `ssh_host_key_algorithms` array.
 
 The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults/main.yml](defaults/main.yml).
 
