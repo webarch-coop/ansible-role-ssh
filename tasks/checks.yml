@@ -252,7 +252,7 @@
             ssh_audit: "{{ ssh_ssh_audit.stdout | from_json }}"
 
         - name: Debug the SSH audit results
-          debug:
+          ansible.builtin.debug:
             var: ssh_audit
 
       when: ssh_which_ssh_audit.rc == 1
