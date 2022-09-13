@@ -236,7 +236,7 @@
       check_mode: false
       changed_when: false
       register: ssh_which_ssh_audit
-      failed_when: ssh_which_ssh_audit.rc is not regex('^0|1$)
+      failed_when: ssh_which_ssh_audit.rc is not regex('^0|1$')
 
     - name: Run ssh-audit
       block:
