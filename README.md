@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
-This role uses the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) linked from [the `ssh-audit` tool](https://github.com/jtesta/ssh-audit), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config) for all the configuration options.
+This role folows the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) and uses the [the `ssh-audit` tool](https://github.com/jtesta/ssh-audit) to ensure that recent security standards are followed, see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config) for all the configuration options.
 
 ## Defaults
 
