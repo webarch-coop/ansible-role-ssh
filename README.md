@@ -14,7 +14,7 @@ This role defaults to the recomendations from `ssh-audit` for [Debian Bullseye (
 
 For servers running OpenSSH older than OpenSSH 8.4, the `sk` algorithms need to be omitted from the `ssh_host_key_algorithms` array.
 
-The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults/main.yml](defaults/main.yml) however note that [OpenSSH 6.7](https://www.openssh.com/txt/release-6.7) was released eight years ago (2014-10-06) so this is a legacy, not a modern, configuration guide.
+The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults file](defaults/main.yml), however note that [OpenSSH 6.7](https://www.openssh.com/txt/release-6.7) was released eight years ago (2014-10-06) so this is a legacy, not a modern, configuration guide.
 
 ## Defaults
 
@@ -53,7 +53,7 @@ See the [chroot role](https://git.coop/webarch/chroot) for the Debian chroot imp
 
 ## CI keys
 
-The content of the private key and the known hosts files can use used as GitLab CI env vars for SSH'ing to the server as root but only from the listed IP addresses.
+The content of the private key and the known hosts files can be used as GitLab CI env vars for SSH'ing to the server as `root` but only from the listed IP addresses.
 
 ## Repo
 
