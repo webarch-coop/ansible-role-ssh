@@ -10,10 +10,12 @@
 # possible, but leave them commented.  Uncommented options override the
 # default value.
 
-# TODO Automatically uncomment the following Include if OpenSSH 8.2 or
-#      greater is installed from buster-backports
-#      https://packages.debian.org/buster/openssh-server
+{% if ssh_version is defined and ssh_version >= 8.4 %}
+Include /etc/ssh/sshd_config.d/*.conf
+{% else %}
+# OpenSSH 8.4 or greater is required for Include support
 # Include /etc/ssh/sshd_config.d/*.conf
+{% endif %}
 
 #Port 22
 #AddressFamily any
@@ -195,6 +197,14 @@ Match group chroot
     PermitRootLogin No
 {% endif %}
 
+{% if 'git' in ssh_allow_groups and ssh_gitlab is defined and ssh_gitlab | bool %}
+# https://docs.gitlab.com/ee/administration/operations/fast_ssh_key_lookup.html
+Match User git    # Apply the AuthorizedKeysCommands to the git user only
+    AuthorizedKeysCommand /opt/gitlab/embedded/service/gitlab-shell/bin/gitlab-shell-authorized-keys-check git %u %k
+    AuthorizedKeysCommandUser git
+Match all    # End match, settings apply to all users again
+{% endif %}
+
 {% if 'sftponly' in ssh_allow_groups %}
 Match group sftponly
     AllowGroups sftponly
@@ -240,14 +250,6 @@ Match group xenshell
     PermitRootLogin No
 {% endif %}
 
-{% endif %}
-
-{% if ssh_gitlab is defined and ssh_gitlab | bool %}
-# https://docs.gitlab.com/ee/administration/operations/fast_ssh_key_lookup.html
-Match User git    # Apply the AuthorizedKeysCommands to the git user only
-  AuthorizedKeysCommand /opt/gitlab/embedded/service/gitlab-shell/bin/gitlab-shell-authorized-keys-check git %u %k
-  AuthorizedKeysCommandUser git
-Match all    # End match, settings apply to all users again
 {% endif %}
 
 # vim: ft=sshdconfig

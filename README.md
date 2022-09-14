@@ -4,7 +4,7 @@
 
 This role follows the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) and uses [`ssh-audit`](https://github.com/jtesta/ssh-audit) to ensure that recent security recomendations are followed when configuring [OpenSSH](https://www.openssh.com/), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config) for all the available options.
 
-This role expects Buster [backports](https://backports.debian.org/) to be enabled so that [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server) can be installed, the default settings of this role are designed for OpenSSH 8.4 or newer.
+This role expects Buster [backports](https://backports.debian.org/) to be enabled so that [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server) can be installed, the default settings of this role are designed for [OpenSSH 8.4 (2020-09-27)](https://www.openssh.com/txt/release-8.4) or newer.
 
 This role has only been recently tested on Debian Buster (10), Bullseye (11) and Bookworm (12), see the [production releases list on the Debian wiki](https://wiki.debian.org/DebianReleases#Production_Releases).
 
@@ -12,9 +12,9 @@ This role has only been recently tested on Debian Buster (10), Bullseye (11) and
 
 This role defaults to the recomendations from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11) and therefore results in A+ when testing with the [online web front-end to `ssh-audit`](https://www.ssh-audit.com/).
 
-For servers running OpenSSH older than [OpenSSH 8.4 (2020-09-27)](https://www.openssh.com/txt/release-8.4), the `sk` algorithms needs to be omitted from the `ssh_host_key_algorithms` array.
+For servers running OpenSSH older than OpenSSH 8.4, the `sk` algorithms need to be omitted from the `ssh_host_key_algorithms` array.
 
-The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults/main.yml](defaults/main.yml) however note that [OpenSSH 6.7](https://www.openssh.com/txt/release-6.7) was released eight years ago (2014-10-06) so this is now a legacy configuration guide.
+The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults/main.yml](defaults/main.yml) however note that [OpenSSH 6.7](https://www.openssh.com/txt/release-6.7) was released eight years ago (2014-10-06) so this is a legacy, not a modern, configuration guide.
 
 ## Defaults
 
@@ -43,11 +43,11 @@ For the configurable variables see [defaults/main.yml](defaults/main.yml):
 | `ssh_root_keypair`            | No       | `true`                                                                                                                                                                                                                           | A boolean, optionally generate a SSH keypair for the `root` user                                                                                                                                                                                |
 | `ssh_x11_forwarding`          | No       | `false`                                                                                                                                                                                                                          | A boolean, optionally allow X11 forwarding                                                                                                                                                                                                      |
 
-## Groups
+## Matching groups and users
 
-By default only members of the `root` and `sudo` groups can connect to the server using keys.
+By default only members of the `root` and `sudo` groups can connect to the server using SSH public keys.
 
-There are three `Match group` blocks that are conditionally added to the `/etc/ssh/sshd_config` file depending on the the `chroot`, `sshonly` and `sftponly` groups being in the `ssh_allow_groups` list.
+There are five [`Match`](https://man.openbsd.org/sshd_config#Match) blocks that are conditionally added to the `/etc/ssh/sshd_config` file depending on the the `chroot`, `git`, `sshonly`, `sftponly` and `xen` groups being in the `ssh_allow_groups` list, a [more generic method to add `Match` blocks](https://git.coop/webarch/ssh/-/issues/3) is planned.
 
 See the [chroot role](https://git.coop/webarch/chroot) for the Debian chroot implementation.
 
