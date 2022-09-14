@@ -279,7 +279,7 @@
             - not ssh_first_check | bool
             - ssh_audit_fail.rc is not regex('0|3')
 
-        - name: Debug the SSH audit results
+        - name: Print the SSH audit failure results
           ansible.builtin.debug:
             var: ssh_audit_fail.stdout_lines
           when: ssh_audit_fail.stdout_lines != []
@@ -293,7 +293,7 @@
             - ssh_check_fail | bool
             - ssh_audit_fail.rc != 0
 
-        - name: Run SSH audit for JSON and info results
+        - name: Run SSH audit for info results
           block:
 
             - name: Audit SSH to check informational results
@@ -309,26 +309,6 @@
               ansible.builtin.debug:
                 var: ssh_audit_info.stdout_lines
                 verbosity: 1
-
-            - name: Audit SSH and generate JSON output
-              ansible.builtin.command: ssh-audit -j localhost
-              check_mode: false
-              changed_when: false
-              register: ssh_audit_json
-              failed_when: ssh_audit_json.rc is not regex('0|3')
-
-            - name: Set a fact for the SSH audit results
-              ansible.builtin.set_fact:
-                ssh_audit: "{{ ssh_audit_json.stdout | from_json }}"
-
-            - name: Debug the SSH audit results
-              ansible.builtin.debug:
-                var: ssh_audit
-                verbosity: 1
-
-            - name: Set a fact for the version of OpenSSH installed
-              ansible.builtin.set_fact:
-                ssh_version: "{{ ssh_audit.banner.software | regex_replace('^OpenSSH_') | regex_replace('p1$') | int }}"
 
           when: ssh_audit_fail.stdout_lines == []
 
@@ -346,15 +326,15 @@
         - name: Debug the SSH audit results
           ansible.builtin.debug:
             var: ssh_audit
-            verbosity: 1
+            verbosity: 2
 
         - name: Set a fact for the version of OpenSSH installed
           ansible.builtin.set_fact:
             ssh_version: "{{ ssh_audit.banner.software | regex_replace('^OpenSSH_') | regex_replace('p1$') }}"
 
-        - name: Print the server fingerprints as YAML
+        - name: Print the server fingerprints
           ansible.builtin.debug:
-            msg: "{{ ssh_audit.fingerprints | to_nice_yaml }}"
+            var: ssh_audit.fingerprints
 
       when: ssh_which_ssh_audit.rc == 0
 
