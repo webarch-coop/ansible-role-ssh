@@ -10,7 +10,7 @@ This role has only been recently tested on Debian Buster (10), Bullseye (11) and
 
 ## SSH hardening
 
-This role defaults to the recomendations from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11) and therefore results in A+ when testing with the [online web front-end to `ssh-audit`](https://www.ssh-audit.com/).
+This role defaults to the recomendations from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11) and therefore results in A+ when testing with the [online web front-end to `ssh-audit`](https://www.ssh-audit.com/), see the [example here](https://docs.webarch.net/w/images/3/38/Ssh_audit.png).
 
 For servers running OpenSSH older than OpenSSH 8.4, the `sk` algorithms need to be omitted from the `ssh_host_key_algorithms` array.
 
