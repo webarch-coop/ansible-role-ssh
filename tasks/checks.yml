@@ -335,6 +335,7 @@
         - name: Print the server fingerprints
           ansible.builtin.debug:
             var: ssh_audit.fingerprints
+          when: not ssh_first_check | bool
 
       when: ssh_which_ssh_audit.rc == 0
 
