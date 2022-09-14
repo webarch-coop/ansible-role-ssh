@@ -5,7 +5,7 @@
     - name: Debug variables
       ansible.builtin.debug:
         msg:
-          - "Debian version {{ ansible_distribution_version | regex_replace(\"'\") }}"
+          - "Debian version {{ ansible_distribution_release }}"
           - "AllowAgentForwarding{% if ssh_allow_agent_forwarding is defined and ssh_allow_agent_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_agent_forwarding"
           - "AllowGroups{% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %} # ssh_allow_groups "
           - "AllowTcpForwarding{% if ssh_allow_tcp_forwarding is defined and ssh_allow_tcp_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_tcp_forwarding"
@@ -79,7 +79,7 @@
             state: present
             executable: /usr/bin/pip3
 
-      when: ansible_distribution_version | regex_replace(\"'\") | int | is version('12', '<')
+      when: ansible_distribution_release != "bookworm"
 
     - name: Debian Bookworm has a working version of ssh-audit
       block:
@@ -96,7 +96,7 @@
             state: absent
             executable: /usr/bin/pip3
 
-      when: ansible_distribution_version | regex_replace(\"'\") | int | is version('11', '>')
+      when: ansible_distribution_release == "bookworm"
 
     - name: SSH allow groups present
       ansible.builtin.group:
