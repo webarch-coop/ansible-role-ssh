@@ -105,8 +105,8 @@ ssh_macs:
 
 # https://man.openbsd.org/sshd_config#MACs
 # Use `append` for `+`, `head` for `^` and `remove` for `-` to be used as a
-# prefix to the array of MACs   
-# ssh_mac_list_strategy: 
+# prefix to the array of MACs
+# ssh_mac_list_strategy:
 
 # https://man.openbsd.org/sshd_config#PasswordAuthentication
 ssh_password_authentication: false
