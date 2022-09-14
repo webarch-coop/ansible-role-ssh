@@ -51,6 +51,7 @@
         state: latest
         default_release: "{{ ansible_distribution_release }}-backports"
         install_recommends: true
+      notify: restart ssh
       when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
     - name: OpenSSH and related packages present
@@ -63,8 +64,9 @@
           - openssh-sftp-server
           - ssh-import-id
         state: present
+      notify: restart ssh
 
-    - name: Older versions of Debian have ssh-audit less then 2.5.0 which error on JSON output
+    - name: Older versions of Debian have ssh-audit less then 2.5.0 which generate an error when producing JSON output
       block:
 
         - name: python3-pip present
@@ -87,7 +89,7 @@
 
       when: ansible_distribution_release is not regex('^bookworm|trixy$')
 
-    - name: Debian Bookworm has a working version of ssh-audit
+    - name: Debian Bookworm and Trixy have working versions of ssh-audit
       block:
 
         - name: Install ssh-audit using a deb package
