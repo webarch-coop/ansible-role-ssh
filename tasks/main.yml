@@ -67,6 +67,12 @@
     - name: Older versions of Debian have ssh-audit less then 2.5.0 which error on JSON output
       block:
 
+        - name: phthon3-pip present
+          ansible.builtin.apt:
+            pkg:
+              - python3-pip
+            state: present
+
         - name: ssh-audit deb absent
           ansible.builtin.apt:
             pkg:
