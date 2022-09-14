@@ -67,7 +67,7 @@
     - name: Older versions of Debian have ssh-audit less then 2.5.0 which error on JSON output
       block:
 
-        - name: phthon3-pip present
+        - name: python3-pip present
           ansible.builtin.apt:
             pkg:
               - python3-pip
@@ -85,7 +85,7 @@
             state: present
             executable: /usr/bin/pip3
 
-      when: ansible_distribution_release != "bookworm"
+      when: ansible_distribution_release is not regex('^bookworm|trixy$')
 
     - name: Debian Bookworm has a working version of ssh-audit
       block:
@@ -102,7 +102,7 @@
             state: absent
             executable: /usr/bin/pip3
 
-      when: ansible_distribution_release == "bookworm"
+      when: ansible_distribution_release is regex('^bookworm|trixy$')
 
     - name: SSH allow groups present
       ansible.builtin.group:
