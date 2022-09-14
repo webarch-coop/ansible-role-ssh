@@ -45,6 +45,9 @@ ssh_ciphers:
 # ssh_deny_users:
 #  - www-data
 
+# Add SSH configuration for git user for GitLab
+ssh_gitlab: false
+
 # https://man.openbsd.org/sshd_config#HostKeyAlgorithms
 ssh_host_key_algorithms:
   - ssh-ed25519
@@ -66,9 +69,6 @@ ssh_host_key_algorithms:
   # - ecdsa-sha2-nistp521
   # - ecdsa-sha2-nistp384
   # - ecdsa-sha2-nistp256
-
-# Add SSH configuration for git user for GitLab
-ssh_gitlab: false
 
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
@@ -102,6 +102,11 @@ ssh_macs:
   # - hmac-sha2-512
   # - hmac-sha2-256
   # - umac-128@openssh.com
+
+# https://man.openbsd.org/sshd_config#MACs
+# Use `append` for `+`, `head` for `^` and `remove` for `-` to be used as a
+# prefix to the array of MACs   
+# ssh_mac_list_strategy: 
 
 # https://man.openbsd.org/sshd_config#PasswordAuthentication
 ssh_password_authentication: false
