@@ -10,7 +10,7 @@
 # possible, but leave them commented.  Uncommented options override the
 # default value.
 
-{% if ssh_version is defined and ssh_version >= 8.4 %}
+{% if ssh_version is defined and ssh_version is version('8.4', '>=') %}
 Include /etc/ssh/sshd_config.d/*.conf
 {% else %}
 # OpenSSH 8.4 or greater is required for Include support
