@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
-This role folows the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) and uses [`ssh-audit`](https://github.com/jtesta/ssh-audit) to ensure that recent security recomendations are followed when configuring [OpenSSH](https://www.openssh.com/), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config) for all the available options.
+This role follows the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) and uses [`ssh-audit`](https://github.com/jtesta/ssh-audit) to ensure that recent security recomendations are followed when configuring [OpenSSH](https://www.openssh.com/), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config) for all the available options.
 
 This role expects Buster [backports](https://backports.debian.org/) to be enabled so that [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server) can be installed, the default settings of this role are designed for OpenSSH 8.4 or newer.
 
