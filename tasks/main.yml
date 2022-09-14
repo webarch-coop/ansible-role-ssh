@@ -162,7 +162,7 @@
             mode: "0600"
             owner: root
             group: root
-            validate: sshd -t -dd -f %s
+            validate: /usr/sbin/sshd -t -dd -f %s
           register: ssh_config_test
 
       rescue:
@@ -187,7 +187,7 @@
             mode: "0644"
             owner: root
             group: root
-            validate: sshd -t -f %s
+            validate: /usr/sbin/sshd -t -f %s
             backup: true
           register: ssh_config
           notify: restart ssh
