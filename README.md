@@ -8,7 +8,7 @@ This role expects Buster [backports](https://backports.debian.org/) to be enable
 
 ## SSH hardening
 
-This role defaults to the recomendations from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11).
+This role defaults to the recomendations from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11) and therefore results in A+ when testing with the [online web front-end to `ssh-audit`](https://www.ssh-audit.com/).
 
 For servers running OpenSSH older than [OpenSSH 8.4 (2020-09-27)](https://www.openssh.com/txt/release-8.4), the `sk` algorithms needs to be omitted from the `ssh_host_key_algorithms` array.
 
