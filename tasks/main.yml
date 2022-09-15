@@ -227,13 +227,29 @@
       tags:
         - ssh_keyscan
 
-    - name: Generate a local Host file
-      ansible.builtin.template:
-        src: host.j2
-        dest: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}"
-        mode: 0600
-      become: false
-      delegate_to: localhost
+    - name: Local Host files
+      block:
+
+        - name: Local Host directory present
+          ansible.builtin.file:
+            path: "{{ ssh_local_hosts_directory }}"
+            state: directory
+            mode: 0700
+          register: ssh_local_hosts_dir
+          become: false
+          delegate_to: localhost
+
+        - debug:
+            var: ssh_local_hosts_dir
+
+        - name: Generate a local Host file
+          ansible.builtin.template:
+            src: host.j2
+            dest: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}"
+            mode: 0600
+          become: false
+          delegate_to: localhost
+
       when:
         - ssh_local_hosts_directory is defined
         - ssh_local_hosts_hostname is defined
