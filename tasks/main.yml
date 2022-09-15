@@ -35,6 +35,7 @@
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: true
+      when: not ansible_check_mode | bool
 
     - name: Run apt-cache policy
       ansible.builtin.command: apt-cache policy
@@ -118,9 +119,6 @@
             label: "{{ file | basename }}" 
           register: ssh_root_id_ed25519
 
-        - debug:
-            var: ssh_root_id_ed25519
-
         - name: SSH ECDSA keypair for root present
           community.crypto.openssh_keypair:
             path: /root/.ssh/id_ed25519
@@ -134,10 +132,6 @@
              ( ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[0].stat.exists ) or
              ( ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[1].stat.exists ) 
           register: ssh_root_id_ed25519
-
-        - debug:
-            var: ssh_root_id_ed25519
-
 
       when: ( ssh_root_keypair is defined ) and ( ssh_root_keypair | bool )
 
