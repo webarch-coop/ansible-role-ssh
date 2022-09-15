@@ -233,10 +233,12 @@
         dest: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}"
         mode: 0600
       become: false
-      delegate_to: lovcalhost
+      delegate_to: localhost
       when:
         - ssh_local_hosts_directory is defined
         - ssh_local_hosts_hostname is defined
+      tags:
+        - ssh_local_hosts
 
     - name: Run post-update checks
       ansible.builtin.include_tasks: checks.yml
