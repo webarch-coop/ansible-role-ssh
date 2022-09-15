@@ -107,6 +107,20 @@
             owner: root
             group: root
 
+        - name: Stat the root SSH ECDSA keypair
+          ansible.builtin.stat:
+            path: "{{ file }}"
+          loop:
+            - /root/.ssh/id_ed25519
+            - /root/.ssh/id_ed25519.pub
+          loop_control:
+            loop_var: file
+            label: "{{ file | basename }}" 
+          register: ssh_root_id_ed25519
+
+        - debug:
+            var: ssh_root_id_ed25519
+
         - name: SSH ECDSA keypair for root present
           community.crypto.openssh_keypair:
             path: /root/.ssh/id_ed25519
