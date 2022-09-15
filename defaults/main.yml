@@ -120,6 +120,12 @@ ssh_pubkey_authentication: true
 # Generate a SSH keypair for the root user
 ssh_root_keypair: true
 
+# Scan the keys availabe on the default IPv4 and IPv6 addresses
+ssh_scan_keys: true
+
+# Local file to save the results of the keyscan in
+# ssh_local_known_hosts: ~/.ssh/ansible_known_hosts
+
 # Allow X11 forwarding
 ssh_x11_forwarding: false
 ...
