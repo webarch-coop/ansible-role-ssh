@@ -239,9 +239,6 @@
           become: false
           delegate_to: localhost
 
-        - debug:
-            var: ssh_local_hosts_dir
-
         - name: Generate a local Host file
           ansible.builtin.template:
             src: host.j2
@@ -249,6 +246,7 @@
             mode: 0600
           become: false
           delegate_to: localhost
+          when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
 
       when:
         - ssh_local_hosts_directory is defined
