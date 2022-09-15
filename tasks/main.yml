@@ -106,6 +106,12 @@
 
       when: ansible_distribution_release is regex('^bookworm|trixy$')
 
+    - name: Loop through the SSH host keys
+      ansible.builtin.include_tasks: host_key.yml
+      loop: "{{ ssh_host_keys }}"
+      loop_control:
+        loop_var: ssh_host_key_path
+
     - name: SSH allow groups present
       ansible.builtin.group:
         name: "{{ ssh_allow_group }}"
@@ -212,12 +218,6 @@
               - "/etc/ssh/sshd_config has not been updated, a non-valid SSH server config has not been applied."
               - "The non-valid SSH server config has been written to /etc/ssh/.sshd_config.broken"
 
-    - name: Loop through the SSH host keys
-      ansible.builtin.include_tasks: host_key.yml
-      loop: "{{ ssh_host_keys }}"
-      loop_control:
-        loop_var: ssh_host_key_path
-
     - name: Flush handlers to restart SSH if the configuration has changed
       ansible.builtin.meta: flush_handlers
 
@@ -226,6 +226,17 @@
       when: ( ssh_scan_keys is defined ) and ( ssh_scan_keys | bool )
       tags:
         - ssh_keyscan
+
+    - name: Generate a local Host file
+      ansible.builtin.template:
+        src: host.j2
+        dest: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}"
+        mode: 0600
+      become: false
+      delegate_to: lovcalhost
+      when:
+        - ssh_local_hosts_directory is defined
+        - ssh_local_hosts_hostname is defined
 
     - name: Run post-update checks
       ansible.builtin.include_tasks: checks.yml
