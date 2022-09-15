@@ -66,8 +66,8 @@
       changed_when: false
       register: ssh_audit_gpg_check
       when:
-        - ( ssh_audit_sig_get_url.state is defined ) and ( ssh_audit_sig_get_url.state == file )
-        - ( ssh_audit_get_url.state is defined ) and ( ssh_audit_get_url.state == file )
+        - ( ssh_audit_sig_get_url.state is defined ) and ( ssh_audit_sig_get_url.state == "file" )
+        - ( ssh_audit_get_url.state is defined ) and ( ssh_audit_get_url.state == "file" )
       failed_when: ( "Good signature" not in ssh_audit_gpg_check.stdout )
 
     - name: ssh-audit source unarchived
