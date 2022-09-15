@@ -102,7 +102,7 @@ argument_specs:
         description: Generate a SSH keypair for root
       ssh_scan_keys:
         type: bool
-        description: Scan the SSH key fingerprints 
+        description: Scan the SSH key fingerprints
       ssh_x11_forwarding:
         type: bool
         description: X11Forwarding, optionally enable or disable
