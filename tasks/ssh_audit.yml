@@ -24,6 +24,57 @@
       ansible.builtin.set_fact:
         ssh_audit_version_latest: "{{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
 
+    - name: GPG public present
+      ansible.builtin.copy:
+        src: jtesta_2020-2025.asc
+        dest: /root/jtesta_2020-2025.asc
+        mode: 0644
+
+    - name: GPG present
+      ansible.builtin.apt:
+        pkg:
+          - gpg
+        state: present
+
+    - name: GPG key imported
+      ansible.builtin.command: gpg --import /root/jtesta_2020-2025.asc
+      register: ssh_audit_gpg_import
+      changed_when: ( "not changed" not in ssh_audit_gpg_import.stderr )
+
+    - name: ssh-audit signature present
+      ansible.builtin.get_url:
+        url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
+        dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
+        mode: 0644
+
+    - name: ssh-audit source present
+      ansible.builtin.get_url:
+        url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
+        dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
+        mode: 0644
+
+    - name: GPG signature verified
+      ansible.builtin.command: "gpg --verify --logger-fd 1 /usr/local/src/{{ ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
+      register: ssh_audit_gpg_check
+      failed_when: ( "Good signature" not in ssh_audit_gpg_check.stdout )
+
+    - name: ssh-audit source unarchived
+      ansible.builtin.unarchive:
+        src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
+        dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}"
+        remote_src: true
+
+    - name: Check that ssh-audit works
+      ansible.builtin.command: "python3 /usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}ssh-audit.py --help"
+
+    - name: ssh-audit symlink in place
+      ansible.builtin.file:
+        state: link
+        src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}/ssh-audit.py"
+        dest: /usr/local/bin/ssh-audit
+        follow: false
+        mode: 0777
+
   tags:
     - ssh
     - ssh_audit
