@@ -19,7 +19,7 @@
       ansible.builtin.blockinfile:
         path: "{{ ssh_local_known_hosts_file }}"
         create: true
-        marker: "<!-- {mark} {{ ansible_default_ipv4.address }} KnownHosts -->"
+        marker: "# {mark} {{ ansible_default_ipv4.address }} KnownHosts"
         block: "{{ ssh_keyscan_ipv4.stdout }}"
       become: false
       delegate_to: localhost
@@ -44,7 +44,7 @@
       ansible.builtin.blockinfile:
         path: "{{ ssh_local_known_hosts_file }}"
         create: true
-        marker: "<!-- {mark} {{ ansible_default_ipv6.address }} KnownHosts -->"
+        marker: "# {mark} {{ ansible_default_ipv6.address }} KnownHosts"
         block: "{{ ssh_keyscan_ipv6.stdout }}"
       become: false
       delegate_to: localhost
