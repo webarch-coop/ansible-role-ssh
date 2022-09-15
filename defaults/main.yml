@@ -92,6 +92,10 @@ ssh_kex_algorithms:
   # - ecdh-sha2-nistp384
   # - ecdh-sha2-nistp256
 
+# https://man.openbsd.org/sshd_config#ListenAddress
+ssh_listen_addresses:
+  - 0.0.0.0
+
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
   - hmac-sha2-512-etm@openssh.com
@@ -113,6 +117,10 @@ ssh_password_authentication: false
 
 # https://man.openbsd.org/sshd_config#PermitRootLogin
 ssh_permit_root_login: prohibit-password
+
+# https://man.openbsd.org/sshd_config#Port
+ssh_ports:
+  - 22
 
 # https://man.openbsd.org/sshd_config#PubkeyAuthentication
 ssh_pubkey_authentication: true

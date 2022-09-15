@@ -2,6 +2,22 @@
 - name: Scan SSH key fingerprints
   block:
 
+    # TODO Loop through the ListenAddress rather then the Ansible default IP addresses
+    #      and save the port with the fingerprint, for example [127.0.0.1:22] see
+    #      https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
+
+    - name: Scan keys available on the default IPv4 address
+      ansible.builtin.include_tasks: scan_key_address.yml
+      vars:
+        ip: "{{ ansible_default_ipv4.address }}"
+      when: ansible_default_ipv4.address is defined
+
+    - name: Scan keys available on the default IPv6 address
+      ansible.builtin.include_tasks: scan_key_address.yml
+      vars:
+        ip: "{{ ansible_default_ipv4.address }}"
+      when: ansible_default_ipv6.address is defined
+
     - name: Scan keys available on the default IPv4 address
       ansible.builtin.command: "ssh-keyscan {{ ansible_default_ipv4.address }}"
       check_mode: false

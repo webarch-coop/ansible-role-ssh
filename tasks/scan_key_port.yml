@@ -1,0 +1,33 @@
+---
+- name: Scan port for SSH public keys
+  block:
+
+    # https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
+    - name: SSH key scan
+      ansible.builtin.shell: "ssh-keyscan -p {{ port }} {{ ip }} | sed 's/^{{ ip }} /[{{ ip }}]:{{ port }} /'"
+      check_mode: false
+      changed_when: false
+      register: ssh_keyscan_command
+
+    - name: Debug the key scan result
+      ansible.builtin.debug:
+        var: ssh_keyscan_command.stdout_lines
+        verbosity: 2
+      when: ssh_keyscan_command.stdout_lines is defined
+
+    - name: Write the ssh-keyscan results to a local KnownHosts file if one is defined
+      ansible.builtin.blockinfile:
+        path: "{{ ssh_local_known_hosts_file }}"
+        create: true
+        marker: "# {mark} {{ ip }}:{{ port }} KnownHosts"
+        block: "{{ ssh_keyscan_command.stdout }}"
+      become: false
+      delegate_to: localhost
+      when:
+        - ssh_local_known_hosts_file is defined
+        - ssh_keyscan_ipv4.stdout_lines is defined
+
+  tags:
+    - ssh
+    - ssh_keyscan
+...

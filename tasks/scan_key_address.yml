@@ -1,0 +1,14 @@
+---
+- name: Scan address for SSH public keys
+  block:
+
+    - name: Loop through the SSH ports
+      ansible.builtin.include_tasks: scan_key_port.yml
+      loop: "{{ ssh_ports }}"
+      loop_control:
+        loop_var: port
+
+  tags:
+    - ssh
+    - ssh_keyscan
+...

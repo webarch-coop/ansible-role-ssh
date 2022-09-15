@@ -17,10 +17,24 @@ Include /etc/ssh/sshd_config.d/*.conf
 # Include /etc/ssh/sshd_config.d/*.conf
 {% endif %}
 
+{% if ssh_ports is defined %}
+{% for p in ssh_ports %}
+Port {{ p }}
+{% endfor %}
+{% else %}
 #Port 22
+{% endif %}
+
 #AddressFamily any
+
+{% if ssh_listen_addresses is defined %}
+{% for a in ssh_listen_addresses %}
+ListenAddress {{ a }}
+{% endfor %}
+{% else %}
 #ListenAddress 0.0.0.0
 #ListenAddress ::
+{% endif %}
 
 # Supported HostKey algorithms by order of preference.
 {% if ssh_host_keys is defined %}
