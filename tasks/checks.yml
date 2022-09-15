@@ -277,19 +277,10 @@
           register: ssh_audit_fail
           failed_when: ssh_audit_fail.rc is not regex('0|2|3')
 
-        - name: Print the SSH audit failure results
+        - name: Print the SSH audit failure results if there are any
           ansible.builtin.debug:
             var: ssh_audit_fail.stdout_lines
           when: ssh_audit_fail.stdout_lines != []
-
-        - name: Fail due to bad ssh-audit results
-          ansible.builtin.fail:
-            msg:
-              - "ssh-audit failed with the above results"
-          when:
-            - not ssh_first_check | bool
-            - ssh_check_fail | bool
-            - ssh_audit_fail.rc != 0
 
         - name: Run SSH audit for info results
           block:
@@ -307,7 +298,18 @@
               ansible.builtin.debug:
                 var: ssh_audit_info.stdout_lines
 
-          when: ( ssh_audit_fail.rc != 0 ) or ( ansible_verbosity != 0 )
+          when:
+            - ssh_check_fail | bool
+            - ssh_audit_fail.rc != 0
+
+        - name: Fail due to ssh-audit results
+          ansible.builtin.fail:
+            msg:
+              - "ssh-audit failed with the above results"
+          when:
+            - not ssh_first_check | bool
+            - ssh_check_fail | bool
+            - ssh_audit_fail.rc != 0
 
         - name: Audit SSH and generate JSON output
           ansible.builtin.command: ssh-audit -j localhost
