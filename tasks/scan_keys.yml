@@ -18,6 +18,7 @@
     - name: Write the ssh-keyscan IPv4 results to a local KnownHosts file if one is defined
       ansible.builtin.blockinfile:
         path: "{{ ssh_local_known_hosts_file }}"
+        create: true
         marker: "<!-- {mark} {{ ansible_default_ipv4.address }} KnownHosts -->"
         block: "{{ ssh_keyscan_ipv4.stdout }}"
       become: false
@@ -42,6 +43,7 @@
     - name: Write the ssh-keyscan IPv6 results to a local KnownHosts file if one is defined
       ansible.builtin.blockinfile:
         path: "{{ ssh_local_known_hosts_file }}"
+        create: true
         marker: "<!-- {mark} {{ ansible_default_ipv6.address }} KnownHosts -->"
         block: "{{ ssh_keyscan_ipv6.stdout }}"
       become: false
