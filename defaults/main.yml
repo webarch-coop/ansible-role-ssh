@@ -99,11 +99,14 @@ ssh_listen_addresses:
 # Local directory for Host file
 # ssh_local_hosts_directory: ~/.ssh/ansible_hosts.d
 
-# Hostname to use in the locak Host file
+# Host to use in the local Host file
+ssh_local_hosts_host: "{{ inventory_hostname_short }} {{ inventory_hostname }}"
+
+# Hostname to use in the local Host file
 ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address }}"
 
 # Local file to save the results of the keyscan in
-# ssh_local_known_hosts_file: ~/.ssh/ansible_known_hosts
+# ssh_local_known_hosts_file: ~/.ssh/known_hosts_ansible
 
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
