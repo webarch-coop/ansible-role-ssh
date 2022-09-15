@@ -96,6 +96,9 @@ ssh_kex_algorithms:
 ssh_listen_addresses:
   - 0.0.0.0
 
+# Local file to save the results of the keyscan in
+# ssh_local_known_hosts_file: ~/.ssh/ansible_known_hosts
+
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
   - hmac-sha2-512-etm@openssh.com
@@ -130,9 +133,6 @@ ssh_root_keypair: true
 
 # Scan the keys availabe on the default IPv4 and IPv6 addresses
 ssh_scan_keys: true
-
-# Local file to save the results of the keyscan in
-# ssh_local_known_hosts_file: ~/.ssh/ansible_known_hosts
 
 # Allow X11 forwarding
 ssh_x11_forwarding: false

@@ -42,13 +42,13 @@ argument_specs:
         type: list
         elements: str
         description: DenyUsers, an optional list of users to deny access to
+      ssh_gitlab:
+        type: bool
+        description: Add configuration for git user for GitLab
       ssh_host_key_algorithms:
         type: list
         elements: str
         description: HostKeyAlgorithms, an optional list of algorithms to override the defaults
-      ssh_gitlab:
-        type: bool
-        description: Add configuration for git user for GitLab
       ssh_host_keys:
         type: list
         elements: str
@@ -58,6 +58,13 @@ argument_specs:
         type: list
         elements: str
         description: KexAlgorithms, an optional list of algorithms list to override the defaults
+      ssh_listen_addresses:
+        type: list
+        elements: str
+        description: ListenAddress, IP addresses that SSH should listen for connections on
+      ssh_local_known_hosts_file:
+        type: str
+        description: Local KnownHosts file for Ansible to update
       ssh_macs:
         type: list
         elements: str
@@ -82,6 +89,10 @@ argument_specs:
           - "no"
           - prohibit-password
           - "yes"
+      ssh_ports:
+        type: list
+        elements: int
+        description: Port, a list of ports for SSH to listen on
       ssh_pubkey_authentication:
         type: bool
         description: Enable or disable public key authentication using PubkeyAuthentication

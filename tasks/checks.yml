@@ -95,6 +95,23 @@
         loop_var: user
       when: ssh_deny_users is defined
 
+    - name: GitLab checks
+      block:
+
+        - name: Check that the git user is present for GitLab
+          ansible.builtin.getent:
+            database: passwd
+            key: git
+            fail_key: "{{ ssh_check_fail }}"
+
+        - name: Check that the git user is in ssh_allow_groups
+          ansible.builtin.assert:
+            that:
+              - ( "git" in ssh_allow_groups )
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+      when: ( ssh_gitlab is defined ) and ( ssh_gitlab | bool )
+
     - name: Host key algorithm checks
       block:
 
@@ -123,23 +140,6 @@
             loop_var: algo
 
       when: ssh_host_key_algorithms is defined
-
-    - name: GitLab checks
-      block:
-
-        - name: Check that the git user is present for GitLab
-          ansible.builtin.getent:
-            database: passwd
-            key: git
-            fail_key: "{{ ssh_check_fail }}"
-
-        - name: Check that the git user is in ssh_allow_groups
-          ansible.builtin.assert:
-            that:
-              - ( "git" in ssh_allow_groups )
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-
-      when: ( ssh_gitlab is defined ) and ( ssh_gitlab | bool )
 
     - name: Host keys checks
       block:
@@ -230,6 +230,14 @@
             loop_var: algo
 
       when: ssh_kex_algorithms is defined
+
+    - name: Ensure that all ListenAddress are IP addresses
+      ansible.builtin.assert:
+        that:
+          - ip | ansible.netcommon.ipaddr | bool
+      loop: "{{ ssh_listen_addresses }}"
+      loop_control:
+        loop_var: ip
 
     - name: Mac checks
       block:
