@@ -78,9 +78,14 @@
         owner: root
         group: root
         remote_src: true
+      register: ssh_audit_unarchived
+
+    - debug:
+        var: ssh_audit_unarchived
 
     - name: Check that ssh-audit works be running it with --help
       ansible.builtin.command: "python3 /usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}/ssh-audit.py --help"
+      changed_when: false
 
     - name: ssh-audit symlink in place
       ansible.builtin.file:
