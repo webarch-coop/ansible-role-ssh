@@ -22,7 +22,7 @@
         block: "{{ ssh_keyscan_ipv4.stdout }}"
       delegate_to: localhost
       when:
-        - ssh_local_known_hosts is defned
+        - ssh_local_known_hosts is defined
         - ssh_keyscan_ipv4.stdout_lines is defined
 
     - name: Scan keys available on the default IPv6 address
@@ -45,7 +45,7 @@
         block: "{{ ssh_keyscan_ipv6.stdout }}"
       delegate_to: localhost
       when:
-        - ssh_local_known_hosts is defned
+        - ssh_local_known_hosts is defined
         - ssh_keyscan_ipv6.stdout_lines is defined
 
   tags:
