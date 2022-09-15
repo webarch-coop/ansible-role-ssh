@@ -25,7 +25,7 @@
       delegate_to: localhost
       when:
         - ssh_local_known_hosts_file is defined
-        - sh_keyscan_command.stdout_lines is defined
+        - shh_keyscan_command.stdout_lines is defined
 
   tags:
     - ssh
