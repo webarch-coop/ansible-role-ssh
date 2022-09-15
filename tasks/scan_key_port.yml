@@ -4,7 +4,7 @@
 
     # https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
     - name: SSH key scan
-      ansible.builtin.shell: "ssh-keyscan -p {{ port }} {{ ip }} | sed 's/^{{ ip }} /[{{ ip }}]:{{ port }} /'"
+      ansible.builtin.shell: "ssh-keyscan -p {{ port }} {{ ip }} | sed 's/^{{ ip }} /[{{ ip }}]:{{ port }} /' | sort"
       check_mode: false
       changed_when: false
       register: ssh_keyscan_command
