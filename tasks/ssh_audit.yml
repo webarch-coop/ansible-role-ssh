@@ -52,6 +52,9 @@
         group: root
       register: ssh_audit_sig_get_url
 
+    - debug:
+        var: ssh_audit_sig_get_url
+
     - name: ssh-audit source present
       ansible.builtin.get_url:
         url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
@@ -60,6 +63,9 @@
         owner: root
         group: root
       register: ssh_audit_get_url
+
+    - debug:
+        var: ssh_audit_get_url
 
     - name: GPG signature verified
       ansible.builtin.command: "gpg --verify --logger-fd 1 /usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
