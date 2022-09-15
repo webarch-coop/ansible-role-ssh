@@ -18,7 +18,7 @@
     - name: Write the ssh-keyscan results to a local KnownHosts file if one is defined
       ansible.builtin.blockinfile:
         path: "{{ ssh_local_known_hosts_file }}"
-        mode: 0600        
+        mode: 0600
         create: true
         marker: "# {mark} {{ ip }}:{{ port }} KnownHosts"
         block: "{{ ssh_keyscan_command.stdout }}"
