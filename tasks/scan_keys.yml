@@ -2,9 +2,8 @@
 - name: Scan SSH key fingerprints
   block:
 
-    # TODO Loop through the ListenAddress rather then the Ansible default IP addresses
-    #      and save the port with the fingerprint, for example [127.0.0.1:22] see
-    #      https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
+    # TODO Perhaps loop through the ListenAddress rather then the Ansible
+    #      default IP addresses?
 
     - name: Scan keys available on the default IPv4 address
       ansible.builtin.include_tasks: scan_key_address.yml
@@ -15,58 +14,8 @@
     - name: Scan keys available on the default IPv6 address
       ansible.builtin.include_tasks: scan_key_address.yml
       vars:
-        ip: "{{ ansible_default_ipv4.address }}"
+        ip: "{{ ansible_default_ipv6.address }}"
       when: ansible_default_ipv6.address is defined
-
-    - name: Scan keys available on the default IPv4 address
-      ansible.builtin.command: "ssh-keyscan {{ ansible_default_ipv4.address }}"
-      check_mode: false
-      changed_when: false
-      when: ansible_default_ipv4.address is defined
-      register: ssh_keyscan_ipv4
-
-    - name: Debug the keys available on the default IPv4 address
-      ansible.builtin.debug:
-        var: ssh_keyscan_ipv4.stdout_lines
-        verbosity: 2
-      when: ssh_keyscan_ipv4.stdout_lines is defined
-
-    - name: Write the ssh-keyscan IPv4 results to a local KnownHosts file if one is defined
-      ansible.builtin.blockinfile:
-        path: "{{ ssh_local_known_hosts_file }}"
-        create: true
-        marker: "# {mark} {{ ansible_default_ipv4.address }} KnownHosts"
-        block: "{{ ssh_keyscan_ipv4.stdout }}"
-      become: false
-      delegate_to: localhost
-      when:
-        - ssh_local_known_hosts_file is defined
-        - ssh_keyscan_ipv4.stdout_lines is defined
-
-    - name: Scan keys available on the default IPv6 address
-      ansible.builtin.command: "ssh-keyscan {{ ansible_default_ipv6.address }}"
-      check_mode: false
-      changed_when: false
-      when: ansible_default_ipv6.address is defined
-      register: ssh_keyscan_ipv6
-
-    - name: Debug the keys available on the default IPv6 address
-      ansible.builtin.debug:
-        var: ssh_keyscan_ipv6.stdout_lines
-        verbosity: 2
-      when: ssh_keyscan_ipv6.stdout_lines is defined
-
-    - name: Write the ssh-keyscan IPv6 results to a local KnownHosts file if one is defined
-      ansible.builtin.blockinfile:
-        path: "{{ ssh_local_known_hosts_file }}"
-        create: true
-        marker: "# {mark} {{ ansible_default_ipv6.address }} KnownHosts"
-        block: "{{ ssh_keyscan_ipv6.stdout }}"
-      become: false
-      delegate_to: localhost
-      when:
-        - ssh_local_known_hosts_file is defined
-        - ssh_keyscan_ipv6.stdout_lines is defined
 
   tags:
     - ssh
