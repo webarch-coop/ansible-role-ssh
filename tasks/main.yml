@@ -130,6 +130,9 @@
             mode: "0600"
             owner: root
             group: root
+          when: >
+             ( ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[0].stat.exists ) or
+             ( ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[1].stat.exists ) 
           register: ssh_root_id_ed25519
 
         - debug:
