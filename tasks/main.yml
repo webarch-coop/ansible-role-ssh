@@ -221,6 +221,12 @@
     - name: Flush handlers to restart SSH if the configuration has changed
       ansible.builtin.meta: flush_handlers
 
+    - name: Scan SSH keys
+      ansible.builtin.include_tasks: scan_keys.yml
+      when: ( ssh_scan_keys is defined ) and ( ssh_scan_keys | bool )
+      tags:
+        - ssh_keyscan
+
     - name: Run post-update checks
       ansible.builtin.include_tasks: checks.yml
       vars:
