@@ -63,6 +63,8 @@ This role can optionally generate a [UserKnownHostsFile](https://man.openbsd.org
 UserKnownHostsFile ~/.ssh/ansible_known_hosts ~/.ssh/known_hosts
 ```
 
+The file generated has non-hashed entries and includes the port number(s), see the [known hosts file format documentation](https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT).
+
 ## CI keys
 
 The content of the private key and the known hosts files can be used as GitLab CI env vars for SSH'ing to the server as `root` but only from the listed IP addresses.
