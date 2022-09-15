@@ -15,18 +15,38 @@
         verbosity: 2
       when: ssh_keyscan_ipv4.stdout_lines is defined
 
+    - name: Write the ssh-keyscan IPv4 results to a local KnownHosts file if one is defined
+      ansible.builtin.local_action:
+        ansible.builtin.blockinfile:
+          path: "{{ ssh_local_known_hosts_file }}"
+          marker: "<!-- {mark} {{ ansible_default_ipv4.address }} KnownHosts -->"
+          block: "{{ ssh_keyscan_ipv4.stdout }}"
+      when:
+        - ssh_local_known_hosts is defned
+        - ssh_keyscan_ipv4.stdout_lines is defined
+
     - name: Scan keys available on the default IPv6 address
       ansible.builtin.command: "ssh-keyscan {{ ansible_default_ipv6.address }}"
       check_mode: false
       changed_when: false
       when: ansible_default_ipv6.address is defined
       register: ssh_keyscan_ipv6
-  
+
     - name: Debug the keys available on the default IPv6 address
       ansible.builtin.debug:
         var: ssh_keyscan_ipv6.stdout_lines
         verbosity: 2
       when: ssh_keyscan_ipv6.stdout_lines is defined
+
+    - name: Write the ssh-keyscan IPv6 results to a local KnownHosts file if one is defined
+      ansible.builtin.local_action:
+        ansible.builtin.blockinfile:
+          path: "{{ ssh_local_known_hosts_file }}"
+          marker: "<!-- {mark} {{ ansible_default_ipv6.address }} KnownHosts -->"
+          block: "{{ ssh_keyscan_ipv6.stdout }}"
+      when:
+        - ssh_local_known_hosts is defned
+        - ssh_keyscan_ipv6.stdout_lines is defined
 
   tags:
     - ssh
