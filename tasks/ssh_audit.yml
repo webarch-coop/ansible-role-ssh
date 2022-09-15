@@ -1,0 +1,30 @@
+---
+- name: Install ssh-audit from source
+  block:
+
+    - name: Check the latest version of ssh-audit
+      ansible.builtin.uri:
+        url: https://github.com/jtesta/ssh-audit/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      changed_when: false
+      register: ssh_audit_headers
+
+    - name: Debug ssh-audit latest headers
+      ansible.builtin.debug:
+        msg:
+          - "Location: {{ ssh_audit_headers.location }}"
+          - "Path: {{ ssh_audit_headers.location | urlsplit('path') }}"
+          - "Version: {{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+        verbosity: 2
+
+    - name: Set a fact for the latest version of ssh-audit
+      ansible.builtin.set_fact:
+        ssh_audit_version_latest: "{{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+
+  tags:
+    - ssh
+    - ssh_audit
+...

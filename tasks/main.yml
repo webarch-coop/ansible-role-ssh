@@ -66,45 +66,20 @@
         state: present
       notify: restart ssh
 
-    - name: Older versions of Debian have ssh-audit less then 2.5.0 which generate an error when producing JSON output
-      block:
-
-        - name: python3-pip present
-          ansible.builtin.apt:
-            pkg:
-              - python3-pip
-            state: present
-
-        - name: ssh-audit deb absent
-          ansible.builtin.apt:
-            pkg:
-              - ssh-audit
-            state: absent
-
-        - name: ssh-audit present via pip
-          ansible.builtin.pip:
-            name: ssh-audit
-            state: present
-            executable: /usr/bin/pip3
-
+    - name: Install ssh-audit from source on Debian Buster and older
+      ansible.builtin.include_tasks: ssh_audit.yml
       when: ansible_distribution_release is not regex('^bookworm|trixy$')
+      tags:
+        - ssh_audit
 
-    - name: Debian Bookworm and Trixy have working versions of ssh-audit
-      block:
-
-        - name: Install ssh-audit using a deb package
-          ansible.builtin.apt:
-            pkg:
-              - ssh-audit
-            state: present
-
-        - name: Pip version of ssh-audit absent
-          ansible.builtin.pip:
-            name: ssh-audit
-            state: absent
-            executable: /usr/bin/pip3
-
+    - name: Install ssh-audit using the Debian package on Bookworm and Trixy
+      ansible.builtin.apt:
+        pkg:
+          - ssh-audit
+        state: present
       when: ansible_distribution_release is regex('^bookworm|trixy$')
+      tags:
+        - ssh_audit
 
     - name: Loop through the SSH host keys
       ansible.builtin.include_tasks: host_key.yml

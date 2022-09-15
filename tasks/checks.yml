@@ -277,6 +277,8 @@
       changed_when: false
       register: ssh_which_ssh_audit
       failed_when: ssh_which_ssh_audit.rc is not regex('^0|1$')
+      tags:
+        - ssh_audit
 
     - name: Run ssh-audit for fail and info results
       block:
@@ -348,6 +350,8 @@
           when: not ssh_first_check | bool
 
       when: ssh_which_ssh_audit.rc == 0
+      tags:
+        - ssh_audit
 
   tags:
     - ssh
