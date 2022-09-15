@@ -124,7 +124,7 @@ ssh_root_keypair: true
 ssh_scan_keys: true
 
 # Local file to save the results of the keyscan in
-# ssh_local_known_hosts: ~/.ssh/ansible_known_hosts
+# ssh_local_known_hosts_file: ~/.ssh/ansible_known_hosts
 
 # Allow X11 forwarding
 ssh_x11_forwarding: false
