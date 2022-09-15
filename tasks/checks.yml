@@ -235,6 +235,9 @@
       ansible.builtin.assert:
         that:
           - ip | ansible.utils.ipaddr | bool
+      when:
+        - ip != "0.0.0.0"
+        - ip != "::"
       loop: "{{ ssh_listen_addresses }}"
       loop_control:
         loop_var: ip
