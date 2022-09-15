@@ -39,11 +39,11 @@
       when: ssh_keyscan_ipv6.stdout_lines is defined
 
     - name: Write the ssh-keyscan IPv6 results to a local KnownHosts file if one is defined
-      ansible.builtin.local_action:
-        ansible.builtin.blockinfile:
-          path: "{{ ssh_local_known_hosts_file }}"
-          marker: "<!-- {mark} {{ ansible_default_ipv6.address }} KnownHosts -->"
-          block: "{{ ssh_keyscan_ipv6.stdout }}"
+      ansible.builtin.blockinfile:
+        path: "{{ ssh_local_known_hosts_file }}"
+        marker: "<!-- {mark} {{ ansible_default_ipv6.address }} KnownHosts -->"
+        block: "{{ ssh_keyscan_ipv6.stdout }}"
+      delegate_to: localhost
       when:
         - ssh_local_known_hosts is defned
         - ssh_keyscan_ipv6.stdout_lines is defined
