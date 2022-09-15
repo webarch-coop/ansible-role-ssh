@@ -28,7 +28,9 @@
       ansible.builtin.copy:
         src: jtesta_2020-2025.asc
         dest: /root/jtesta_2020-2025.asc
-        mode: 0644
+        mode: 0600
+        owner: root
+        group: root
 
     - name: GPG present
       ansible.builtin.apt:
@@ -46,12 +48,16 @@
         url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
         dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
         mode: 0644
+        owner: root
+        group: root
 
     - name: ssh-audit source present
       ansible.builtin.get_url:
         url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
         dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
         mode: 0644
+        owner: root
+        group: root
 
     - name: GPG signature verified
       ansible.builtin.command: "gpg --verify --logger-fd 1 /usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
@@ -61,7 +67,10 @@
     - name: ssh-audit source unarchived
       ansible.builtin.unarchive:
         src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
-        dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}"
+        dest: "/usr/local/src"
+        creates: "ssh-audit-{{ ssh_audit_version_latest }}"
+        owner: root
+        group: root
         remote_src: true
 
     - name: Check that ssh-audit works
@@ -74,6 +83,8 @@
         dest: /usr/local/bin/ssh-audit
         follow: false
         mode: 0777
+        owner: root
+        group: root
 
   tags:
     - ssh
