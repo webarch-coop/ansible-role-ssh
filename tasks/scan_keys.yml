@@ -11,7 +11,7 @@
 
     - name: Debug the keys available on the default IPv4 address
       ansible.builtin.debug:
-        var: ssh_keyscan_ipv4.sdtout
+        var: ssh_keyscan_ipv4.stdout_lines
         verbosity: 2
 
     - name: Scan keys available on the default IPv6 address
@@ -23,7 +23,7 @@
   
     - name: Debug the keys available on the default IPv6 address
       ansible.builtin.debug:
-        var: ssh_keyscan_ipv6.sdtout
+        var: ssh_keyscan_ipv6.stdout_lines
         verbosity: 2
 
   tags:
