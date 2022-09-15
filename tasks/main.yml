@@ -116,6 +116,11 @@
             mode: "0600"
             owner: root
             group: root
+          register: ssh_root_id_ed25519
+
+        - debug:
+            var: ssh_root_id_ed25519
+
 
       when: ( ssh_root_keypair is defined ) and ( ssh_root_keypair | bool )
 
@@ -123,7 +128,7 @@
       ansible.builtin.include_tasks: ci.yml
       when: ( ssh_ci_ips is defined ) and ( ssh_ci_ips != [] )
 
-    - name: Remove Diffie-Hellman moduli which are less than 4000 bits
+    - name: Diffie-Hellman moduli which are less than 4000 bits absent
       ansible.builtin.lineinfile:
         path: /etc/ssh/moduli
         regexp: '^[0-9]{14}\ 2\ 6\ 100\ [1|2|3][0-9]{3}\ .*$'
