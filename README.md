@@ -57,7 +57,7 @@ See the [chroot role](https://git.coop/webarch/chroot) for the Debian chroot imp
 
 ## UserKnownHostsFile
 
-This role can optionally generate a [UserKnownHostsFile](https://man.openbsd.org/ssh_config#UserKnownHostsFile) if `ssh_local_known_hosts_file` is defined, for example set this variable to `~/.ssh/ansible_known_hosts` and add the following to `~/.ssh/config`:
+This role can optionally generate a [UserKnownHostsFile](https://man.openbsd.org/ssh_config#UserKnownHostsFile) if `ssh_scan_keys` is `True` and `ssh_local_known_hosts_file` is defined, for example set this variable to `~/.ssh/ansible_known_hosts` and add the following to `~/.ssh/config`:
 
 ```
 UserKnownHostsFile ~/.ssh/ansible_known_hosts ~/.ssh/known_hosts
