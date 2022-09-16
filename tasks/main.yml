@@ -213,12 +213,17 @@
       ansible.builtin.meta: flush_handlers
 
     - name: Scan SSH keys
-      ansible.builtin.include_tasks: scan_keys.yml
-      when: ( ssh_scan_keys is defined ) and ( ssh_scan_keys | bool )
+      ansible.builtin.include_tasks: scan_key_address.yml
+      loop: "{{ ssh_scan_ip_addresses }}"
+      loop_control:
+        loop_label: ip
+      when: 
+        - ( ssh_scan_keys is defined ) and ( ssh_scan_keys | bool )
+        - ( ssh_scan_ip_addresses is defined ) and ( ssh_scan_ip_addresses[0] is defined )
       tags:
         - ssh_keyscan
 
-    - name: Local Host files
+    - name: Local files
       block:
 
         - name: Local Host directory present

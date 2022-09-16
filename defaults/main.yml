@@ -108,6 +108,12 @@ ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address }}"
 # Local file to save the results of the keyscan in
 # ssh_local_known_hosts_file: ~/.ssh/known_hosts_ansible
 
+# Local Markdown documentation
+# ssh_local_markdown_file: /tmp/ssh_fingerprints.md
+
+# Local MediaWiki documentation
+# ssh_local_mediawiki_file: /tmp/ssh_fingerprints.wiki
+
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
   - hmac-sha2-512-etm@openssh.com
@@ -140,7 +146,12 @@ ssh_pubkey_authentication: true
 # Generate a SSH keypair for the root user
 ssh_root_keypair: true
 
-# Scan the keys availabe on the default IPv4 and IPv6 addresses
+# An array of IP addresses to scan for fingerprinting
+ssh_scan_ip_addresses:
+  - "{{ ansible_default_ipv4.address }}"
+  # - "{{ ansible_default_ipv6.address }}" 
+
+# Scan the keys available on the default IPv4 and IPv6 addresses
 ssh_scan_keys: true
 
 # Allow X11 forwarding
