@@ -223,6 +223,11 @@
       tags:
         - ssh_keyscan
 
+    - name: Run post-update checks
+      ansible.builtin.include_tasks: checks.yml
+      vars:
+        ssh_first_check: false
+
     - name: Local files
       block:
 
@@ -342,11 +347,6 @@
         - ssh_local_hosts_port
       tags:
         - ssh_local_hosts
-
-    - name: Run post-update checks
-      ansible.builtin.include_tasks: checks.yml
-      vars:
-        ssh_first_check: false
 
   tags:
     - ssh
