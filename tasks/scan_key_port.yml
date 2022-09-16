@@ -25,7 +25,7 @@
         path: "{{ ssh_local_hosts_user_known_hosts_file }}"
         mode: 0600
         create: true
-        marker: "{% if port == '22' %}# {mark} {{ ip }}:{{ port }}{% else %}# {mark} {{ ip }}:{{ port }}{% endif %}"
+        marker: "{% if port == '22' %}# {mark} {{ ip }}{% else %}# {mark} {{ ip }} {{ port }}{% endif %}"
         block: {{ ssh_keyscan_command.stdout }}
       become: false
       delegate_to: localhost
