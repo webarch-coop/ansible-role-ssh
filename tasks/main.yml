@@ -324,9 +324,12 @@
               ```yml
               {{  ssh_audit.fingerprints | to_nice_yaml }}
               ```
+            insertafter: EOF
             create: true
             mode: 0600
-          when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
+          when:
+            - ssh_local_hosts_readme is defined
+            - ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
 
       become: false
       delegate_to: localhost
