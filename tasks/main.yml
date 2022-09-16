@@ -326,7 +326,7 @@
             marker: "<!-- {mark} {{ ssh_local_hosts_hostname }} -->"
             block: |
               ## {{ inventory_hostname }}
-              SSH server configuration details for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}`:
+              SSH server configuration details for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}` generated on {{ ansible_date_time.date }} at {{ ansible_date_time.time }}:
               ```yml
               {{  ssh_audit | to_nice_yaml }}
               ```
