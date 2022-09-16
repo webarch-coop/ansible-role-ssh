@@ -15,9 +15,9 @@
         verbosity: 2
       when: ssh_keyscan_command.stdout_lines is defined
 
-    - name: Write the ssh-keyscan results to a local KnownHosts file if one is defined
+    - name: Write any ssh-keyscan results to a local KnownHosts file if one is defined
       ansible.builtin.blockinfile:
-        path: "{{ ssh_local_known_hosts_file }}"
+        path: "{{ ssh_local_hosts_user_known_hosts_file }}"
         mode: 0600
         create: true
         marker: "# {mark} {{ ip }}:{{ port }} KnownHosts"
@@ -25,8 +25,8 @@
       become: false
       delegate_to: localhost
       when:
-        - ssh_local_known_hosts_file is defined
         - ssh_keyscan_command.stdout_lines is defined
+        - ssh_local_hosts_user_known_hosts_file is defined
 
   tags:
     - ssh
