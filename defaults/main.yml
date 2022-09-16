@@ -108,12 +108,6 @@ ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address }}"
 # Local file to save the results of the keyscan in
 # ssh_local_known_hosts_file: ~/.ssh/known_hosts_ansible
 
-# Local Markdown documentation
-# ssh_local_markdown_file: /tmp/ssh_fingerprints.md
-
-# Local MediaWiki documentation
-# ssh_local_mediawiki_file: /tmp/ssh_fingerprints.wiki
-
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
   - hmac-sha2-512-etm@openssh.com
