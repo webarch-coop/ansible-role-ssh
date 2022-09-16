@@ -2,6 +2,18 @@
 - name: Scan port for SSH public keys
   block:
 
+    - name: Debug IP address
+      ansible.builtin.debug:
+        var: ip
+        verbosity: 2
+      when: ip is defined
+
+    - name: Debug port
+      ansible.builtin.debug:
+        var: port
+        verbosity: 2
+      when: port is defined
+
     # https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
     - name: SSH key scan
       ansible.builtin.shell: >
