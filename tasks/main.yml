@@ -241,15 +241,7 @@
             insertbefore: BOF
             create: true
             mode: 0600
-
-        - name: Last line in local Host file present
-          ansible.builtin.lineinfile:
-            path: "{{ ssh_local_hosts_file }}"
-            line: "# vim: syntax=sshconfig"
-            state: present
-            insertafter: EOF
-            create: true
-            mode: 0600
+          when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
 
         - name: Debug local directory for Host file
           ansible.builtin.debug:
@@ -308,6 +300,16 @@
               {% endif %}
               {% endif %}
             insertafter: "^# Ansible managed$"
+            create: true
+            mode: 0600
+          when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
+
+        - name: Last line in local Host file present
+          ansible.builtin.lineinfile:
+            path: "{{ ssh_local_hosts_file }}"
+            line: "# vim: syntax=sshconfig"
+            state: present
+            insertafter: EOF
             create: true
             mode: 0600
           when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
