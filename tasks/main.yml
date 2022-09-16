@@ -293,10 +293,10 @@
                 Port {{ ssh_local_hosts_port }}
               {% endif %}
               {% if ssh_local_hosts_user_known_hosts_file is defined %}
-                HashKnownHosts no
               {% if ssh_local_hosts_hostname | ansible.utils.ipaddr == ssh_local_hosts_hostname %}
                 CheckHostIP yes
               {% endif %}
+                HashKnownHosts no
                 UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
               {% endif %}
               {% endif %}
