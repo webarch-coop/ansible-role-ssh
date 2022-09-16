@@ -49,7 +49,7 @@
     - name: Check that ssh_ci_ips are IP addresses when defined
       ansible.builtin.assert:
         that:
-          - ip | ansible.utils.ipaddr | bool
+          - ip | ansible.utils.ipaddr == ip
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       loop: "{{ ssh_ci_ips }}"
       loop_control:
@@ -234,7 +234,7 @@
     - name: Ensure that all ListenAddress are IP addresses
       ansible.builtin.assert:
         that:
-          - ip | ansible.utils.ipaddr | bool
+          - ip | ansible.utils.ipaddr == ip
       when:
         - ip != "0.0.0.0"
         - ip != "::"
