@@ -235,7 +235,7 @@
 
         - name: First line in local Host file present
           ansible.builtin.lineinfile:
-            line: "# {{ ansible_managed }}"
+            line: "# Ansible managed"
             state: present
             insertbefore: BOF
             create: true
