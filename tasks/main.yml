@@ -286,9 +286,6 @@
             block: |
               {% if ssh_local_hosts_host is defined %}
               Host {{ ssh_local_hosts_host }}
-              {% if ssh_local_hosts_hostname | ansible.utils.ipaddr == ssh_local_hosts_hostname %}
-                CheckHostIP yes
-              {% endif %}
               {% if ssh_local_hosts_hostname is defined %}
                 Hostname {{ ssh_local_hosts_hostname }}
               {% endif %}
@@ -296,6 +293,9 @@
                 Port {{ ssh_local_hosts_port }}
               {% endif %}
               {% if ssh_local_hosts_user_known_hosts_file is defined %}
+              {% if ssh_local_hosts_hostname | ansible.utils.ipaddr == ssh_local_hosts_hostname %}
+                CheckHostIP yes
+              {% endif %}
                 UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
               {% endif %}
               {% endif %}
