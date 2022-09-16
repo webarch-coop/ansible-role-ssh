@@ -238,7 +238,7 @@
         - name: Generate a local Host file
           ansible.builtin.template:
             src: host.j2
-            dest: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}"
+            dest: "{{ ssh_local_hosts_file }}"
             mode: 0600
           become: false
           delegate_to: localhost

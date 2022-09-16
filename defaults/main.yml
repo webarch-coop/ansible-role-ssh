@@ -97,13 +97,19 @@ ssh_listen_addresses:
   - 0.0.0.0
 
 # Local directory for Host file
-# ssh_local_hosts_directory: ~/.ssh/ansible_hosts.d
+ssh_local_hosts_directory: ~/.ssh/ansible_hosts.d
+
+# Path to the local Host file
+ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.host"
 
 # Host to use in the local Host file
 ssh_local_hosts_host: "{{ inventory_hostname_short }} {{ inventory_hostname }}"
 
 # Hostname to use in the local Host file
 ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address }}"
+
+# UserKnownHostsFile to use in the local Host file
+ssh_local_hosts_userknownHostsfile: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.fingerprints"
 
 # Local file to save the results of the keyscan in
 # ssh_local_known_hosts_file: ~/.ssh/known_hosts_ansible
@@ -131,6 +137,8 @@ ssh_password_authentication: false
 ssh_permit_root_login: prohibit-password
 
 # https://man.openbsd.org/sshd_config#Port
+# The first port in this list will be used for the local host file
+# to connect with another specify it on the command line
 ssh_ports:
   - 22
 

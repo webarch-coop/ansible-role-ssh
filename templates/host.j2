@@ -2,5 +2,6 @@
 
 Host {{ inventory_hostname_short }} {{ inventory_hostname }}
   Hostname {{ ssh_local_hosts_hostname }}
+  UserKnownHostsFile {{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.fingerprints
 
 # vim: syntax=sshconfig
