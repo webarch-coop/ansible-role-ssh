@@ -235,6 +235,7 @@
 
         - name: First line in local Host file present
           ansible.builtin.lineinfile:
+            path: "{{ ssh_local_hosts_file }}"
             line: "# Ansible managed"
             state: present
             insertbefore: BOF
@@ -243,6 +244,7 @@
 
         - name: Last line in local Host file present
           ansible.builtin.lineinfile:
+            path: "{{ ssh_local_hosts_file }}"
             line: "# vim: syntax=sshconfig"
             state: present
             insertafter: EOF
