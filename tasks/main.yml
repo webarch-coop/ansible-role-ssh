@@ -232,18 +232,47 @@
             state: directory
             mode: 0700
           register: ssh_local_hosts_dir
-          become: false
-          delegate_to: localhost
 
-        - name: Generate a local Host file
-          ansible.builtin.template:
-            src: host.j2
-            dest: "{{ ssh_local_hosts_file }}"
+        - name: First line in local Host file present
+          ansible.builtin.lineinfile:
+            line: "# {{ ansible_namaged }}"
+            state: present
+            insertbefore: BOF
+            create: true
             mode: 0600
-          become: false
-          delegate_to: localhost
+
+        - name: Last line in local Host file present
+          ansible.builtin.lineinfile:
+            line: "# vim: syntax=sshconfig"
+            state: present
+            insertafter: EOF
+            create: true
+            mode: 0600
+
+        - name: Host present in the local Host file
+          ansible.builtin.blockinfile:
+            path: "{{ ssh_local_hosts_file }}"
+            marker: "# {mark} {{ ssh_local_hosts_hostname }}"
+            block: |
+              {% if ssh_local_hosts_host is defined %}
+              Host {{ ssh_local_hosts_host }}
+                CheckHostIP yes
+              {% if ssh_local_hosts_hostname is defined %}
+                Hostname {{ ssh_local_hosts_hostname }}
+              {% endif %}
+              {% if ssh_local_hosts_port is defined %}
+                Port {{ ssh_local_hosts_port }}
+              {% endif %}
+              {% if ssh_local_hosts_user_known_hosts_file is defined %}
+                UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
+              {% endif %}
+              {% endif %}
+            create: true
+            mode: 0600
           when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
 
+      become: false
+      delegate_to: localhost
       when:
         - ssh_local_hosts_directory is defined
         - ssh_local_hosts_hostname is defined
