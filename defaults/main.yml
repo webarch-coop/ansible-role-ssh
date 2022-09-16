@@ -118,8 +118,7 @@ ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/known_ho
 # Port to use in the local Host file
 ssh_local_hosts_port: "{{ ssh_ports[0] | default('22') }}"
 
-# Local file to save the results of the keyscan in
-# ssh_local_known_hosts_file: ~/.ssh/known_hosts_ansible
+ssh_local_hosts_readme: "{{ ssh_local_hosts_directory }}/README.md"
 
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
