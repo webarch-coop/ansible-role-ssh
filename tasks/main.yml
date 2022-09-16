@@ -308,7 +308,6 @@
               {% endif %}
               {% endif %}
             insertafter: "^# Ansible managed$"
-            insertbefore: "^# vim: syntax=sshconfig$"
             create: true
             mode: 0600
           when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
