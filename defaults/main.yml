@@ -113,7 +113,7 @@ ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address }}"
 # UserKnownHostsFile to use in the local Host file
 ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/known_hosts"
 # Use the following for one file per host
-ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.fingerprints"
+# ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.fingerprints"
 
 # Port to use in the local Host file
 ssh_local_hosts_port: "{{ ssh_ports[0] | default('22') }}"
