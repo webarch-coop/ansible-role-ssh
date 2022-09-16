@@ -216,7 +216,7 @@
       ansible.builtin.include_tasks: scan_key_address.yml
       loop: "{{ ssh_scan_ip_addresses }}"
       loop_control:
-        loop_label: ip
+        loop_var: ip
       when: 
         - ( ssh_scan_keys is defined ) and ( ssh_scan_keys | bool )
         - ( ssh_scan_ip_addresses is defined ) and ( ssh_scan_ip_addresses[0] is defined )
