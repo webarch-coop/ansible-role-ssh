@@ -320,9 +320,10 @@
             path: "{{ ssh_local_hosts_readme }}"
             marker: "<!-- {mark} {{ ssh_local_hosts_hostname }} -->"
             block: |
-              {{ ssh_local_hosts_hostname }} fingerprints:
+              ## {{ ssh_local_hosts_hostname }}
+              The following YAML can generated using `ssh-keyscan -j {{ ssh_local_hosts_hostname }} | yq -P`
               ```yml
-              {{  ssh_audit.fingerprints | to_nice_yaml }}
+              {{  ssh_audit | to_nice_yaml }}
               ```
             insertafter: EOF
             create: true
