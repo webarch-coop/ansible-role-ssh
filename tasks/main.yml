@@ -320,8 +320,8 @@
             path: "{{ ssh_local_hosts_readme }}"
             marker: "<!-- {mark} {{ ssh_local_hosts_hostname }} -->"
             block: |
-              ## {{ ssh_local_hosts_host }}
-              SSH server configuration details for {{ ssh_local_hosts_hostname }}:
+              ## {{ inventory_hostname }}
+              SSH server configuration details for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}`:
               ```yml
               {{  ssh_audit | to_nice_yaml }}
               ```
