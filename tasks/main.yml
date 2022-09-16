@@ -251,6 +251,42 @@
             create: true
             mode: 0600
 
+        - name: Debug local directory for Host file
+          ansible.builtin.debug:
+            var: ssh_local_hosts_directory
+            verbosity: 2
+          when: ssh_local_hosts_directory is defined
+
+        - name: Debug path to the local Host file
+          ansible.builtin.debug:
+            var: ssh_local_hosts_file
+            verbosity: 2
+          when: ssh_local_hosts_file is defined
+
+        - name: Debug Host to use in the local Host file
+          ansible.builtin.debug:
+            var: ssh_local_hosts_host
+            verbosity: 2
+          when: ssh_local_hosts_host is defined
+
+        - name: Debug Hostname to use in the local Host file
+          ansible.builtin.debug:
+            var: ssh_local_hosts_hostname
+            verbosity: 2
+          when: ssh_local_hosts_hostname is defined
+
+        - name: Debug UserKnownHostsFile to use in the local Host file
+          ansible.builtin.debug:
+            var: ssh_local_hosts_user_known_hosts_file
+            verbosity: 2
+          when: ssh_local_hosts_user_known_hosts_file is defined
+
+        - name: Debug Port to use in the local Host file
+          ansible.builtin.debug:
+            var: ssh_local_hosts_port
+            verbosity: 2
+          when: ssh_local_hosts_port is defined
+
         - name: Host present in the local Host file
           ansible.builtin.blockinfile:
             path: "{{ ssh_local_hosts_file }}"
@@ -271,6 +307,8 @@
                 UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
               {% endif %}
               {% endif %}
+            insertafter: "^# Ansible managed$"
+            insertbefore: "^# vim: syntax=sshconfig$"
             create: true
             mode: 0600
           when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
@@ -279,7 +317,9 @@
       delegate_to: localhost
       when:
         - ssh_local_hosts_directory is defined
+        - ssh_local_hosts_file is defined
         - ssh_local_hosts_hostname is defined
+        - ssh_local_hosts_port
       tags:
         - ssh_local_hosts
 

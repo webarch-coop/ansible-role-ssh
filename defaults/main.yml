@@ -97,7 +97,7 @@ ssh_listen_addresses:
   - 0.0.0.0
 
 # Local directory for Host file
-ssh_local_hosts_directory: ~/.ssh/ansible_hosts.d
+ssh_local_hosts_directory: ~/.ssh/ansible.d
 
 # Path to the local Host file
 ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.host"
@@ -109,7 +109,10 @@ ssh_local_hosts_host: "{{ inventory_hostname_short }} {{ inventory_hostname }}"
 ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address }}"
 
 # UserKnownHostsFile to use in the local Host file
-ssh_local_hosts_userknownHostsfile: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.fingerprints"
+ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.fingerprints"
+
+# Port to use in the local Host file
+ssh_local_hosts_port: "{{ ssh_ports[0] | default('22') }}"
 
 # Local file to save the results of the keyscan in
 # ssh_local_known_hosts_file: ~/.ssh/known_hosts_ansible
