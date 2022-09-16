@@ -1,7 +1,9 @@
 # {{ ansible_managed }}
 
 Host {{ inventory_hostname_short }} {{ inventory_hostname }}
+  CheckHostIP yes
   Hostname {{ ssh_local_hosts_hostname }}
+  Port {{ ssh_ports[0] }}
   UserKnownHostsFile {{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.fingerprints
 
 # vim: syntax=sshconfig
