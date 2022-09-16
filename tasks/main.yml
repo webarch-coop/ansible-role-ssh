@@ -320,11 +320,12 @@
             path: "{{ ssh_local_hosts_readme }}"
             marker: "<!-- {mark} {{ ssh_local_hosts_hostname }} -->"
             block: |
-              ## {{ ssh_local_hosts_hostname }}
-              The following YAML can generated using `ssh-keyscan -j {{ ssh_local_hosts_hostname }} | yq -P`
+              ## {{ ssh_local_hosts_host }}
+              SSH server configuration details for {{ ssh_local_hosts_hostname }}:
               ```yml
               {{  ssh_audit | to_nice_yaml }}
               ```
+              The above YAML can generated using `ssh-keyscan -j {{ ssh_local_hosts_hostname }} | yq -P`
             insertafter: EOF
             create: true
             mode: 0600
