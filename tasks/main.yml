@@ -20,7 +20,7 @@
           - "HostKey{% if ssh_host_keys is defined %}{% for key in ssh_host_keys %} {{ key }}{% endfor %}{% endif %} # ssh_host_keys"
           - "KexAlgorithms{% if ssh_kex_algorithms is defined %} {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_kex_algorithms"
           - "ListenAddress{% if ssh_listen_addresses is defined %} {% for a in ssh_listen_addresses %}{{ a }}{% endfor %}{% endif %} # ssh_listen_addresses"
-          - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}" 
+          - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}"
           - "ssh_local_hosts_file{% if ssh_local_hosts_file is defined %} {{ ssh_local_hosts_file }}{% endif %}"
           - "ssh_local_hosts_host{% if ssh_local_hosts_host is defined %} {{ ssh_local_hosts_host }}{% endif %}"
           - "ssh_local_hosts_hostname{% if ssh_local_hosts_hostname is defined %} {{ ssh_local_hosts_hostname }}{% endif %}"
