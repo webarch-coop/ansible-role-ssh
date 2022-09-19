@@ -104,7 +104,7 @@ ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/config"
 # Use the following for one file per host
 # ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.host"
 
-# Host to use in the local Host file
+# Host name(s) to use in the local Host file
 ssh_local_hosts_host: "{{ inventory_hostname_short }} {{ inventory_hostname }}"
 
 # Hostname to use in the local Host file
@@ -118,6 +118,7 @@ ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/known_ho
 # Port to use in the local Host file
 ssh_local_hosts_port: "{{ ssh_ports[0] | default('22') }}"
 
+# Path to a local README.md file
 ssh_local_hosts_readme: "{{ ssh_local_hosts_directory }}/README.md"
 
 # https://man.openbsd.org/sshd_config#MACs

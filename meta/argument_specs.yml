@@ -62,9 +62,27 @@ argument_specs:
         type: list
         elements: str
         description: ListenAddress, IP addresses that SSH should listen for connections on
-      ssh_local_known_hosts_file:
+      ssh_local_hosts_directory:
+        type: str
+        description: Local directory for Host file
+      ssh_local_hosts_file:
+        type: str
+        description: Path to the local Host file
+      ssh_local_hosts_host:
+        type: str
+        description: Host name(s) to use in the local Host file
+      ssh_local_hosts_hostname:
+        type: str
+        description: Hostname to use in the local Host file
+      ssh_local_hosts_user_known_hosts_file:
         type: str
         description: Local KnownHosts file for Ansible to update
+      ssh_local_hosts_port:
+        type: int
+        description: Port to use in the local Host file
+      ssh_local_hosts_readme:
+        type: str
+        description: Path to a local README.md file
       ssh_macs:
         type: list
         elements: str
