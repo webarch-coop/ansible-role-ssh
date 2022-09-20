@@ -25,7 +25,7 @@
             state: absent
           when: ssh_pip3_show_ssh_audit.rc == 0
 
-      when: ssh_which_pip3.rc == 1
+      when: ssh_which_pip3.rc == 0
 
     - name: Check the latest version of ssh-audit
       ansible.builtin.uri:
