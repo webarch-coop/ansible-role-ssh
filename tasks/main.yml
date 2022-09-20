@@ -75,7 +75,7 @@
         state: present
       notify: restart ssh
 
-    - name: Install ssh-audit from source on Debian Buster and older
+    - name: Install ssh-audit from source on Debian Bullseye and older
       ansible.builtin.include_tasks: ssh_audit.yml
       when: ansible_distribution_release is not regex('^bookworm|trixy$')
       tags:
