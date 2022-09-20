@@ -2,6 +2,31 @@
 - name: Install ssh-audit from source
   block:
 
+    - name: Check if pip3 is available
+      ansible.builtin.command: which pip3
+      check_mode: false
+      changed_when: false
+      register: ssh_which_pip3
+      failed_when: ssh_which_pip3.rc is not regex('^0|1$')
+
+    - name: Ensure that ssh-audit is not installed using pip3
+      block:
+
+        - name: Run pip3 show ssh-audit
+          ansible.builtin.command: pip3 show ssh-audit
+          check_mode: false
+          changed_when: false
+          register: ssh_pip3_show_ssh_audit
+          failed_when: ssh_pip3_show_ssh_audit.rc is not regex('^0|1$')
+
+        - name: Uninstall pip3 ssh-audit
+          ansible.builtin.pip:
+            name: ssh-audit
+            state: absent
+          when: ssh_pip3_show_ssh_audit.rc == 0
+
+      when: ssh_which_pip3.rc == 1
+
     - name: Check the latest version of ssh-audit
       ansible.builtin.uri:
         url: https://github.com/jtesta/ssh-audit/releases/latest
