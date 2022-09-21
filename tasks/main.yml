@@ -57,7 +57,7 @@
           - openssh-client
           - openssh-server
           - openssh-sftp-server
-        state: latest
+        state: present
         default_release: "{{ ansible_distribution_release }}-backports"
         install_recommends: true
       notify: restart ssh
