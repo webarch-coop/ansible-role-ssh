@@ -87,7 +87,7 @@
           register: ssh_audit_gpg_import
           changed_when: ("not changed" not in ssh_audit_gpg_import.stderr)
 
-        - name: ssh-audit signature present
+        - name: GPG signature for archive of ssh-audit source present
           ansible.builtin.get_url:
             url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
             dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
@@ -96,7 +96,7 @@
             group: root
           register: ssh_audit_sig_get_url
 
-        - name: ssh-audit source present
+        - name: Archive of ssh-audit source present
           ansible.builtin.get_url:
             url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
             dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
@@ -114,7 +114,7 @@
             - (ssh_audit_get_url.state is defined) and (ssh_audit_get_url.state == "file")
           failed_when: ("Good signature" not in ssh_audit_gpg_check.stdout)
 
-        - name: ssh-audit source unarchived
+        - name: Archive of ssh-audit source unarchived
           ansible.builtin.unarchive:
             src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
             dest: "/usr/local/src"
@@ -129,7 +129,7 @@
           changed_when: false
           when: (ssh_audit_unarchived.failed is defined) and (not ssh_audit_unarchived.failed | bool)
 
-        - name: ssh-audit symlink in place
+        - name: Symlink to add ssh-audit to PATH environment present
           ansible.builtin.file:
             state: link
             src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}/ssh-audit.py"
