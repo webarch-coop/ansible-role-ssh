@@ -1,14 +1,11 @@
 ---
 # https://docs.ansible.com/ansible-lint/rules/default_rules.html
-warn_list:
-  # All names should start with an uppercase letter
-  - name[casing]
+skip_list:
   # Jinja2 spacing could be improved
   - jinja[spacing]
-skip_list:
-  # The metadata schema validation fails as it expect the versions of Debian to be intergers and not strings
-  - schema[meta]
   # When installing from backports the latest version is wanted
   - package-latest
+  # The metadata schema validation fails as it expect the versions of Debian to be intergers and not strings
+  - schema[meta]
 # vim: syntax=yaml
 ...
