@@ -10,5 +10,5 @@
 
   tags:
     - ssh
-    - ssh_keyscan
+    - ssh_local_hosts
 ...

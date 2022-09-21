@@ -51,7 +51,7 @@
       changed_when: false
       register: ssh_apt_cache_policy
 
-    - name: OpenSSH packages present from backport
+    - name: OpenSSH packages present from backports
       ansible.builtin.apt:
         pkg:
           - openssh-client
@@ -73,20 +73,11 @@
           - openssh-sftp-server
           - ssh-import-id
         state: present
+        install_recommends: true
       notify: restart ssh
 
-    - name: Install ssh-audit from source on Debian Bullseye and older
+    - name: Include ssh-audit install tasks
       ansible.builtin.include_tasks: ssh_audit.yml
-      when: ansible_distribution_release is not regex('^bookworm|trixy$')
-      tags:
-        - ssh_audit
-
-    - name: Install ssh-audit using the Debian package on Bookworm and Trixy
-      ansible.builtin.apt:
-        pkg:
-          - ssh-audit
-        state: present
-      when: ansible_distribution_release is regex('^bookworm|trixy$')
       tags:
         - ssh_audit
 
@@ -220,139 +211,14 @@
     - name: Flush handlers to restart SSH if the configuration has changed
       ansible.builtin.meta: flush_handlers
 
-    - name: Scan SSH keys
-      ansible.builtin.include_tasks: scan_key_address.yml
-      loop: "{{ ssh_scan_ip_addresses }}"
-      loop_control:
-        loop_var: ip
-      when:
-        - ( ssh_scan_keys is defined ) and ( ssh_scan_keys | bool )
-        - ( ssh_scan_ip_addresses is defined ) and ( ssh_scan_ip_addresses[0] is defined )
-      tags:
-        - ssh_keyscan
-
     - name: Run post-update checks
       ansible.builtin.include_tasks: checks.yml
       vars:
         ssh_first_check: false
 
-    - name: Local files
-      block:
-
-        - name: Local Host directory present
-          ansible.builtin.file:
-            path: "{{ ssh_local_hosts_directory }}"
-            state: directory
-            mode: 0700
-          register: ssh_local_hosts_dir
-
-        - name: First line in local Host file present
-          ansible.builtin.lineinfile:
-            path: "{{ ssh_local_hosts_file }}"
-            line: "# Ansible managed"
-            state: present
-            insertbefore: BOF
-            create: true
-            mode: 0600
-          when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
-
-        - name: Debug local directory for Host file
-          ansible.builtin.debug:
-            var: ssh_local_hosts_directory
-            verbosity: 2
-          when: ssh_local_hosts_directory is defined
-
-        - name: Debug path to the local Host file
-          ansible.builtin.debug:
-            var: ssh_local_hosts_file
-            verbosity: 2
-          when: ssh_local_hosts_file is defined
-
-        - name: Debug Host to use in the local Host file
-          ansible.builtin.debug:
-            var: ssh_local_hosts_host
-            verbosity: 2
-          when: ssh_local_hosts_host is defined
-
-        - name: Debug Hostname to use in the local Host file
-          ansible.builtin.debug:
-            var: ssh_local_hosts_hostname
-            verbosity: 2
-          when: ssh_local_hosts_hostname is defined
-
-        - name: Debug UserKnownHostsFile to use in the local Host file
-          ansible.builtin.debug:
-            var: ssh_local_hosts_user_known_hosts_file
-            verbosity: 2
-          when: ssh_local_hosts_user_known_hosts_file is defined
-
-        - name: Debug Port to use in the local Host file
-          ansible.builtin.debug:
-            var: ssh_local_hosts_port
-            verbosity: 2
-          when: ssh_local_hosts_port is defined
-
-        - name: Host present in the local Host file
-          ansible.builtin.blockinfile:
-            path: "{{ ssh_local_hosts_file }}"
-            marker: "# {mark} {{ ssh_local_hosts_hostname }}"
-            block: |
-              {% if ssh_local_hosts_host is defined %}
-              Host {{ ssh_local_hosts_host }}
-              {% if ssh_local_hosts_hostname is defined %}
-                Hostname {{ ssh_local_hosts_hostname }}
-              {% endif %}
-              {% if ssh_local_hosts_port is defined %}
-                Port {{ ssh_local_hosts_port }}
-              {% endif %}
-              {% if ssh_local_hosts_user_known_hosts_file is defined %}
-              {% if ssh_local_hosts_hostname | ansible.utils.ipaddr == ssh_local_hosts_hostname %}
-                CheckHostIP yes
-              {% endif %}
-                HashKnownHosts no
-                UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
-              {% endif %}
-              {% endif %}
-            insertafter: "^# Ansible managed$"
-            create: true
-            mode: 0600
-          when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
-
-        - name: Last line in local Host file present
-          ansible.builtin.lineinfile:
-            path: "{{ ssh_local_hosts_file }}"
-            line: "# vim: syntax=sshconfig"
-            state: present
-            insertafter: EOF
-            create: true
-            mode: 0600
-          when: ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
-
-        - name: Local README.md present
-          ansible.builtin.blockinfile:
-            path: "{{ ssh_local_hosts_readme }}"
-            marker: "<!-- {mark} {{ ssh_local_hosts_hostname }} -->"
-            block: |
-              ## {{ inventory_hostname }}
-              SSH server fingerprints for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}`:
-              ```yml
-              {{  ssh_audit.fingerprints | to_nice_yaml }}
-              ```
-              The above YAML can generated using `ssh-audit -j {{ ssh_local_hosts_hostname }} | jq .fingerprints | yq -P`
-            insertafter: EOF
-            create: true
-            mode: 0600
-          when:
-            - ssh_local_hosts_readme is defined
-            - ( ssh_local_hosts_dir.state is defined ) and ( ssh_local_hosts_dir.state == "directory" )
-
-      become: false
-      delegate_to: localhost
-      when:
-        - ssh_local_hosts_directory is defined
-        - ssh_local_hosts_file is defined
-        - ssh_local_hosts_hostname is defined
-        - ssh_local_hosts_port
+    - name: Include local configuration generation tasks
+      ansible.builtin.include_tasks: local_hosts.yml
+      when: ( ssh_local_hosts is defined ) and ( ssh_local_hosts | bool )
       tags:
         - ssh_local_hosts
 
