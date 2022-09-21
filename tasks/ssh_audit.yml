@@ -33,7 +33,7 @@
         - name: Local ssh-audit absent
           ansible.builtin.file:
             path: /usr/local/bin/ssh-audit
-            state: basent
+            state: absent
 
         - name: Install ssh-audit using the Debian package on Bookworm and Trixy
           ansible.builtin.apt:
