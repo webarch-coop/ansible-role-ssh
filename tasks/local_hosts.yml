@@ -2,6 +2,18 @@
 - name: OpenSSH local configuration
   block:
 
+    - name: Debug variables
+      ansible.builtin.debug:
+        msg:
+          - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}"
+          - "ssh_local_hosts_file{% if ssh_local_hosts_file is defined %} {{ ssh_local_hosts_file }}{% endif %}"
+          - "ssh_local_hosts_host{% if ssh_local_hosts_host is defined %} {{ ssh_local_hosts_host }}{% endif %}"
+          - "ssh_local_hosts_hostname{% if ssh_local_hosts_hostname is defined %} {{ ssh_local_hosts_hostname }}{% endif %}"
+          - "ssh_local_hosts_user_known_hosts_file{% if ssh_local_hosts_user_known_hosts_file is defined %} {{ ssh_local_hosts_user_known_hosts_file }}{% endif %}"
+          - "ssh_local_hosts_port{% if ssh_local_hosts_port is defined %} {{ ssh_local_hosts_port }}{% endif %}"
+          - "ssh_local_hosts_readme{% if ssh_local_hosts_readme is defined %} {{ ssh_local_hosts_readme }}{% endif %}"
+        verbosity: 1
+
     - name: Audit SSH and generate JSON output
       ansible.builtin.command: ssh-audit -j localhost
       check_mode: false
