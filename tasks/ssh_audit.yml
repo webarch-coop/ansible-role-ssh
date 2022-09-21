@@ -85,7 +85,7 @@
         - name: GPG key imported
           ansible.builtin.command: gpg --import /root/jtesta_2020-2025.asc
           register: ssh_audit_gpg_import
-          changed_when: ( "not changed" not in ssh_audit_gpg_import.stderr )
+          changed_when: ("not changed" not in ssh_audit_gpg_import.stderr)
 
         - name: ssh-audit signature present
           ansible.builtin.get_url:
@@ -110,9 +110,9 @@
           changed_when: false
           register: ssh_audit_gpg_check
           when:
-            - ( ssh_audit_sig_get_url.state is defined ) and ( ssh_audit_sig_get_url.state == "file" )
-            - ( ssh_audit_get_url.state is defined ) and ( ssh_audit_get_url.state == "file" )
-          failed_when: ( "Good signature" not in ssh_audit_gpg_check.stdout )
+            - (ssh_audit_sig_get_url.state is defined) and (ssh_audit_sig_get_url.state == "file")
+            - (ssh_audit_get_url.state is defined) and (ssh_audit_get_url.state == "file")
+          failed_when: ("Good signature" not in ssh_audit_gpg_check.stdout)
 
         - name: ssh-audit source unarchived
           ansible.builtin.unarchive:
@@ -127,7 +127,7 @@
         - name: Check that ssh-audit works by running it with --help
           ansible.builtin.command: "python3 /usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}/ssh-audit.py --help"
           changed_when: false
-          when: ( ssh_audit_unarchived.failed is defined ) and ( not ssh_audit_unarchived.failed | bool )
+          when: (ssh_audit_unarchived.failed is defined) and (not ssh_audit_unarchived.failed | bool)
 
         - name: ssh-audit symlink in place
           ansible.builtin.file:
