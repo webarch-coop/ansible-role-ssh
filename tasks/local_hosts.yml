@@ -130,13 +130,7 @@
           ansible.builtin.blockinfile:
             path: "{{ ssh_local_hosts_readme }}"
             marker: "<!-- {mark} {{ ssh_local_hosts_hostname }} -->"
-            block: |
-              ## {{ inventory_hostname }}
-              SSH server fingerprints for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}`:
-              ```yml
-              {{  ssh_audit.fingerprints | to_nice_yaml }}
-              ```
-              The above YAML can generated using `ssh-audit -j {{ ssh_local_hosts_hostname }} | jq .fingerprints | yq -P`
+            block: "{{ ssh_local_hosts_readme_host }}"
             insertafter: EOF
             create: true
             mode: 0600

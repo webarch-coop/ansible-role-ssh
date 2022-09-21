@@ -124,6 +124,15 @@ ssh_local_hosts_port: "{{ ssh_ports[0] | default('22') }}"
 # Path to a local README.md file
 ssh_local_hosts_readme: "{{ ssh_local_hosts_directory }}/README.md"
 
+# Template for each Host for the local README.md file
+ssh_local_hosts_readme_host: |
+  ## {{ inventory_hostname }}
+  SSH server fingerprints for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}`:
+  ```yml
+  {{  ssh_audit.fingerprints | to_nice_yaml }}
+  ```
+  The above YAML can generated using `ssh-audit -j {{ ssh_local_hosts_hostname }} | jq .fingerprints | yq -P`
+
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
   - hmac-sha2-512-etm@openssh.com
