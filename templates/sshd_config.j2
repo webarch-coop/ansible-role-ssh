@@ -210,7 +210,6 @@ Match group chroot
     PermitUserRC no
     PermitTTY yes
     PermitRootLogin No
-    SetEnv TMPDIR=/home/%u/tmp TMP=/home/%u/tmp TEMP=/home/%u/tmp
 {% endif %}
 
 {% if 'git' in ssh_allow_groups and ssh_gitlab is defined and ssh_gitlab | bool %}
