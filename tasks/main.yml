@@ -60,6 +60,7 @@
         state: latest
         default_release: "{{ ansible_distribution_release }}-backports"
         install_recommends: true
+      register: ssh_install_backports
       notify: restart ssh
       when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
@@ -74,7 +75,21 @@
           - ssh-import-id
         state: present
         install_recommends: true
+      register: ssh_install
       notify: restart ssh
+
+    - name: Restart SSH and re-run checks if when new packages are installed
+      block:
+
+        - name: Flush handlers to restart SSH if packages have bee updated
+          ansible.builtin.meta: flush_handlers
+
+        - name: Run pre-update checks
+          ansible.builtin.include_tasks: checks.yml
+          vars:
+            ssh_first_check: true
+
+      when: (ssh_install_backports is defined and ssh_install_backports.changed | bool) or (ssh_install is defined and ssh_install.changed | bool)
 
     - name: Include ssh-audit install tasks
       ansible.builtin.include_tasks: ssh_audit.yml
@@ -95,48 +110,6 @@
       loop_control:
         loop_var: ssh_allow_group
       when: (ssh_allow_groups is defined) and (ssh_allow_groups != [])
-
-    - name: Generate keypair for root user
-      block:
-
-        - name: Root ~/.ssh directory present
-          ansible.builtin.file:
-            path: /root/.ssh
-            state: directory
-            mode: 0700
-            owner: root
-            group: root
-
-        - name: Stat the root SSH ECDSA keypair
-          ansible.builtin.stat:
-            path: "{{ file }}"
-          loop:
-            - /root/.ssh/id_ed25519
-            - /root/.ssh/id_ed25519.pub
-          loop_control:
-            loop_var: file
-            label: "{{ file | basename }}"
-          register: ssh_root_id_ed25519
-
-        - name: SSH ECDSA keypair for root present
-          community.crypto.openssh_keypair:
-            path: /root/.ssh/id_ed25519
-            type: ed25519
-            comment: "root@{{ inventory_hostname }}"
-            state: present
-            mode: "0600"
-            owner: root
-            group: root
-          when: >
-             (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[0].stat.exists) or
-             (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[1].stat.exists)
-          register: ssh_root_id_ed25519
-
-      when: (ssh_root_keypair is defined) and (ssh_root_keypair | bool)
-
-    - name: Include SSH key pair generation for CI
-      ansible.builtin.include_tasks: ci.yml
-      when: (ssh_ci_ips is defined) and (ssh_ci_ips != [])
 
     - name: Diffie-Hellman moduli which are less than 4000 bits absent
       ansible.builtin.lineinfile:
@@ -210,11 +183,54 @@
 
     - name: Flush handlers to restart SSH if the configuration has changed
       ansible.builtin.meta: flush_handlers
+      when: (ssh_config is defined) and (ssh_config.changed | bool)
 
     - name: Run post-update checks
       ansible.builtin.include_tasks: checks.yml
       vars:
         ssh_first_check: false
+
+    - name: Generate keypair for root user
+      block:
+
+        - name: Root ~/.ssh directory present
+          ansible.builtin.file:
+            path: /root/.ssh
+            state: directory
+            mode: 0700
+            owner: root
+            group: root
+
+        - name: Stat the root SSH ECDSA keypair
+          ansible.builtin.stat:
+            path: "{{ file }}"
+          loop:
+            - /root/.ssh/id_ed25519
+            - /root/.ssh/id_ed25519.pub
+          loop_control:
+            loop_var: file
+            label: "{{ file | basename }}"
+          register: ssh_root_id_ed25519
+
+        - name: SSH ECDSA keypair for root present
+          community.crypto.openssh_keypair:
+            path: /root/.ssh/id_ed25519
+            type: ed25519
+            comment: "root@{{ inventory_hostname }}"
+            state: present
+            mode: "0600"
+            owner: root
+            group: root
+          when: >
+             (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[0].stat.exists) or
+             (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[1].stat.exists)
+          register: ssh_root_id_ed25519
+
+      when: (ssh_root_keypair is defined) and (ssh_root_keypair | bool)
+
+    - name: Include SSH key pair generation for CI
+      ansible.builtin.include_tasks: ci.yml
+      when: (ssh_ci_ips is defined) and (ssh_ci_ips != [])
 
     - name: Include local configuration generation tasks
       ansible.builtin.include_tasks: local_hosts.yml
