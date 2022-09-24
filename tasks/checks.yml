@@ -139,6 +139,13 @@
           loop_control:
             loop_var: algo
 
+      rescue:
+
+        - name: Host key algorithms check failed
+          ansible.builtin.debug:
+            var: ssh_q_host_key_algorithms.stderr
+          when: ssh_q_host_key_algorithms.rc == 255
+
       when: ssh_host_key_algorithms is defined
 
     - name: Host keys checks
@@ -206,7 +213,7 @@
       block:
 
         - name: Get a list of available kex algorithms
-          ansible.builtin.command: ssh -Q KexAlgorithms
+          ansible.builtin.command: ssh -Q kexalgorithms
           check_mode: false
           changed_when: false
           register: ssh_q_kex_algorithms
@@ -228,6 +235,13 @@
           loop: "{{ ssh_kex_algorithms }}"
           loop_control:
             loop_var: algo
+
+      rescue:
+
+        - name: Kex algorithms check failed
+          ansible.builtin.debug:
+            var: ssh_q_kex_algorithms.stderr
+          when: ssh_q_kex_algorithms.rc == 255
 
       when: ssh_kex_algorithms is defined
 
