@@ -22,7 +22,7 @@
     - name: Chroot checks
       block:
 
-        - name: "Check that {{ ssh_chroot_users_dir }} is a directory when it is defined"
+        - name: Check that the chroot users dir is a directory when it is defined
           ansible.builtin.stat:
             path: "{{ ssh_chroot_users_dir }}"
           register: ssh_chroot_users_dir_check

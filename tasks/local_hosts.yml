@@ -14,7 +14,7 @@
           - "ssh_local_hosts_readme{% if ssh_local_hosts_readme is defined %} {{ ssh_local_hosts_readme }}{% endif %}"
         verbosity: 1
 
-    - name: Audit SSH and generate JSON output
+    - name: Audit SSH server and generate JSON output
       ansible.builtin.command: ssh-audit -j localhost
       check_mode: false
       changed_when: false
@@ -36,23 +36,6 @@
 
     - name: Local Host files
       block:
-
-        - name: Local Host directory present
-          ansible.builtin.file:
-            path: "{{ ssh_local_hosts_directory }}"
-            state: directory
-            mode: 0700
-          register: ssh_local_hosts_dir
-
-        - name: First line in local Host file present
-          ansible.builtin.lineinfile:
-            path: "{{ ssh_local_hosts_file }}"
-            line: "# Ansible managed"
-            state: present
-            insertbefore: BOF
-            create: true
-            mode: 0600
-          when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
 
         - name: Debug local directory for Host file
           ansible.builtin.debug:
@@ -90,6 +73,23 @@
             verbosity: 2
           when: ssh_local_hosts_port is defined
 
+        - name: Local Host directory present
+          ansible.builtin.file:
+            path: "{{ ssh_local_hosts_directory }}"
+            state: directory
+            mode: 0700
+          register: ssh_local_hosts_dir
+
+        - name: Last line in local Host file present
+          ansible.builtin.lineinfile:
+            path: "{{ ssh_local_hosts_file }}"
+            line: "# vim: syntax=sshconfig"
+            state: present
+            insertafter: EOF
+            create: true
+            mode: 0600
+          when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
+
         - name: Host present in the local Host file
           ansible.builtin.blockinfile:
             path: "{{ ssh_local_hosts_file }}"
@@ -111,17 +111,17 @@
                 UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
               {% endif %}
               {% endif %}
-            insertafter: "^# Ansible managed$"
+            insertbefore: "^# vim: syntax=sshconfig$"
             create: true
             mode: 0600
           when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
 
-        - name: Last line in local Host file present
+        - name: First line in local Host file present
           ansible.builtin.lineinfile:
             path: "{{ ssh_local_hosts_file }}"
-            line: "# vim: syntax=sshconfig"
+            line: "# Ansible managed"
             state: present
-            insertafter: EOF
+            insertbefore: BOF
             create: true
             mode: 0600
           when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")

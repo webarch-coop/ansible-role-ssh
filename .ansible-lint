@@ -3,6 +3,8 @@
 skip_list:
   # Jinja2 spacing could be improved
   - jinja[spacing]
+  # You can improve the task key order to: name, when, block
+  - key-order[task]
   # When installing from backports the latest version is wanted
   - package-latest
   # The metadata schema validation fails as it expect the versions of Debian to be intergers and not strings
