@@ -5,15 +5,26 @@
     - name: Check variable types
       ansible.builtin.assert:
         that:
-          - ( ssh_authentication_methods == "publickey" ) or ( ssh_authentication_methods | type_debug == "bool" )
-          - ssh_password_authentication | type_debug == "bool"
-          - ssh_pubkey_authentication | type_debug == "bool"
           - ssh_allow_agent_forwarding | type_debug == "bool"
+          - ssh_allow_groups | type_debug == "list"
           - ssh_allow_tcp_forwarding | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_kex_algorithms | type_debug == "list"
+          - ssh_allow_tcp_forwarding is regex('all|local|no|remote|yes')
+          - ssh_authentication_methods | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_check_fail | type_debug == "bool"
           - ssh_ciphers | type_debug == "list"
+          - ssh_gitlab | type_debug == "bool"
+          - ssh_host_key_algorithms | type_debug == "list"
+          - ssh_host_keys | type_debug == "list"
+          - ssh_kex_algorithms | type_debug == "list"
+          - ssh_listen_addresses | type_debug == "list"
           - ssh_macs | type_debug == "list"
-        fail_msg: "Please check your variables, some which were previously strings are now expected to be booleans"
+          - ssh_password_authentication | type_debug == "bool"
+          - ssh_permit_root_login | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_permit_root_login is regex('forced-commands-only|no|prohibit-password|yes')
+          - ssh_ports | type_debug == "list"
+          - ssh_pubkey_authentication | type_debug == "bool"
+          - ssh_x11_forwarding | type_debug == "bool"
+        fail_msg: "Please check your variables"
 
     - name: Check ssh_allow_groups variable type
       ansible.builtin.assert:

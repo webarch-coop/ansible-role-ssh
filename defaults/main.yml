@@ -1,7 +1,7 @@
 ---
 # See also meta/argument_specs.yml
 
-# https://man.openbsd.org/sshd_config#PubkeyAuthentication
+# https://man.openbsd.org/sshd_config#AllowAgentForwarding
 ssh_allow_agent_forwarding: false
 
 # https://man.openbsd.org/sshd_config#AllowGroups
