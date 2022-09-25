@@ -43,7 +43,7 @@
     - name: Restart SSH and re-run checks if when new packages are installed
       block:
 
-        - name: Flush handlers to restart SSH if packages have bee updated
+        - name: Flush handlers to restart SSH if packages have been updated
           ansible.builtin.meta: flush_handlers
 
         - name: Run pre-update checks
