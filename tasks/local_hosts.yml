@@ -149,4 +149,5 @@
   tags:
     - ssh
     - ssh_local_hosts
+    - ssh_fingerprint
 ...

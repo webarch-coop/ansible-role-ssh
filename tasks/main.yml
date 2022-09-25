@@ -11,13 +11,15 @@
     - ssh
     - ssh_debug
 
+- name: Run pre-update checks
+  ansible.builtin.include_tasks: checks.yml
+  vars:
+    ssh_first_check: true
+  tags:
+    - ssh_check
+
 - name: OpenSSH server present and configured
   block:
-
-    - name: Run pre-update checks
-      ansible.builtin.include_tasks: checks.yml
-      vars:
-        ssh_first_check: true
 
     - name: OpenSSH present
       ansible.builtin.include_tasks: install.yml
@@ -72,4 +74,5 @@
   tags:
     - ssh
     - ssh_local_hosts
+    - ssh_fingerprint
 ...
