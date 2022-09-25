@@ -2,6 +2,31 @@
 - name: Check OpenSSH server variables
   block:
 
+    - name: Check variable types
+      ansible.builtin.assert:
+        that:
+          - ( ssh_authentication_methods == "publickey" ) or ( ssh_authentication_methods | type_debug == "bool" )
+          - ssh_password_authentication | type_debug == "bool"
+          - ssh_pubkey_authentication | type_debug == "bool"
+          - ssh_allow_agent_forwarding | type_debug == "bool"
+          - ( ssh_allow_tcp_forwarding | type_debug == "bool" ) or ( ssh_allow_tcp_forwarding == "all" ) or ( ssh_allow_tcp_forwarding == "remote" )
+          - ssh_kex_algorithms | type_debug == "list"
+          - ssh_ciphers | type_debug == "list"
+          - ssh_macs | type_debug == "list"
+        fail_msg: "Please check your variables, some which were previously strings are now expected to be booleans"
+
+    - name: Check ssh_allow_groups variable type
+      ansible.builtin.assert:
+        that:
+          - ssh_allow_groups | type_debug == "list"
+      when: ssh_allow_groups is defined
+
+    - name: Check ssh_deny_users variable type
+      ansible.builtin.assert:
+        that:
+          - ssh_deny_users | type_debug == "list"
+      when: ssh_deny_users is defined
+
     - name: Check that the groups in ssh_allow_groups are present
       ansible.builtin.getent:
         database: group
