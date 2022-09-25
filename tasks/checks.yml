@@ -9,7 +9,7 @@
           - ssh_password_authentication | type_debug == "bool"
           - ssh_pubkey_authentication | type_debug == "bool"
           - ssh_allow_agent_forwarding | type_debug == "bool"
-          - ( ssh_allow_tcp_forwarding | type_debug == "bool" ) or ( ssh_allow_tcp_forwarding == "all" ) or ( ssh_allow_tcp_forwarding == "remote" )
+          - ssh_allow_tcp_forwarding | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$)
           - ssh_kex_algorithms | type_debug == "list"
           - ssh_ciphers | type_debug == "list"
           - ssh_macs | type_debug == "list"
