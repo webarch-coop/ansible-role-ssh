@@ -400,4 +400,5 @@
 
   tags:
     - ssh
+    - ssh_check
 ...
