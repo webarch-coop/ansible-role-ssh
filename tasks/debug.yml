@@ -1,0 +1,37 @@
+---
+- name: Debug variables
+  ansible.builtin.debug:
+    msg:
+      - "Debian version {{ ansible_distribution_release }}"
+      - "AllowAgentForwarding{% if ssh_allow_agent_forwarding is defined and ssh_allow_agent_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_agent_forwarding"
+      - "AllowGroups{% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %} # ssh_allow_groups "
+      - "AllowTcpForwarding{% if ssh_allow_tcp_forwarding is defined and ssh_allow_tcp_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_tcp_forwarding"
+      - "AuthenticationMethods {{ ssh_authentication_methods }} # ssh_authentication_methods"
+      - "ssh_check_fail: {{ ssh_check_fail }}"
+      - "ChrootDirectory{% if ssh_chroot_users_dir is defined %} {{ ssh_chroot_users_dir }}{% endif %} # ssh_chroot_users_dir"
+      - "ssh_ci_ips{% if ssh_ci_ips is defined %}{% for ip in ssh_ci_ips %} {{ ip }}{% endfor %}{% endif %}"
+      - "Chipers{% if ssh_ciphers is defined %} {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_ciphers"
+      - "DenyUsers{% if ssh_deny_users is defined %}{% for u in ssh_deny_users %} {{ u }}{% endfor %}{% endif %} # ssh_deny_users"
+      - "HostKeyAlgorithms{% if ssh_host_key_algorithms is defined %} {% for a in ssh_host_key_algorithms %}{{ a }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_host_key_algorithms"
+      - "ssh_gitlab{% if ssh_gitlab is defined %} {{ ssh_gitlab | lower }}{% endif %}"
+      - "HostKey{% if ssh_host_keys is defined %}{% for key in ssh_host_keys %} {{ key }}{% endfor %}{% endif %} # ssh_host_keys"
+      - "KexAlgorithms{% if ssh_kex_algorithms is defined %} {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_kex_algorithms"
+      - "ListenAddress{% if ssh_listen_addresses is defined %} {% for a in ssh_listen_addresses %}{{ a }}{% endfor %}{% endif %} # ssh_listen_addresses"
+      - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}"
+      - "ssh_local_hosts_file{% if ssh_local_hosts_file is defined %} {{ ssh_local_hosts_file }}{% endif %}"
+      - "ssh_local_hosts_host{% if ssh_local_hosts_host is defined %} {{ ssh_local_hosts_host }}{% endif %}"
+      - "ssh_local_hosts_hostname{% if ssh_local_hosts_hostname is defined %} {{ ssh_local_hosts_hostname }}{% endif %}"
+      - "ssh_local_hosts_user_known_hosts_file{% if ssh_local_hosts_user_known_hosts_file is defined %} {{ ssh_local_hosts_user_known_hosts_file }}{% endif %}"
+      - "ssh_local_hosts_port{% if ssh_local_hosts_port is defined %} {{ ssh_local_hosts_port }}{% endif %}"
+      - "ssh_local_hosts_readme{% if ssh_local_hosts_readme is defined %} {{ ssh_local_hosts_readme }}{% endif %}"
+      - "MACs{% if ssh_macs is defined %} {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == 'append' %}+{% elif ssh_mac_list_strategy == 'head' %}^{% elif ssh_mac_list_strategy == 'remove' %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_macs and ssh_mac_list_strategy"
+      - "PasswordAuthentication {{ ssh_password_authentication | lower }} # ssh_password_authentication"
+      - "PermitRootLogin {{ ssh_permit_root_login }} # ssh_permit_root_login"
+      - "PubkeyAuthentication {% if ssh_password_authentication | bool %}yes{% else %}no{% endif %} # ssh_pubkey_authentication"
+      - "ssh_root_keypair{% if ssh_root_keypair is defined %} {{ ssh_root_keypair | lower }}{% endif %}"
+      - "X11Forwarding{% if ssh_x11_forwarding is defined and ssh_x11_forwarding | bool %} yes{% else %} no{% endif %} # ssh_x11_forwarding"
+    verbosity: 1
+  tags:
+    - ssh
+    - ssh_debug
+...

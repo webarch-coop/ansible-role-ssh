@@ -1,0 +1,40 @@
+---
+- name: Generate keypair for root user
+  block:
+
+    - name: Root ~/.ssh directory present
+      ansible.builtin.file:
+        path: /root/.ssh
+        state: directory
+        mode: 0700
+        owner: root
+        group: root
+
+    - name: Stat the root SSH ECDSA keypair
+      ansible.builtin.stat:
+        path: "{{ file }}"
+      loop:
+        - /root/.ssh/id_ed25519
+        - /root/.ssh/id_ed25519.pub
+      loop_control:
+        loop_var: file
+        label: "{{ file | basename }}"
+      register: ssh_root_id_ed25519
+
+    - name: SSH ECDSA keypair for root present
+      community.crypto.openssh_keypair:
+        path: /root/.ssh/id_ed25519
+        type: ed25519
+        comment: "root@{{ inventory_hostname }}"
+        state: present
+        mode: "0600"
+        owner: root
+        group: root
+      when: >
+         (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[0].stat.exists) or
+         (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[1].stat.exists)
+      register: ssh_root_id_ed25519
+
+  tags:
+    - ssh
+...

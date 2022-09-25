@@ -1,0 +1,58 @@
+---
+- name: OpenSSH server present
+  block:
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+      when: not ansible_check_mode | bool
+
+    - name: Run apt-cache policy
+      ansible.builtin.command: apt-cache policy
+      check_mode: false
+      changed_when: false
+      register: ssh_apt_cache_policy
+
+    - name: OpenSSH packages present from backports
+      ansible.builtin.apt:
+        pkg:
+          - openssh-client
+          - openssh-server
+          - openssh-sftp-server
+        state: latest
+        default_release: "{{ ansible_distribution_release }}-backports"
+        install_recommends: true
+      register: ssh_install_backports
+      notify: restart ssh
+      when: ssh_apt_backports in ssh_apt_cache_policy.stdout
+
+    - name: OpenSSH and related packages present
+      ansible.builtin.apt:
+        pkg:
+          - libc-bin
+          - kitty-terminfo
+          - openssh-client
+          - openssh-server
+          - openssh-sftp-server
+          - ssh-import-id
+        state: present
+        install_recommends: true
+      register: ssh_install
+      notify: restart ssh
+
+    - name: Restart SSH and re-run checks if when new packages are installed
+      block:
+
+        - name: Flush handlers to restart SSH if packages have bee updated
+          ansible.builtin.meta: flush_handlers
+
+        - name: Run pre-update checks
+          ansible.builtin.include_tasks: checks.yml
+          vars:
+            ssh_first_check: true
+
+      when: (ssh_install_backports is defined and ssh_install_backports.changed | bool) or (ssh_install is defined and ssh_install.changed | bool)
+
+  tags:
+    - ssh
+...

@@ -1,102 +1,28 @@
 ---
-- name: Configure OpenSSH server
-  block:
+- name: Include ssh-audit install tasks
+  ansible.builtin.include_tasks: ssh_audit.yml
+  tags:
+    - ssh
+    - ssh_audit
 
-    - name: Debug variables
-      ansible.builtin.debug:
-        msg:
-          - "Debian version {{ ansible_distribution_release }}"
-          - "AllowAgentForwarding{% if ssh_allow_agent_forwarding is defined and ssh_allow_agent_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_agent_forwarding"
-          - "AllowGroups{% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %} # ssh_allow_groups "
-          - "AllowTcpForwarding{% if ssh_allow_tcp_forwarding is defined and ssh_allow_tcp_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_tcp_forwarding"
-          - "AuthenticationMethods {{ ssh_authentication_methods }} # ssh_authentication_methods"
-          - "ssh_check_fail: {{ ssh_check_fail }}"
-          - "ChrootDirectory{% if ssh_chroot_users_dir is defined %} {{ ssh_chroot_users_dir }}{% endif %} # ssh_chroot_users_dir"
-          - "ssh_ci_ips{% if ssh_ci_ips is defined %}{% for ip in ssh_ci_ips %} {{ ip }}{% endfor %}{% endif %}"
-          - "Chipers{% if ssh_ciphers is defined %} {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_ciphers"
-          - "DenyUsers{% if ssh_deny_users is defined %}{% for u in ssh_deny_users %} {{ u }}{% endfor %}{% endif %} # ssh_deny_users"
-          - "HostKeyAlgorithms{% if ssh_host_key_algorithms is defined %} {% for a in ssh_host_key_algorithms %}{{ a }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_host_key_algorithms"
-          - "ssh_gitlab{% if ssh_gitlab is defined %} {{ ssh_gitlab | lower }}{% endif %}"
-          - "HostKey{% if ssh_host_keys is defined %}{% for key in ssh_host_keys %} {{ key }}{% endfor %}{% endif %} # ssh_host_keys"
-          - "KexAlgorithms{% if ssh_kex_algorithms is defined %} {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_kex_algorithms"
-          - "ListenAddress{% if ssh_listen_addresses is defined %} {% for a in ssh_listen_addresses %}{{ a }}{% endfor %}{% endif %} # ssh_listen_addresses"
-          - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}"
-          - "ssh_local_hosts_file{% if ssh_local_hosts_file is defined %} {{ ssh_local_hosts_file }}{% endif %}"
-          - "ssh_local_hosts_host{% if ssh_local_hosts_host is defined %} {{ ssh_local_hosts_host }}{% endif %}"
-          - "ssh_local_hosts_hostname{% if ssh_local_hosts_hostname is defined %} {{ ssh_local_hosts_hostname }}{% endif %}"
-          - "ssh_local_hosts_user_known_hosts_file{% if ssh_local_hosts_user_known_hosts_file is defined %} {{ ssh_local_hosts_user_known_hosts_file }}{% endif %}"
-          - "ssh_local_hosts_port{% if ssh_local_hosts_port is defined %} {{ ssh_local_hosts_port }}{% endif %}"
-          - "ssh_local_hosts_readme{% if ssh_local_hosts_readme is defined %} {{ ssh_local_hosts_readme }}{% endif %}"
-          - "MACs{% if ssh_macs is defined %} {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == 'append' %}+{% elif ssh_mac_list_strategy == 'head' %}^{% elif ssh_mac_list_strategy == 'remove' %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_macs and ssh_mac_list_strategy"
-          - "PasswordAuthentication {{ ssh_password_authentication | lower }} # ssh_password_authentication"
-          - "PermitRootLogin {{ ssh_permit_root_login }} # ssh_permit_root_login"
-          - "PubkeyAuthentication {% if ssh_password_authentication | bool %}yes{% else %}no{% endif %} # ssh_pubkey_authentication"
-          - "ssh_root_keypair{% if ssh_root_keypair is defined %} {{ ssh_root_keypair | lower }}{% endif %}"
-          - "X11Forwarding{% if ssh_x11_forwarding is defined and ssh_x11_forwarding | bool %} yes{% else %} no{% endif %} # ssh_x11_forwarding"
-        verbosity: 1
+- name: Debug variables
+  ansible.builtin.include_tasks: debug.yml
+  tags:
+    - ssh
+    - ssh_debug
+
+- name: OpenSSH server present and configured
+  block:
 
     - name: Run pre-update checks
       ansible.builtin.include_tasks: checks.yml
       vars:
         ssh_first_check: true
 
-    - name: Update apt cache
-      ansible.builtin.apt:
-        update_cache: true
-      when: not ansible_check_mode | bool
+    - name: OpenSSH present
+      ansible.builtin.include_tasks: install.yml
 
-    - name: Run apt-cache policy
-      ansible.builtin.command: apt-cache policy
-      check_mode: false
-      changed_when: false
-      register: ssh_apt_cache_policy
-
-    - name: OpenSSH packages present from backports
-      ansible.builtin.apt:
-        pkg:
-          - openssh-client
-          - openssh-server
-          - openssh-sftp-server
-        state: latest
-        default_release: "{{ ansible_distribution_release }}-backports"
-        install_recommends: true
-      register: ssh_install_backports
-      notify: restart ssh
-      when: ssh_apt_backports in ssh_apt_cache_policy.stdout
-
-    - name: OpenSSH and related packages present
-      ansible.builtin.apt:
-        pkg:
-          - libc-bin
-          - kitty-terminfo
-          - openssh-client
-          - openssh-server
-          - openssh-sftp-server
-          - ssh-import-id
-        state: present
-        install_recommends: true
-      register: ssh_install
-      notify: restart ssh
-
-    - name: Restart SSH and re-run checks if when new packages are installed
-      block:
-
-        - name: Flush handlers to restart SSH if packages have bee updated
-          ansible.builtin.meta: flush_handlers
-
-        - name: Run pre-update checks
-          ansible.builtin.include_tasks: checks.yml
-          vars:
-            ssh_first_check: true
-
-      when: (ssh_install_backports is defined and ssh_install_backports.changed | bool) or (ssh_install is defined and ssh_install.changed | bool)
-
-    - name: Include ssh-audit install tasks
-      ansible.builtin.include_tasks: ssh_audit.yml
-      tags:
-        - ssh_audit
-
-    - name: Loop through the SSH host keys
+    - name: SSH host keys present
       ansible.builtin.include_tasks: host_key.yml
       loop: "{{ ssh_host_keys }}"
       loop_control:
@@ -121,123 +47,29 @@
         group: root
       notify: restart ssh
 
-    - name: Test the SSH server configuration
-      block:
-
-        - name: Write the proposed config to a test file
-          ansible.builtin.template:
-            src: templates/sshd_config.j2
-            dest: /etc/ssh/.sshd_config.ansible.test
-            mode: "0600"
-            owner: root
-            group: root
-            validate: /usr/sbin/sshd -t -dd -f %s
-          register: ssh_config_test
-
-      rescue:
-
-        - name: Print standard error from the test of the proposed configuration
-          ansible.builtin.debug:
-            var: ssh_config_test.stderr
-
-        - name: Fail because the generated test sshd_config does not validate
-          ansible.builtin.fail:
-            msg:
-              - "The proposed new SSH configuration did not validate, see the errors above."
-              - "The failed configuration has been written to /etc/ssh/.sshd_config.new"
-
-    - name: Apply the SSH server configuration
-      block:
-
-        - name: SSHD configuration file sshd_config in place
-          ansible.builtin.template:
-            src: templates/sshd_config.j2
-            dest: /etc/ssh/sshd_config
-            mode: "0644"
-            owner: root
-            group: root
-            validate: /usr/sbin/sshd -t -f %s
-            backup: true
-          register: ssh_config
-          notify: restart ssh
-
-      rescue:
-
-        - name: Non-valid sshd_config written to /etc/ssh/.sshd_config.broken
-          ansible.builtin.template:
-            src: templates/sshd_config.j2
-            dest: /etc/ssh/.sshd_config.broken
-            mode: "0600"
-            owner: root
-            group: root
-
-        - name: Print standard error from the test of the proposed configuration
-          ansible.builtin.debug:
-            var: ssh_config.stderr
-
-        - name: Fail because the generated sshd_config does not validate
-          ansible.builtin.fail:
-            msg:
-              - "/etc/ssh/sshd_config has not been updated, a non-valid SSH server config has not been applied."
-              - "The non-valid SSH server config has been written to /etc/ssh/.sshd_config.broken"
-
-    - name: Flush handlers to restart SSH if the configuration has changed
-      ansible.builtin.meta: flush_handlers
-      when: (ssh_config is defined) and (ssh_config.changed | bool)
+    - name: OpenSSH server configured
+      ansible.builtin.include_tasks: configure.yml
 
     - name: Run post-update checks
       ansible.builtin.include_tasks: checks.yml
       vars:
         ssh_first_check: false
 
-    - name: Generate keypair for root user
-      block:
-
-        - name: Root ~/.ssh directory present
-          ansible.builtin.file:
-            path: /root/.ssh
-            state: directory
-            mode: 0700
-            owner: root
-            group: root
-
-        - name: Stat the root SSH ECDSA keypair
-          ansible.builtin.stat:
-            path: "{{ file }}"
-          loop:
-            - /root/.ssh/id_ed25519
-            - /root/.ssh/id_ed25519.pub
-          loop_control:
-            loop_var: file
-            label: "{{ file | basename }}"
-          register: ssh_root_id_ed25519
-
-        - name: SSH ECDSA keypair for root present
-          community.crypto.openssh_keypair:
-            path: /root/.ssh/id_ed25519
-            type: ed25519
-            comment: "root@{{ inventory_hostname }}"
-            state: present
-            mode: "0600"
-            owner: root
-            group: root
-          when: >
-             (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[0].stat.exists) or
-             (ssh_root_id_ed25519.results[0].stat.exists is not defined or not ssh_root_id_ed25519.results[1].stat.exists)
-          register: ssh_root_id_ed25519
-
+    - name: Generate OpenSSH keypair for root user
+      ansible.builtin.include_tasks: root.yml
       when: (ssh_root_keypair is defined) and (ssh_root_keypair | bool)
 
-    - name: Include SSH key pair generation for CI
+    - name: Include OpenSSH key pair generation for CI
       ansible.builtin.include_tasks: ci.yml
       when: (ssh_ci_ips is defined) and (ssh_ci_ips != [])
 
-    - name: Include local configuration generation tasks
-      ansible.builtin.include_tasks: local_hosts.yml
-      when: (ssh_local_hosts is defined) and (ssh_local_hosts | bool)
-      tags:
-        - ssh_local_hosts
-
   tags:
     - ssh
+
+- name: Include local OpenSSH client configuration tasks
+  ansible.builtin.include_tasks: local_hosts.yml
+  when: (ssh_local_hosts is defined) and (ssh_local_hosts | bool)
+  tags:
+    - ssh
+    - ssh_local_hosts
 ...
