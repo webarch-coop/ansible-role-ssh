@@ -26,7 +26,7 @@
       ansible.builtin.assert:
         that:
           - ssh_version is defined
-          - ssh_version is regex(^[0-9]{1,2}[.][0-9]{1,2}$)
+          - ssh_version is regex('^[0-9]{1,2}[.][0-9]{1,2}$')
 
     - name: Test the SSH server configuration
       block:
