@@ -10,6 +10,7 @@
           check_mode: false
           changed_when: false
           register: ssh_audit_json
+          failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
         - name: Set a fact for the SSH audit results
           ansible.builtin.set_fact:
