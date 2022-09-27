@@ -16,6 +16,20 @@ For servers running OpenSSH older than OpenSSH 8.4, the `sk` algorithms need to 
 
 The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults file](defaults/main.yml), however note that [OpenSSH 6.7](https://www.openssh.com/txt/release-6.7) was released eight years ago (2014-10-06) so this is a legacy, not a modern, configuration guide.
 
+## Local SSH client configuration files
+
+If the `ssh_local_hosts` variable to set to `True` then this role will generate local SSH `config` and `known_hosts` files, either one file per host or one file for all hosts, see the [Webarchitects SSH fingerprints](https://git.coop/webarch/webarch-ssh) git repo for an example of the generated configuration.
+
+## Role tags
+
+The suggest way to run this role is to first run it with the `ssh_audit` tag to ensure that `ssh-audit` is installed.
+
+Then run it with the `ssh` tag and `--check --diff` to see what changes, if any are to be made to the `/etc/ssh/sshd_config` file.
+
+Then once your are sure everything looks OK run without `--check`.
+
+To just update / create local SSH configuration files run with the `ssh_fingerprint` tag. 
+
 ## Defaults
 
 For the configurable variables see [defaults/main.yml](defaults/main.yml):
@@ -62,16 +76,6 @@ By default only members of the `root` and `sudo` groups can connect to the serve
 There are five [`Match`](https://man.openbsd.org/sshd_config#Match) blocks that are conditionally added to the `/etc/ssh/sshd_config` file depending on the the `chroot`, `git`, `sshonly`, `sftponly` and `xen` groups being in the `ssh_allow_groups` list, a [more generic method to add `Match` blocks](https://git.coop/webarch/ssh/-/issues/3) is planned.
 
 See the [chroot role](https://git.coop/webarch/chroot) for the Debian chroot implementation.
-
-## UserKnownHostsFile
-
-This role can optionally generate a [UserKnownHostsFile](https://man.openbsd.org/ssh_config#UserKnownHostsFile) if `ssh_scan_keys` is `True` and `ssh_local_known_hosts_file` is defined, for example set this variable to `~/.ssh/ansible_known_hosts` and add the following to `~/.ssh/config`:
-
-```
-UserKnownHostsFile ~/.ssh/ansible_known_hosts ~/.ssh/known_hosts
-```
-
-The file generated has non-hashed entries and includes the port number(s), see the [known hosts file format documentation](https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT).
 
 ## CI keys
 
