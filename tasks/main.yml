@@ -11,11 +11,12 @@
     - ssh
     - ssh_debug
 
-- name: Run pre-update checks
+- name: Run checks
   ansible.builtin.include_tasks: checks.yml
   vars:
     ssh_first_check: true
   tags:
+    - ssh
     - ssh_check
 
 - name: OpenSSH server present and configured
