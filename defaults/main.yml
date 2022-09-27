@@ -128,8 +128,10 @@ ssh_local_hosts_readme: "{{ ssh_local_hosts_directory }}/README.md"
 ssh_local_hosts_readme_host: |
   ## {{ inventory_hostname }}
   SSH server fingerprints for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}`:
+  {% if ssh_audit is defined %}
   ```yml
-  {{  ssh_audit.fingerprints | to_nice_yaml }}
+  {{ ssh_audit.fingerprints | to_nice_yaml }}
+  {% endif %}
   ```
   The above YAML can generated using `ssh-audit -j {{ ssh_local_hosts_hostname }} | jq .fingerprints | yq -P`
 

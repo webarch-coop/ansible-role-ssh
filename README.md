@@ -22,9 +22,9 @@ If the `ssh_local_hosts` variable to set to `True` then this role will generate 
 
 ## Role tags
 
-The suggest way to run this role is to first run it with the `ssh_audit` tag to ensure that `ssh-audit` is installed.
+The suggested way to run this role is to first run it with the `ssh_audit` tag to ensure that `ssh-audit` is installed.
 
-Then run it with the `ssh` tag and `--check --diff` to see what changes, if any are to be made to the `/etc/ssh/sshd_config` file.
+Then run it with the `ssh` tag and `--check --diff` to see what changes, if any, are to be made to the `/etc/ssh/sshd_config` file.
 
 Then once your are sure everything looks OK run without `--check`.
 
