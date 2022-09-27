@@ -62,12 +62,15 @@ argument_specs:
         type: list
         elements: str
         description: ListenAddress, IP addresses that SSH should listen for connections on
+      ssh_local_hosts:
+        type: bool
+        description: Generate local SSH client configuration files
       ssh_local_hosts_directory:
         type: str
-        description: Local directory for Host file
+        description: Local directory for SSH client configuration files
       ssh_local_hosts_file:
         type: str
-        description: Path to the local Host file
+        description: Path to the local SSH client configuration file
       ssh_local_hosts_host:
         type: str
         description: Host name(s) to use in the local Host file
@@ -83,6 +86,9 @@ argument_specs:
       ssh_local_hosts_readme:
         type: str
         description: Path to a local README.md file
+      ssh_local_hosts_readme_host:
+        type: str
+        description: Template for each Host for the local README.md file
       ssh_macs:
         type: list
         elements: str

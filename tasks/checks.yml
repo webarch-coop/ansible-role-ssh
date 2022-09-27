@@ -2,21 +2,131 @@
 - name: Check OpenSSH server variables
   block:
 
-    - name: Check variable types
+    - name: Check ssh_allow_agent_forwarding variable
       ansible.builtin.assert:
         that:
           - ssh_allow_agent_forwarding | type_debug == "bool"
+      when: ssh_allow_agent_forwarding is defined
+
+    - name: Check ssh_allow_groups variable
+      ansible.builtin.assert:
+        that:
           - ssh_allow_groups | type_debug == "list"
+      when: ssh_allow_groups is defined
+
+    - name: Check ssh_allow_tcp_forwarding variable
+      ansible.builtin.assert:
+        that:
           - ssh_allow_tcp_forwarding | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
           - ssh_allow_tcp_forwarding is regex('all|local|no|remote|yes')
-          - ssh_authentication_methods | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_check_fail | type_debug == "bool"
+      when: ssh_allow_tcp_forwarding is defined
+
+    - name: Check ssh_ciphers variable
+      ansible.builtin.assert:
+        that:
           - ssh_ciphers | type_debug == "list"
+      when: ssh_ciphers is defined
+
+    - name: Check ssh_gitlab variable
+      ansible.builtin.assert:
+        that:
           - ssh_gitlab | type_debug == "bool"
+      when: ssh_gitlab is defined
+
+    - name: Check ssh_host_key_algorithms variable
+      ansible.builtin.assert:
+        that:
           - ssh_host_key_algorithms | type_debug == "list"
+      when: ssh_host_key_algorithms is defined
+
+    - name: Check ssh_host_keys variable
+      ansible.builtin.assert:
+        that:
           - ssh_host_keys | type_debug == "list"
+      when: ssh_host_keys is defined
+
+    - name: Check ssh_kex_algorithms variable
+      ansible.builtin.assert:
+        that:
           - ssh_kex_algorithms | type_debug == "list"
+      when: ssh_kex_algorithms is defined
+
+    - name: Check ssh_listen_addresses variable
+      ansible.builtin.assert:
+        that:
           - ssh_listen_addresses | type_debug == "list"
+      when: ssh_listen_addresses is defined
+
+    - name: Check ssh_local_hosts variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts | type_debug == "bool"
+      when: ssh_local_hosts is defined
+
+    - name: Check ssh_local_hosts_directory variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_directory | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_local_hosts_directory | length > 0
+      when: ssh_local_hosts_directory is defined
+
+    - name: Check ssh_local_hosts_file variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_file | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_local_hosts_file | length > 0
+      when: ssh_local_hosts_file is defined
+
+    - name: Check ssh_local_hosts_host variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_host | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_local_hosts_host | length > 0
+      when: ssh_local_hosts_host is defined
+
+    - name: Check ssh_local_host_hostname variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_hostname | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_local_hosts_hostname | length > 0
+      when: ssh_local_hosts_hostname is defined
+
+    - name: Check ssh_local_host_user_known_hosts_file variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_user_known_hosts_file | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_local_hosts_user_known_hosts_file | length > 0
+      when: ssh_local_hosts_user_known_hosts_file is defined
+
+    - name: Check ssh_local_host_port variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_port | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+      when: ssh_local_hosts_port is defined
+
+    - name: Check ssh_local_host_readme variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_readme | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_local_hosts_readme | length > 0
+      when: ssh_local_hosts_readme is defined
+
+    - name: Check ssh_local_host_readme_host variable
+      ansible.builtin.assert:
+        that:
+          - ssh_local_hosts_readme_host | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_local_hosts_readme_host | length > 0
+      when: ssh_local_hosts_readme_host is defined
+
+    - name: Check ssh_macs variable
+      ansible.builtin.assert:
+        that:
+          - ssh_macs | type_debug == "list"
+      when: ssh_macs is defined
+
+    - name: Check variable types
+      ansible.builtin.assert:
+        that:
           - ssh_macs | type_debug == "list"
           - ssh_password_authentication | type_debug == "bool"
           - ssh_permit_root_login | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
@@ -24,6 +134,9 @@
           - ssh_ports | type_debug == "list"
           - ssh_pubkey_authentication | type_debug == "bool"
           - ssh_x11_forwarding | type_debug == "bool"
+
+          - ssh_authentication_methods | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+          - ssh_check_fail | type_debug == "bool"
         fail_msg: "Please check your variables"
 
     - name: Check ssh_allow_groups variable type
