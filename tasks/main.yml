@@ -1,10 +1,4 @@
 ---
-- name: Include ssh-audit install tasks
-  ansible.builtin.include_tasks: ssh_audit.yml
-  tags:
-    - ssh
-    - ssh_audit
-
 - name: Debug variables
   ansible.builtin.include_tasks: debug.yml
   tags:
@@ -18,6 +12,12 @@
   tags:
     - ssh
     - ssh_check
+
+- name: Include ssh-audit install tasks
+  ansible.builtin.include_tasks: ssh_audit.yml
+  tags:
+    - ssh
+    - ssh_audit
 
 - name: OpenSSH server present and configured
   block:
