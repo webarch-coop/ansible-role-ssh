@@ -26,6 +26,9 @@
           loop: "{{ ssh_allow_groups }}"
           loop_control:
             loop_var: group
+          when:
+            - ssh_check_fail | bool
+            - not ssh_first_check | bool
 
       when: ssh_allow_groups is defined
 
@@ -161,6 +164,9 @@
           loop: "{{ ssh_deny_users }}"
           loop_control:
             loop_var: user
+          when:
+            - ssh_check_fail | bool
+            - not ssh_first_check | bool
 
       when: ssh_deny_users is defined
 
@@ -173,17 +179,20 @@
               - ssh_gitlab | type_debug == "bool"
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-        - name: Check that the git user is present for GitLab
-          ansible.builtin.getent:
-            database: passwd
-            key: git
-            fail_key: "{{ ssh_check_fail }}"
-
         - name: Check that the git user is in ssh_allow_groups
           ansible.builtin.assert:
             that:
               - ("git" in ssh_allow_groups)
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+        - name: Check that the git user is present for GitLab
+          ansible.builtin.getent:
+            database: passwd
+            key: git
+            fail_key: "{{ ssh_check_fail }}"
+          when:
+            - ssh_check_fail | bool
+            - not ssh_first_check | bool
 
       when: (ssh_gitlab is defined) and (ssh_gitlab | bool)
 
