@@ -1,176 +1,79 @@
 ---
-- name: Install ssh-audit
+- name: OpenSSH audit
   block:
 
-    - name: Check the latest version of ssh-audit
-      ansible.builtin.uri:
-        url: https://github.com/jtesta/ssh-audit/releases/latest
-        method: HEAD
-        status_code: 302
-        follow_redirects: none
-      check_mode: false
-      changed_when: false
-      register: ssh_audit_headers
-
-    - name: Debug ssh-audit latest headers
-      ansible.builtin.debug:
-        msg:
-          - "Location: {{ ssh_audit_headers.location }}"
-          - "Path: {{ ssh_audit_headers.location | urlsplit('path') }}"
-          - "Version: {{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
-        verbosity: 2
-
-    - name: Set a fact for the latest version of ssh-audit
-      ansible.builtin.set_fact:
-        ssh_audit_version_latest: "{{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
-
-    - name: Check if ssh-audit is installed
+    - name: Check if ssh-audit is available
       ansible.builtin.command: which ssh-audit
       check_mode: false
       changed_when: false
       register: ssh_which_ssh_audit
       failed_when: ssh_which_ssh_audit.rc is not regex('^0|1$')
 
-    - name: Check the insalled version of SSH Audit
+    - name: Run ssh-audit for fail and info results
       block:
 
-        - name: Print ssh-audit -h
-          ansible.builtin.command: ssh-audit -n -h
+        - name: Audit SSH to check for failures
+          ansible.builtin.command: ssh-audit -n -l fail localhost
           check_mode: false
           changed_when: false
-          register: ssh_audit_help
+          register: ssh_audit_fail
+          failed_when: ssh_audit_fail.rc is not regex('0|2|3')
 
-        - name: Set a fact for the installed version of ssh-audit
-          ansible.builtin.set_fact:
-            ssh_audit_installed_version: "{{ ssh_audit_help.stdout_lines[0].split(' ')[2] | regex_replace('^v') | regex_replace(',$') }}"
+        - name: Print the SSH audit failure results if there are any
+          ansible.builtin.debug:
+            var: ssh_audit_fail.stdout_lines
+          when: ssh_audit_fail.stdout_lines != []
 
-      when: ssh_which_ssh_audit.rc == 0
-
-    - name: Install or upgrad ssh-audit
-      block:
-
-        - name: Check if pip3 is available
-          ansible.builtin.command: which pip3
-          check_mode: false
-          changed_when: false
-          register: ssh_which_pip3
-          failed_when: ssh_which_pip3.rc is not regex('^0|1$')
-
-        - name: Ensure that ssh-audit is not installed using pip3
+        - name: Run SSH audit for info results
           block:
 
-            - name: Run pip3 show ssh-audit
-              ansible.builtin.command: pip3 show ssh-audit
+            - name: Audit SSH to check informational results
+              ansible.builtin.command: ssh-audit -n -l info localhost
               check_mode: false
               changed_when: false
-              register: ssh_pip3_show_ssh_audit
-              failed_when: ssh_pip3_show_ssh_audit.rc is not regex('^0|1$')
+              register: ssh_audit_info
+              failed_when:
+                - not ssh_first_check | bool
+                - ssh_audit_info.rc is not regex('0|2|3')
 
-            - name: Uninstall pip3 ssh-audit
-              ansible.builtin.pip:
-                name: ssh-audit
-                state: absent
-              when: ssh_pip3_show_ssh_audit.rc == 0
+            - name: Debug the SSH audit info results
+              ansible.builtin.debug:
+                var: ssh_audit_info.stdout_lines
 
-          when: ssh_which_pip3.rc == 0
+          when:
+            - ssh_check_fail | bool
+            - ssh_audit_fail.rc != 0
 
-        - name: Ensure that ssh-audit is present using a Debian package on Bookworm and Trixy
-          block:
+        - name: Fail due to ssh-audit results
+          ansible.builtin.fail:
+            msg:
+              - "ssh-audit failed with the above results"
+          when:
+            - not ssh_first_check | bool
+            - ssh_check_fail | bool
+            - ssh_audit_fail.rc != 0
 
-            - name: Local ssh-audit absent
-              ansible.builtin.file:
-                path: /usr/local/bin/ssh-audit
-                state: absent
+        - name: Audit SSH and generate JSON output
+          ansible.builtin.command: ssh-audit -j localhost
+          check_mode: false
+          changed_when: false
+          register: ssh_audit_json
+          failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
-            - name: Install ssh-audit using the Debian package on Bookworm and Trixy
-              ansible.builtin.apt:
-                pkg:
-                  - ssh-audit
-                state: present
+        - name: Set a fact for the SSH audit results
+          ansible.builtin.set_fact:
+            ssh_audit: "{{ ssh_audit_json.stdout | from_json }}"
 
-          when: ansible_distribution_release is regex('^bookworm|trixy$')
+        - name: Debug the SSH audit results
+          ansible.builtin.debug:
+            var: ssh_audit
+            verbosity: 2
 
-        - name: Install ssh-audit from source on Debian Bullseye and older
-          block:
+        - name: Set a fact for the version of OpenSSH installed
+          ansible.builtin.set_fact:
+            ssh_version: "{{ ssh_audit.banner.software | regex_replace('^OpenSSH_') | regex_replace('p1$') }}"
 
-            - name: GPG public present
-              ansible.builtin.copy:
-                src: jtesta_2020-2025.asc
-                dest: /root/jtesta_2020-2025.asc
-                mode: 0600
-                owner: root
-                group: root
-
-            - name: GPG present
-              ansible.builtin.apt:
-                pkg:
-                  - gpg
-                state: present
-
-            - name: GPG key imported
-              ansible.builtin.command: gpg --import /root/jtesta_2020-2025.asc
-              register: ssh_audit_gpg_import
-              changed_when: ("not changed" not in ssh_audit_gpg_import.stderr)
-
-            - name: GPG signature for archive of ssh-audit source present
-              ansible.builtin.get_url:
-                url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
-                dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
-                mode: 0644
-                owner: root
-                group: root
-              register: ssh_audit_sig_get_url
-
-            - name: Archive of ssh-audit source present
-              ansible.builtin.get_url:
-                url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
-                dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
-                mode: 0644
-                owner: root
-                group: root
-              register: ssh_audit_get_url
-
-            - name: Verify and install ssh-audit when it has been downloaded
-              block:
-
-                - name: GPG signature verified
-                  ansible.builtin.command: "gpg --verify --logger-fd 1 /usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
-                  changed_when: false
-                  register: ssh_audit_gpg_check
-                  failed_when: ("Good signature" not in ssh_audit_gpg_check.stdout)
-
-                - name: Archive of ssh-audit source unarchived
-                  ansible.builtin.unarchive:
-                    src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
-                    dest: "/usr/local/src"
-                    creates: "ssh-audit-{{ ssh_audit_version_latest }}"
-                    owner: root
-                    group: root
-                    remote_src: true
-                  register: ssh_audit_unarchived
-
-                - name: Check that ssh-audit works by running it with --help
-                  ansible.builtin.command: "python3 /usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}/ssh-audit.py --help"
-                  changed_when: false
-                  when: (ssh_audit_unarchived.failed is defined) and (not ssh_audit_unarchived.failed | bool)
-
-                - name: Symlink to add ssh-audit to PATH environment present
-                  ansible.builtin.file:
-                    state: link
-                    src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}/ssh-audit.py"
-                    dest: /usr/local/bin/ssh-audit
-                    follow: false
-                    mode: 0777
-                    owner: root
-                    group: root
-
-              when:
-                - (ssh_audit_sig_get_url.state is defined) and (ssh_audit_sig_get_url.state == "file")
-                - (ssh_audit_get_url.state is defined) and (ssh_audit_get_url.state == "file")
-
-          when: ansible_distribution_release is not regex('^bookworm|trixy$')
-
-      when: (ssh_audit_installed_version is not defined) or (ssh_audit_installed_version is version(ssh_audit_version_latest, '<'))
+      when: ssh_which_ssh_audit.rc == 0
 
   tags:
     - ssh

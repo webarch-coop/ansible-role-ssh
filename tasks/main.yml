@@ -5,16 +5,68 @@
     - ssh
     - ssh_debug
 
-- name: Run checks
+- name: Check variables
   ansible.builtin.include_tasks: checks.yml
-  vars:
-    ssh_first_check: true
   tags:
     - ssh
     - ssh_check
 
-- name: Include ssh-audit install tasks
-  ansible.builtin.include_tasks: ssh_audit.yml
+- name: SSH audit
+  block:
+
+    - name: Check the latest version of ssh-audit
+      ansible.builtin.uri:
+        url: https://github.com/jtesta/ssh-audit/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      changed_when: false
+      register: ssh_audit_headers
+
+    - name: Debug ssh-audit latest headers
+      ansible.builtin.debug:
+        msg:
+          - "Location: {{ ssh_audit_headers.location }}"
+          - "Path: {{ ssh_audit_headers.location | urlsplit('path') }}"
+          - "Version: {{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+        verbosity: 2
+
+    - name: Set a fact for the latest version of ssh-audit
+      ansible.builtin.set_fact:
+        ssh_audit_version_latest: "{{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+
+    - name: Check if ssh-audit is installed
+      ansible.builtin.command: which ssh-audit
+      check_mode: false
+      changed_when: false
+      register: ssh_which_ssh_audit
+      failed_when: ssh_which_ssh_audit.rc is not regex('^0|1$')
+
+    - name: Check the insalled version of SSH Audit
+      block:
+
+        - name: Print ssh-audit -h
+          ansible.builtin.command: ssh-audit -n -h
+          check_mode: false
+          changed_when: false
+          register: ssh_audit_help
+
+        - name: Set a fact for the installed version of ssh-audit
+          ansible.builtin.set_fact:
+            ssh_audit_installed_version: "{{ ssh_audit_help.stdout_lines[0].split(' ')[2] | regex_replace('^v') | regex_replace(',$') }}"
+
+      when: ssh_which_ssh_audit.rc == 0
+
+    - name: Include ssh-audit install tasks
+      ansible.builtin.include_tasks: ssh_audit_install.yml
+      when: (ssh_which_ssh_audit.rc == 1) or (ssh_audit_installed_version is not defined) or (ssh_audit_installed_version is version(ssh_audit_version_latest, '<'))
+
+    - name: Include ssh-audit tasks
+      ansible.builtin.include_tasks: ssh_audit.yml
+      vars:
+        ssh_first_check: true
+
   tags:
     - ssh
     - ssh_audit
