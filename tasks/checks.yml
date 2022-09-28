@@ -2,6 +2,11 @@
 - name: Check OpenSSH server variables
   block:
 
+    - name: Set ssh_first_check to false if the variable is not defined
+      ansible.builtin.set_fact:
+        ssh_first_check: false
+      when: ssh_first_check is not defined 
+
     - name: Check ssh_allow_agent_forwarding variable
       ansible.builtin.assert:
         that:
