@@ -508,6 +508,7 @@
               - ssh_port | type_debug == "int"
               - ssh_port > 0
               - ssh_port < 61000
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_ports }}"
           loop_control:
             loop_var: ssh_port
