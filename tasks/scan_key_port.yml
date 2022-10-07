@@ -16,11 +16,11 @@
 
     # https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
     - name: SSH key scan
-      ansible.builtin.shell: >-
+      ansible.builtin.command: >-
         {% if port != 22 %}
-        ssh-keyscan -p {{ port }} localhost | sed 's/localhost/{{ ip }}/' | sort
+        ssh-keyscan -p {{ port }} {{ ip }}
         {% else %}
-        ssh-keyscan localhost | sed 's/localhost/{{ ip }}/' | sort
+        ssh-keyscan {{ ip }}
         {% endif %}
       check_mode: false
       changed_when: false
