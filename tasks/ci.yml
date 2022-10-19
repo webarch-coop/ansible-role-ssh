@@ -16,7 +16,7 @@
         loop_var: dir
 
     - name: SSH CI key pair present
-      openssh_keypair:
+      community.crypto.openssh_keypair:
         path: /root/.ssh/ci/id_ecdsa
         type: ecdsa
         comment: "Ansible managed SSH CI public key"
