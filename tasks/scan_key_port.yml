@@ -39,7 +39,7 @@
         create: true
         # marker: "{mark} {{ ip }}:{{ port }}"
         marker: "{% if port == 22 %}# {mark} {{ ip }}{% else %}# {mark} {{ ip }}:{{ port }}{% endif %}"
-        block: "{{ ssh_keyscan_command.stdout }}"
+        block: "{{ ssh_keyscan_command.stdout | sort }}"
       become: false
       delegate_to: localhost
       when:
