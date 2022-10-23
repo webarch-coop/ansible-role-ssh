@@ -33,7 +33,7 @@
       when: ssh_keyscan_command.stdout_lines is defined
 
     - name: Set a fact for the sorted key scan result for Ansible < 2.13
-      ansible.builtin.setfact:
+      ansible.builtin.set_fact:
         ssh_keyscan_results: "{{ ssh_keyscan_results | default([]) }} + [ '{{ line }}' ]"
       loop: "{{ ssh_keyscan_command.stdout_lines | sort }}"
       loop_control:
@@ -43,7 +43,7 @@
         - ssh_keyscan_command.stdout_lines is defined
 
     - name: Set a fact for the sorted key scan result for Ansible >= 2.13
-      ansible.builtin.setfact:
+      ansible.builtin.set_fact:
         ssh_keyscan_results: "{{ ssh_keyscan_results | default([]) + [ line ] }}"
       loop: "{{ ssh_keyscan_command.stdout_lines | sort }}"
       loop_control:
