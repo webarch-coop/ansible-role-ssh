@@ -32,6 +32,32 @@
         verbosity: 2
       when: ssh_keyscan_command.stdout_lines is defined
 
+    - name: Set a fact for the sorted key scan result for Ansible < 2.13
+      ansible.builtin.setfact:
+        ssh_keyscan_results: "{{ ssh_keyscan_results | default([]) }} + [ '{{ line }}' ]"
+      loop: "{{ ssh_keyscan_command.stdout_lines | sort }}"
+      loop_control:
+        loop_var: line
+      when:
+        - ansible_version.full is version('2.13.0', '<')
+        - ssh_keyscan_command.stdout_lines is defined
+
+    - name: Set a fact for the sorted key scan result for Ansible >= 2.13
+      ansible.builtin.setfact:
+        ssh_keyscan_results: "{{ ssh_keyscan_results | default([]) + [ line ] }}"
+      loop: "{{ ssh_keyscan_command.stdout_lines | sort }}"
+      loop_control:
+        loop_var: line
+      when:
+        - ansible_version.full is version('2.13.0', '>=')
+        - ssh_keyscan_command.stdout_lines is defined
+
+    - name: Debug the sorted key scan result
+      ansible.builtin.debug:
+        var: ssh_keyscan_results
+        verbosity: 2
+      when: (ssh_keyscan_results is defined) and (ssh_keyscan_results != [])
+
     - name: Write any ssh-keyscan results to a local KnownHosts file if one is defined
       ansible.builtin.blockinfile:
         path: "{{ ssh_local_hosts_user_known_hosts_file }}"
@@ -39,7 +65,7 @@
         create: true
         # marker: "{mark} {{ ip }}:{{ port }}"
         marker: "{% if port == 22 %}# {mark} {{ ip }}{% else %}# {mark} {{ ip }}:{{ port }}{% endif %}"
-        block: "{{ ssh_keyscan_command.stdout | sort }}"
+        block: "{{ ssh_keyscan_results }}"
       become: false
       delegate_to: localhost
       when:
