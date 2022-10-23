@@ -53,8 +53,8 @@
         create: true
         marker: "{% if port == 22 %}# {mark} {{ ip }}{% else %}# {mark} {{ ip }}:{{ port }}{% endif %}"
         block: |
-          {%- for  in ssh_keyscan_command.stdout_lines | sort %}
-          {{ line }}
+          {%- for ssh_fingerprint in ssh_keyscan_command.stdout_lines | sort %}
+          {{ ssh_fingerprint }}
           {% endfor -%} 
       become: false
       delegate_to: localhost
