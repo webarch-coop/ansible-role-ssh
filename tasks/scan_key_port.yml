@@ -35,9 +35,10 @@
     - name: Set a fact for the sorted key scan result
       ansible.builtin.set_fact:
         ssh_keyscan_results: >-
-          {%+ for line in ssh_keyscan_command.stdout_lines | sort +%}
+          {% for line in ssh_keyscan_command.stdout_lines | sort %}
+
           {{ line }}
-          {%+ endfor +%}
+          {% endfor %}
       when: ssh_keyscan_command.stdout_lines is defined
 
     - name: Debug the sorted key scan result
