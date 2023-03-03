@@ -127,6 +127,9 @@ argument_specs:
       ssh_scan_keys:
         type: bool
         description: Scan the SSH key fingerprints
+      ssh_stream_local_bind_unlink:
+        type: bool
+        description: GPG Agent Forwarding
       ssh_x11_forwarding:
         type: bool
         description: X11Forwarding, optionally enable or disable

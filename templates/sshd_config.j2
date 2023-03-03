@@ -178,6 +178,12 @@ PrintMotd no
 #ChrootDirectory none
 #VersionAddendum none
 
+{% if ssh_stream_local_bind_unlink is defined %}
+StreamLocalBindUnlink {% if ssh_stream_local_bind_unlink | bool %}yes{% else %}no{% endif %}
+{% else %}
+#StreamLocalBindUnlink no
+{% endif %}
+
 # no default banner path
 #Banner none
 

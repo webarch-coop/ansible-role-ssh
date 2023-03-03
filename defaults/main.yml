@@ -179,4 +179,8 @@ ssh_scan_keys: true
 
 # Allow X11 forwarding
 ssh_x11_forwarding: false
+
+# GPG Agent Forwarding
+# https://github.com/drduh/YubiKey-Guide#remote-machines-gpg-agent-forwarding
+ssh_stream_local_bind_unlink: false
 ...
