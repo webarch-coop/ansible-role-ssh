@@ -9,6 +9,7 @@
 
     - name: Reconfigure SSH
       ansible.builtin.command: dpkg-reconfigure openssh-server
+      changed_when: true
       when: not ssh_host_key_state.stat.exists
       notify: restart ssh
 
