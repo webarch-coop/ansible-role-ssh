@@ -16,19 +16,27 @@
           block:
 
             - name: Run pip3 show ssh-audit
-              ansible.builtin.command: pip3 show ssh-audit
+              ansible.builtin.command: pip3 show ssh-audit --no-color
               check_mode: false
               changed_when: false
               register: ssh_pip3_show_ssh_audit
               failed_when: ssh_pip3_show_ssh_audit.rc is not regex('^0|1$')
 
+            - name: Set a fact for the results of pip3 show ssh-audit
+              ansible.builtin.set_fact:
+                ssh_pip3_ssh_audit: "{{ ssh_pip3_show_ssh_audit.stdout | string | community.general.jc('ini') }}"
+
             - name: Uninstall pip3 ssh-audit
               ansible.builtin.pip:
                 name: ssh-audit
                 state: absent
-              when: ssh_pip3_show_ssh_audit.rc == 0
+              when:
+                - ssh_pip3_show_ssh_audit.rc == 0
+                - ssh_pip3_ssh_audit.Location is defined
+                - ssh_pip3_ssh_audit.Location != "/usr/lib/python3/dist-packages"
 
-          when: ssh_which_pip3.rc == 0
+          when:
+            - ssh_which_pip3.rc == 0
 
         - name: Ensure that ssh-audit is present using a Debian package on Bookworm and Trixy
           block:
