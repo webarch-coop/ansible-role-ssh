@@ -16,6 +16,16 @@
     - localhost
   tasks:
 
+    - name: Run which ssh
+      ansible.builtin.command: which ssh
+      check_mode: false
+      changed_when: false
+      register: molecule_which_ssh
+
+    - name: Debug which ssh
+      ansible.builtin.debug:
+        var: molecule_which_ssh.stdout
+
     - name: Check ssh -V
       ansible.builtin.command: ssh -V
       check_mode: false
@@ -24,5 +34,5 @@
 
     - name: Debug ssh version
       ansible.builtin.debug:
-        var: molecule_ssh_v.stdout
+        var: molecule_ssh_v.stderr
 ...
