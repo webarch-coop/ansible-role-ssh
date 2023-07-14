@@ -8,20 +8,21 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check that SSH host keys are present
-  block:
+- name: Verify as root
+  become: true
+  connection: local
+  gather_facts: true
+  hosts:
+    - localhost
+  tasks:
 
-    - name: "Stat {{ ssh_host_key_path }}"
-      ansible.builtin.stat:
-        path: "{{ ssh_host_key_path }}"
-      register: ssh_host_key_state
+    - name: Check ssh -V
+      ansible.builtin.command: ssh -V
+      check_mode: false
+      changed_when: false
+      register: molecule_ssh_v
 
-    - name: Reconfigure SSH
-      ansible.builtin.command: dpkg-reconfigure openssh-server
-      changed_when: true
-      when: not ssh_host_key_state.stat.exists
-      notify: restart ssh
-
-  tags:
-    - ssh
+    - name: Debug ssh version
+      ansible.builtin.debug:
+        var: molecule_ssh_v.stdout
 ...

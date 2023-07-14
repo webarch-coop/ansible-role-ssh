@@ -1,14 +1,42 @@
+# Copyright 2019-2023 Chris Croome
+#
+# This file is part of the Webarchitects OpenSSH Ansible role.
+#
+# The Webarchitects OpenSSH Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects OpenSSH Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+- name: Skip the tasks in this role as ssh is false
+  ansible.builtin.debug:
+    msg: "The ssh variable need to be true for the tasks in this role to run."
+  when: not ssh | bool
+  tags:
+    - ssh
+
 - name: Debug variables
   ansible.builtin.include_tasks: debug.yml
+  when: ssh | bool
   tags:
     - ssh
     - ssh_debug
+
+- name: Verify variables
+  ansible.builtin.include_tasks: verify.yml
+  when:
+    - ssh | bool
+    - ssh_verify | bool
+    - ansible_version.full is version('2.11', '>=')
+  tags:
+    - ssh
+    - ssh_verify
 
 - name: Check variables
   ansible.builtin.include_tasks: checks.yml
   vars:
     ssh_first_check: true
+  when: ssh | bool
   tags:
     - ssh
     - ssh_check
@@ -69,6 +97,7 @@
       vars:
         ssh_first_check: true
 
+  when: ssh | bool
   tags:
     - ssh
     - ssh_audit
@@ -120,12 +149,15 @@
       ansible.builtin.include_tasks: ci.yml
       when: (ssh_ci_ips is defined) and (ssh_ci_ips != [])
 
+  when: ssh | bool
   tags:
     - ssh
 
 - name: Include local OpenSSH client configuration tasks
   ansible.builtin.include_tasks: local_hosts.yml
-  when: (ssh_local_hosts is defined) and (ssh_local_hosts | bool)
+  when:
+    - ssh | bool
+    - (ssh_local_hosts is defined) and (ssh_local_hosts | bool)
   tags:
     - ssh
     - ssh_local_hosts

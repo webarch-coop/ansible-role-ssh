@@ -1,18 +1,30 @@
+# Copyright 2019-2023 Chris Croome
+#
+# This file is part of the Webarchitects OpenSSH Ansible role.
+#
+# The Webarchitects OpenSSH Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects OpenSSH Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 argument_specs:
   main:
-    short_description: The main entry point for the OpenSSH role
+    short_description: The main entry point for the OpenSSH role.
     options:
       ssh_allow_agent_forwarding:
         type: bool
-        description: AllowAgentForwarding, optionally enable or disable
+        required: true
+        description: AllowAgentForwarding, optionally enable or disable.
       ssh_allow_groups:
         type: list
         elements: str
-        description: AllowGroups, an optional list of groups to allow
+        required: false
+        description: AllowGroups, an optional list of groups to allow.
       ssh_allow_tcp_forwarding:
         type: str
-        description: AllowTcpForwarding, optionally enable, disable and restrict forwarding
+        required: false
+        description: AllowTcpForwarding, optionally enable, disable and restrict forwarding.
         choices:
           - all
           - local
@@ -21,93 +33,112 @@ argument_specs:
           - "yes"
       ssh_authentication_methods:
         type: str
-        description: AuthenticationMethods, one or more space seperated lists of comma-separated authentication method names, or the single string any
         required: true
+        description: AuthenticationMethods, one or more space seperated lists of comma-separated authentication method names, or the single string any.
       ssh_check_fail:
         type: bool
-        description: Fail when checks for things like users and groups do not pass
         required: true
+        description: Fail when checks for things like users and groups do not pass.
       ssh_chroot_users_dir:
         type: str
-        description: ChrootDirectory, an optional directory which users in the chroot group will be chrooted to
+        required: false
+        description: ChrootDirectory, an optional directory which users in the chroot group will be chrooted to.
       ssh_ci_ips:
         type: list
         elements: str
-        description: An optional list of IP addresses to allow connections from using the SSH key pair that will be generated
+        required: false
+        description: An optional list of IP addresses to allow connections from using the SSH key pair that will be generated.
       ssh_ciphers:
         type: list
         elements: str
-        description: Ciphers, an optional list of ciphers to override the defaults
+        required: false
+        description: Ciphers, an optional list of ciphers to override the defaults.
       ssh_deny_users:
         type: list
         elements: str
-        description: DenyUsers, an optional list of users to deny access to
+        required: false
+        description: DenyUsers, an optional list of users to deny access to.
       ssh_gitlab:
         type: bool
-        description: Add configuration for git user for GitLab
+        required: false
+        description: Add configuration for git user for GitLab.
       ssh_host_key_algorithms:
         type: list
         elements: str
-        description: HostKeyAlgorithms, an optional list of algorithms to override the defaults
+        required: false
+        description: HostKeyAlgorithms, an optional list of algorithms to override the defaults.
       ssh_host_keys:
         type: list
         elements: str
-        description: HostKey, a list of file paths to keys
-        required: true
+        required: false
+        description: HostKey, a list of file paths to keys.
       ssh_kex_algorithms:
         type: list
         elements: str
-        description: KexAlgorithms, an optional list of algorithms list to override the defaults
+        required: false
+        description: KexAlgorithms, an optional list of algorithms list to override the defaults.
       ssh_listen_addresses:
         type: list
         elements: str
-        description: ListenAddress, IP addresses that SSH should listen for connections on
+        required: false
+        description: ListenAddress, IP addresses that SSH should listen for connections on.
       ssh_local_hosts:
         type: bool
-        description: Generate local SSH client configuration files
+        required: false
+        description: Generate local SSH client configuration files.
       ssh_local_hosts_directory:
         type: str
-        description: Local directory for SSH client configuration files
+        required: false
+        description: Local directory for SSH client configuration files.
       ssh_local_hosts_file:
         type: str
-        description: Path to the local SSH client configuration file
+        required: false
+        description: Path to the local SSH client configuration file.
       ssh_local_hosts_host:
         type: str
-        description: Host name(s) to use in the local Host file
+        required: false
+        description: Host name(s) to use in the local Host file.
       ssh_local_hosts_hostname:
         type: str
-        description: Hostname to use in the local Host file
+        required: false
+        description: Hostname to use in the local Host file.
       ssh_local_hosts_user_known_hosts_file:
         type: str
-        description: Local KnownHosts file for Ansible to update
+        required: false
+        description: Local KnownHosts file for Ansible to update.
       ssh_local_hosts_port:
         type: int
-        description: Port to use in the local Host file
+        required: false
+        description: Port to use in the local Host file.
       ssh_local_hosts_readme:
         type: str
-        description: Path to a local README.md file
+        required: false
+        description: Path to a local README.md file.
       ssh_local_hosts_readme_host:
         type: str
-        description: Template for each Host for the local README.md file
+        required: false
+        description: Template for each Host for the local README.md file.
       ssh_macs:
         type: list
         elements: str
-        description: A list of message authentication code algorithms for MACs
+        required: false
+        description: A list of message authentication code algorithms for MACs.
       ssh_mac_list_strategy:
         type: str
-        description: An optional prefix for the list of MACs
+        required: false
+        description: An optional prefix for the list of MACs.
         choices:
           - append
           - head
           - remove
       ssh_password_authentication:
         type: bool
-        description: Enable or disable password authentication using PasswordAuthentication
         required: true
+        description: Enable or disable password authentication using PasswordAuthentication.
       ssh_permit_root_login:
         type: str
-        description: The option for PermitRootLogin
         required: true
+        description: The option for PermitRootLogin.
         choices:
           - forced-commands-only
           - "no"
@@ -116,21 +147,30 @@ argument_specs:
       ssh_ports:
         type: list
         elements: int
-        description: Port, a list of ports for SSH to listen on
+        required: false
+        description: Port, a list of ports for SSH to listen on.
       ssh_pubkey_authentication:
         type: bool
-        description: Enable or disable public key authentication using PubkeyAuthentication
         required: true
+        description: Enable or disable public key authentication using PubkeyAuthentication.
       ssh_root_keypair:
         type: bool
-        description: Generate a SSH keypair for root
+        required: false
+        description: Generate a SSH keypair for root.
       ssh_scan_keys:
         type: bool
-        description: Scan the SSH key fingerprints
+        required: false
+        description: Scan the SSH key fingerprints.
       ssh_stream_local_bind_unlink:
         type: bool
-        description: GPG Agent Forwarding
+        required: false
+        description: GPG Agent Forwarding.
+      ssh_verify:
+        type: bool
+        required: true
+        description: Verify all variables that start ssh_ using ther argument spec.
       ssh_x11_forwarding:
         type: bool
-        description: X11Forwarding, optionally enable or disable
+        required: false
+        description: X11Forwarding, optionally enable or disable.
 ...

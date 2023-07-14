@@ -8,20 +8,29 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check that SSH host keys are present
-  block:
+- name: Run as root
+  become: true
+  connection: local
+  gather_facts: true
+  hosts:
+    - localhost
+  tasks:
 
-    - name: "Stat {{ ssh_host_key_path }}"
-      ansible.builtin.stat:
-        path: "{{ ssh_host_key_path }}"
-      register: ssh_host_key_state
+    - name: Debug ansible_effective_user_id
+      ansible.builtin.debug:
+        var: ansible_effective_user_id
 
-    - name: Reconfigure SSH
-      ansible.builtin.command: dpkg-reconfigure openssh-server
-      changed_when: true
-      when: not ssh_host_key_state.stat.exists
-      notify: restart ssh
+    - name: Debug ansible_user_id
+      ansible.builtin.debug:
+        var: ansible_user_id
 
-  tags:
-    - ssh
+    - name: Debug ansible_user_dir
+      ansible.builtin.debug:
+        var: ansible_user_dir
+
+    - name: Include ssh role as root
+      ansible.builtin.include_role:
+        name: ssh
+      vars:  # noqa var-naming[no-role-prefix]
+        ssh: true
 ...

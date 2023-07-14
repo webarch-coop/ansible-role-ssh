@@ -8,20 +8,25 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check that SSH host keys are present
+- name: Verify variables
   block:
 
-    - name: "Stat {{ ssh_host_key_path }}"
-      ansible.builtin.stat:
-        path: "{{ ssh_host_key_path }}"
-      register: ssh_host_key_state
+    - name: Debug the hostvars variable names that start with ssh_
+      ansible.builtin.debug:
+        var: sshvarnames
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
-    - name: Reconfigure SSH
-      ansible.builtin.command: dpkg-reconfigure openssh-server
-      changed_when: true
-      when: not ssh_host_key_state.stat.exists
-      notify: restart ssh
+    - name: Debug the hostvars variable names that start with ssh_
+      ansible.builtin.debug:
+        var: sshhostvars
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
+    - name: Check ssh_ variables using meta/argument_specs.yml
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
+        provided_arguments: "{{ sshhostvars }}"
+
+  when: ssh_verify | bool
   tags:
     - ssh
 ...
