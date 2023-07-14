@@ -180,7 +180,7 @@ ssh_root_keypair: true
 
 # An array of IP addresses to scan for fingerprinting
 ssh_scan_ip_addresses:
-  - "{{ ansible_default_ipv4.address }}"
+  - "{{ ansible_default_ipv4.address | d() }}"
   # - "{{ ansible_default_ipv6.address }}"
 
 # Scan the keys available on the default IPv4 and IPv6 addresses
