@@ -314,6 +314,9 @@
                   - "ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''"
                   - "For more infformation see:"
                   - "https://www.ssh-audit.com/hardening_guides.html"
+              when: >-
+                ( ssh_first_check is not defined ) or
+                ( not ssh_first_check | bool )
 
           when: ssh_check_fail | bool
 
