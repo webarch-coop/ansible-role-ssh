@@ -31,6 +31,10 @@ argument_specs:
           - "no"
           - remote
           - "yes"
+      ssh_apt_backports:
+        type: str
+        required: false
+        description: An internal variable for the name of the backports repo.
       ssh_authentication_methods:
         type: str
         required: true
@@ -157,6 +161,10 @@ argument_specs:
         type: bool
         required: false
         description: Generate a SSH keypair for root.
+      ssh_scan_ip_addresses:
+        type: list
+        elements: str
+        description: An array of IP addresses to scan for fingerprinting.
       ssh_scan_keys:
         type: bool
         required: false

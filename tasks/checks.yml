@@ -391,68 +391,75 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ssh_local_hosts is defined
 
-    - name: Check ssh_local_hosts_directory variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_directory | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_local_hosts_directory | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_directory is defined
+    - name: Check ssh_local_hosts variables
+      block:
 
-    - name: Check ssh_local_hosts_file variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_file | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_local_hosts_file | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_file is defined
+        - name: Check ssh_local_hosts_directory variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_directory | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+              - ssh_local_hosts_directory | length > 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_directory is defined
 
-    - name: Check ssh_local_hosts_host variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_host | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_local_hosts_host | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_host is defined
+        - name: Check ssh_local_hosts_file variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_file | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+              - ssh_local_hosts_file | length > 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_file is defined
 
-    - name: Check ssh_local_host_hostname variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_hostname | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_local_hosts_hostname | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_hostname is defined
+        - name: Check ssh_local_hosts_host variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_host | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+              - ssh_local_hosts_host | length > 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_host is defined
 
-    - name: Check ssh_local_host_user_known_hosts_file variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_user_known_hosts_file | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_local_hosts_user_known_hosts_file | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_user_known_hosts_file is defined
+        - name: Check ssh_local_host_hostname variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_hostname | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+              - ssh_local_hosts_hostname | length > 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_hostname is defined
 
-    - name: Check ssh_local_host_port variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_port | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_port is defined
+        - name: Check ssh_local_host_user_known_hosts_file variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_user_known_hosts_file | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+              - ssh_local_hosts_user_known_hosts_file | length > 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_user_known_hosts_file is defined
 
-    - name: Check ssh_local_host_readme variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_readme | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_local_hosts_readme | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_readme is defined
+        - name: Check ssh_local_host_port variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_port | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_port is defined
 
-    - name: Check ssh_local_host_readme_host variable
-      ansible.builtin.assert:
-        that:
-          - ssh_local_hosts_readme_host | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_local_hosts_readme_host | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_local_hosts_readme_host is defined
+        - name: Check ssh_local_host_readme variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_readme | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+              - ssh_local_hosts_readme | length > 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_readme is defined
+
+        - name: Check ssh_local_host_readme_host variable
+          ansible.builtin.assert:
+            that:
+              - ssh_local_hosts_readme_host | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
+              - ssh_local_hosts_readme_host | length > 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          when: ssh_local_hosts_readme_host is defined
+
+      when:
+        - ssh_local_hosts is defined
+        - ssh_local_hosts | bool
 
     - name: Mac checks
       block:
