@@ -43,6 +43,15 @@
 
       when: ssh_init == "systemd"
 
+    - name: Ensure that /run/sshd exists when init system is not systemd
+      ansible.builtin.file:
+        path: /run/sshd
+        state: directory
+        mode: "0755"
+        owner: root
+        group: root
+      when: ssh_init != "systemd"
+
     - name: Test the SSH server configuration
       block:
 
