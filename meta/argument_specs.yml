@@ -76,6 +76,10 @@ argument_specs:
         elements: str
         required: false
         description: HostKey, a list of file paths to keys.
+      ssh_init:
+        type: str
+        required: false
+        description: An internal variable for the init system.
       ssh_kex_algorithms:
         type: list
         elements: str

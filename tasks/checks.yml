@@ -16,6 +16,23 @@
         ssh_first_check: false
       when: ssh_first_check is not defined
 
+
+    # When in a docker container ssh_init.stdout == "sh" or "bash"
+    - name: Check if system has been booted with systemd as init system
+      ansible.builtin.command: ps -p 1 -o comm=
+      changed_when: false
+      check_mode: false
+      register: ssh_ps
+
+    - name: Set a fact for the init system
+      ansible.builtin.set_fact:
+        ssh_init: "{{ ssh_ps.stdout }}"
+
+    - name: Debug the ini system when it is not systemd
+      ansible.builtin.debug:
+        var: ssh_init
+      when: ssh_init != "systemd"
+
     - name: Check ssh_allow_agent_forwarding variable
       ansible.builtin.assert:
         that:
