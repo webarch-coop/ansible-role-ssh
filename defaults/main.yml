@@ -120,7 +120,7 @@ ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/config"
 ssh_local_hosts_host: "{{ inventory_hostname_short }} {{ inventory_hostname }}"
 
 # Hostname to use in the local Host file
-ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address }}"
+ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address | d() }}"
 
 # UserKnownHostsFile to use in the local Host file
 ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/known_hosts"
