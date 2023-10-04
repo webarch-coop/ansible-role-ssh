@@ -25,6 +25,7 @@
     - name: Debug which ssh
       ansible.builtin.debug:
         var: molecule_which_ssh.stdout
+        verbosity: 1
 
     - name: Check ssh -V
       ansible.builtin.command: ssh -V
@@ -77,6 +78,7 @@
     - name: Debug SSH listening ports
       ansible.builtin.debug:
         var: molecule_ssh_listening
+        verbosity: 1
 
     - name: Get a list of the ssh-audit server policies
       ansible.builtin.command: ssh-audit -nL

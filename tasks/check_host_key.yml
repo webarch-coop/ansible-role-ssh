@@ -86,7 +86,7 @@
 
         - name: RSA key need to be regenerated
           ansible.builtin.debug:
-            msg: "The RSA key is currently {{ ssh_host_key_fingerprint }} bits but {{ ssh_host_key.bits }} are required so it will be regenerated."
+            msg: "The RSA key is currently {{ ssh_host_key_fingerprint[0] }} bits but {{ ssh_host_key.bits }} bits are required so it will be regenerated."
           when:
             - ssh_host_key.name == "rsa"
             - ssh_host_key_fingerprint[0] | int != ssh_host_key.bits
