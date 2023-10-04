@@ -32,9 +32,13 @@
       changed_when: false
       register: molecule_ssh_v
 
-    - name: Debug ssh version
+    - name: Set a fact for the SSH version
+      ansible.builtin.set_fact:
+        molecule_ssh_version: "{{ molecule_ssh_v.stderr.split(' ')[0] | regex_replace('^OpenSSH_') | regex_replace('p.*$') }}"
+
+    - name: Debug SSH version
       ansible.builtin.debug:
-        var: molecule_ssh_v.stderr
+        var: molecule_ssh_version
 
     - name: Check the runing services
       ansible.builtin.service_facts:
@@ -116,20 +120,20 @@
 
         - name: Debug SSH audit policy regex
           ansible.builtin.debug:
-            var: ssh_audit_openssh_policy_regex
+            var: molecule_ssh_audit_openssh_policy_regex
             verbosity: 2
           vars:
-            ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ ssh_version }}"
+            molecule_ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ molecule_ssh_version }}"
 
         - name: Set a fact for the SSH audit policy to use for OpenSSH
           ansible.builtin.set_fact:
-            ssh_audit_policy: "{{ ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') }}"
+            molecule_ssh_audit_policy: "{{ molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') }}"
           vars:
-            ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ ssh_version }}"
+            molecule_ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ molecule_ssh_version }}"
           when:
-            - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug == "list"
-            - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug != []
-            - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
+            - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | type_debug == "list"
+            - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | type_debug != []
+            - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
 
       when: ansible_distribution != "Ubuntu"
 
@@ -148,6 +152,24 @@
       ansible.builtin.debug:
         var: molecule_ssh_audit_policy_result
         verbosity: 2
+
+    - name: Debug SSH policy audit failure
+      block:
+
+        - name: SSH profile audit human readable output
+          ansible.builtin.command: "ssh-audit -nP {{ molecule_ssh_audit_policy | quote }} {{ ansible_default_ipv4.address }}"
+          check_mode: false
+          changed_when: false
+          register: molecule_ssh_audit_policy
+          failed_when: molecule_ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
+
+        - name: Debug the SSH profile audit human readable output
+          ansible.builtin.debug:
+            var: molecule_ssh_audit_policy.stdout_lines
+
+      when:
+        - molecule_ssh_audit_policy_result is defined
+        - not molecule_ssh_audit_policy_result.passed | bool
 
     - name: Check that the SSH policy audit passed
       ansible.builtin.assert:

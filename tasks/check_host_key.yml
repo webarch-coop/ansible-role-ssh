@@ -16,6 +16,7 @@
         that:
           - ssh_host_key.bits is defined
           - ssh_host_key.bits == 1024
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ssh_host_key.name == "dsa"
 
     - name: Check the bits required for SSH RSA keys
@@ -24,6 +25,7 @@
           - ssh_host_key.bits is defined
           - ssh_host_key.bits >= 1024
           - ssh_host_key.bits <= 122880
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ssh_host_key.name == "rsa"
 
     - name: Check the bit required for SSH ECDSA keys
@@ -31,12 +33,14 @@
         that:
           - ssh_host_key.bits is defined
           - ( ssh_host_key.bits == 256 ) or ( ssh_host_key.bits == 384 ) or ( ssh_host_key.bits == 521 )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ssh_host_key.name == "ecdsa"
 
     - name: Bit should not be defined for ECDSA-SK, Ed25519 and Ed25519-SK SSH keys
       ansible.builtin.assert:
         that:
           - ssh_host_key.bits is not defined
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: >-
         ( ssh_host_key.name == "ecdsa-sk" ) or
         ( ssh_host_key.name == "ed25519" ) or
@@ -78,10 +82,11 @@
         - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.debug:
             var: ssh_host_key_fingerprint
+            verbosity: 2
 
         - name: RSA key need to be regenerated
           ansible.builtin.debug:
-            msg:
+            msg: "The RSA key is currently {{ ssh_host_key_fingerprint }} bits but {{ ssh_host_key.bits }} are required so it will be regenerated."
           when:
             - ssh_host_key.name == "rsa"
             - ssh_host_key_fingerprint[0] | int != ssh_host_key.bits

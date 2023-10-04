@@ -52,6 +52,7 @@
         - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.debug:
             var: ssh_host_key_fingerprint
+            verbosity: 2
 
       when: ssh_host_key_path.stat.exists | bool
 
@@ -127,6 +128,7 @@
         - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.debug:
             var: ssh_host_key_fingerprint
+            verbosity: 2
 
       when: ssh_host_key_path.stat.exists | bool
 
