@@ -67,26 +67,37 @@ ssh_ciphers:
 ssh_gitlab: false
 
 # https://man.openbsd.org/sshd_config#HostKeyAlgorithms
+# Comment the sk algos for OpenSSH < 8.4
 ssh_host_key_algorithms:
+  - sk-ssh-ed25519@openssh.com
+  - ssh-ed25519-cert-v01@openssh.com
+  - sk-ssh-ed25519-cert-v01@openssh.com
+  - rsa-sha2-256-cert-v01@openssh.com
+  - rsa-sha2-512-cert-v01@openssh.com
   - rsa-sha2-512
   - rsa-sha2-256
   - ssh-ed25519
   - ssh-ed25519-cert-v01@openssh.com
-  # Comment the next two sk lines for OpenSSH < 8.4
-  - sk-ssh-ed25519@openssh.com
-  - sk-ssh-ed25519-cert-v01@openssh.com
-  - rsa-sha2-512-cert-v01@openssh.com
-  - rsa-sha2-256-cert-v01@openssh.com
-  # Uncomment the following lines for
-  # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
-  # - ecdsa-sha2-nistp521-cert-v01@openssh.com
-  # - ecdsa-sha2-nistp384-cert-v01@openssh.com
-  # - ecdsa-sha2-nistp256-cert-v01@openssh.com
-  # - sk-ecdsa-sha2-nistp256@openssh.com
-  # - sk-ecdsa-sha2-nistp256-cert-v01@openssh.com
-  # - ecdsa-sha2-nistp521
-  # - ecdsa-sha2-nistp384
-  # - ecdsa-sha2-nistp256
+
+#   - rsa-sha2-512
+#   - rsa-sha2-256
+#   - ssh-ed25519
+#   - ssh-ed25519-cert-v01@openssh.com
+#   # Comment the next two sk lines for OpenSSH < 8.4
+#   - sk-ssh-ed25519@openssh.com
+#   - sk-ssh-ed25519-cert-v01@openssh.com
+#   - rsa-sha2-256-cert-v01@openssh.com
+#   - rsa-sha2-512-cert-v01@openssh.com
+#   # Uncomment the following lines for
+#   # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
+#   # - ecdsa-sha2-nistp521-cert-v01@openssh.com
+#   # - ecdsa-sha2-nistp384-cert-v01@openssh.com
+#   # - ecdsa-sha2-nistp256-cert-v01@openssh.com
+#   # - sk-ecdsa-sha2-nistp256@openssh.com
+#   # - sk-ecdsa-sha2-nistp256-cert-v01@openssh.com
+#   # - ecdsa-sha2-nistp521
+#   # - ecdsa-sha2-nistp384
+#   # - ecdsa-sha2-nistp256
 
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
@@ -102,6 +113,7 @@ ssh_host_keys:
 
 # https://man.openbsd.org/sshd_config#KexAlgorithms
 ssh_kex_algorithms:
+  - sntrup761x25519-sha512@openssh.com
   - curve25519-sha256
   - curve25519-sha256@libssh.org
   # - diffie-hellman-group14-sha256
