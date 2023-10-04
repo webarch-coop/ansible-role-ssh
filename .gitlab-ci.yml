@@ -9,22 +9,17 @@
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 variables:
+  ANSIBLE_CALLBACK_RESULT_FORMAT: "yaml"
   ANSIBLE_DISPLAY_SKIPPED_HOSTS: "0"
   ANSIBLE_FORCE_COLOR: "1"
-  ANSIBLE_ROLES_PATH: "builds/${CI_PROJECT_ROOT_NAMESPACE}"
-  GIT_STRATEGY: none
+  ANSIBLE_REMOTE_TMP: "/tmp"
+  ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
+  DEFAULT_MANAGED_STR: "Ansible managed"
   MOLECULE_VERBOSITY: "2"
   PY_COLORS: "1"
 before_script:
-  - cd
-  - source ~/.profile
-  - printenv PATH
-  - mkdir -p builds/${CI_PROJECT_ROOT_NAMESPACE}
-  - cd builds/${CI_PROJECT_ROOT_NAMESPACE}
-  - git clone ${CI_PROJECT_URL}.git
-  - cd ${CI_PROJECT_NAME}
+  - whoami
   - pwd
-  - cat /etc/debian_version
   - which ansible
   - ansible --version
   - which yamllint
