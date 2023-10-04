@@ -18,6 +18,7 @@ variables:
   MOLECULE_VERBOSITY: "2"
   PY_COLORS: "1"
 before_script:
+  - ip addr
   - apt-get -y install iproute2 net-tools
   - whoami
   - pwd
