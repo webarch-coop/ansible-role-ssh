@@ -175,5 +175,5 @@
       ansible.builtin.assert:
         that:
           - molecule_ssh_audit_policy_result.passed | bool
-        fail_msg: "{{ molecule_ssh_audit_policy_result }}"
+        quiet: true
 ...
