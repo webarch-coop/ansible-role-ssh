@@ -43,6 +43,8 @@
               ansible.builtin.debug:
                 var: ssh_audit_ubuntu_policy_regex
                 verbosity: 2
+              vars:
+                ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_distribution_version }} LTS"
 
             - name: Set a fact for the SSH audit policy to use for Ubuntu
               ansible.builtin.set_fact:
@@ -66,6 +68,8 @@
               ansible.builtin.debug:
                 var: ssh_audit_openssh_policy_regex
                 verbosity: 2
+              vars:
+                ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ ssh_version }}"
 
             - name: Set a fact for the SSH audit policy to use for OpenSSH
               ansible.builtin.set_fact:
