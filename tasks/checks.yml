@@ -317,11 +317,11 @@
         - name: Check that the host key algorithms wanted are available
           ansible.builtin.assert:
             that:
-              - algo in ssh_host_key_algorithms_available
+              - ssh_algo in ssh_host_key_algorithms_available
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_host_key_algorithms }}"
           loop_control:
-            loop_var: algo
+            loop_var: ssh_algo
 
       rescue:
 
@@ -352,6 +352,15 @@
         - name: List SSH host key algorithms without the ones that can't be used
           ansible.builtin.debug:
             msg: ssh_host_key_algorithms
+
+        - name: Check that the host key algorithms wanted are available
+          ansible.builtin.assert:
+            that:
+              - ssh_algo in ssh_host_key_algorithms_available
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          loop: "{{ ssh_host_key_algorithms }}"
+          loop_control:
+            loop_var: ssh_algo
 
       when: ssh_host_key_algorithms is defined
 
@@ -390,11 +399,11 @@
         - name: Check that the kex algorithms wanted are available
           ansible.builtin.assert:
             that:
-              - algo in ssh_kex_algorithms_available
+              - ssh_algo in ssh_kex_algorithms_available
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_kex_algorithms }}"
           loop_control:
-            loop_var: algo
+            loop_var: ssh_algo
 
       rescue:
 
@@ -425,6 +434,15 @@
         - name: List SSH kex algorithms without the ones that can't be used
           ansible.builtin.debug:
             msg: ssh_kex_algorithms
+
+        - name: Check that the kex algorithms wanted are available
+          ansible.builtin.assert:
+            that:
+              - ssh_algo in ssh_kex_algorithms_available
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          loop: "{{ ssh_kex_algorithms }}"
+          loop_control:
+            loop_var: ssh_algo
 
       when: ssh_kex_algorithms is defined
 
