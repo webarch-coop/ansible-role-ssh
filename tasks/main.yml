@@ -34,6 +34,8 @@
     - ansible_version.full is version('2.11', '>=')
   tags:
     - ssh
+    - ssh_audit
+    - ssh_check
     - ssh_verify
 
 - name: Check variables
@@ -45,6 +47,7 @@
     - ssh | bool
   tags:
     - ssh
+    - ssh_audit
     - ssh_check
 
 - name: SSH audit

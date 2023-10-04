@@ -213,6 +213,10 @@ argument_specs:
         type: bool
         required: true
         description: Verify all variables that start ssh_ using ther argument spec.
+      ssh_version:
+        type: str
+        required: false
+        description: Internal variable for the version of SSH.
       ssh_x11_forwarding:
         type: bool
         required: false

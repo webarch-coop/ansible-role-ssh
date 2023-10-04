@@ -79,7 +79,7 @@
           ansible.builtin.debug:
             var: ssh_host_key_fingerprint
 
-        - name: RSA key need to be regenrated
+        - name: RSA key need to be regenerated
           ansible.builtin.debug:
             msg:
           when:
@@ -90,5 +90,6 @@
 
   tags:
     - ssh
+    - ssh_audit
     - ssh_check
 ...

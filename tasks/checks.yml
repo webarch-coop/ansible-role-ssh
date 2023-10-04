@@ -46,7 +46,7 @@
         that:
           - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).status == "enabled"
           - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).state == "running"
-        quiet: true
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when:
         - ssh_init is defined
         - ssh_init == "systemd"
@@ -68,6 +68,22 @@
     - name: Debug SSH listening ports
       ansible.builtin.debug:
         var: ssh_listening
+        verbosity: 2
+
+    - name: Check the version of SSH installed
+      ansible.builtin.command: ssh -V
+      check_mode: false
+      changed_when: false
+      register: ssh_v
+
+    - name: Set a fact for the version of SSH installed
+      ansible.builtin.set_fact:
+        ssh_version: "{{ ssh_v.stderr.split(' ')[0] | regex_replace('^OpenSSH_') | regex_replace('p.*$') }}"
+
+    - name: Print the version of SSH installed
+      ansible.builtin.debug:
+        var: ssh_version
+        verbosity: 2
 
     - name: Check ssh_allow_agent_forwarding variable
       ansible.builtin.assert:
@@ -554,5 +570,6 @@
 
   tags:
     - ssh
+    - ssh_audit
     - ssh_check
 ...

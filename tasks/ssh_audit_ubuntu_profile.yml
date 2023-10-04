@@ -8,28 +8,21 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Verify variables
+- name: OpenSSH OpenSSH profile audit
   block:
 
-    - name: Debug the hostvars variable names that start with ssh_
-      ansible.builtin.debug:
-        var: sshvarnames
-        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+    - name: SSH version audit
+      ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
+      check_mode: false
+      changed_when: false
+      register: ssh_audit_policy_json
+      failed_when: ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
 
-    - name: Debug the hostvars variable names that start with ssh_
-      ansible.builtin.debug:
-        var: sshhostvars
-        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+    - name: Set a fact for the results of the policy audit
+      ansible.builtin.set_fact:
+        ssh_audit_policy_result: "{{ ssh_audit_policy_json.stdout_lines[0] | ansible.builtin.from_json }}"
+      when: ssh_audit_policy_json.stdout_lines is defined
 
-    - name: Check ssh_ variables using meta/argument_specs.yml
-      ansible.builtin.validate_argument_spec:
-        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
-        provided_arguments: "{{ sshhostvars }}"
-
-  when: ssh_verify | bool
   tags:
     - ssh
     - ssh_audit
-    - ssh_check
-    - ssh_verify
-...
