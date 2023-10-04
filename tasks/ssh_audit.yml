@@ -73,7 +73,7 @@
 
             - name: Set a fact for the SSH audit policy to use for OpenSSH
               ansible.builtin.set_fact:
-                ssh_audit_policy: "{{ (ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex))[0] }}"
+                ssh_audit_policy: "{{ (ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex)) | community.general.json_query('[0]') }}"
               vars:
                 ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ ssh_version }}"
               when:
@@ -82,7 +82,9 @@
 
             - name: SSH version audit
               ansible.builtin.include_tasks: ssh_audit_openssh_profile.yml
-              when: ssh_audit_policy is defined
+              when:
+                - ssh_audit_policy is defined
+                - ssh_audit_policy | length > 0
 
           when: ansible_distribution != "Ubuntu"
 
