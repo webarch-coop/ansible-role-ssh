@@ -102,7 +102,11 @@
       ansible.builtin.include_tasks: ssh_audit.yml
       vars:
         ssh_first_check: true
-      when: ssh_init == "systemd"
+      when:
+        - ssh_init is defined
+        - ssh_init == "systemd"
+        - ssh_listening is defined
+        - ssh_listening != []
 
   when:
     - ssh is defined
