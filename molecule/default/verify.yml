@@ -72,6 +72,20 @@
 
     - name: Debug SSH listening ports
       ansible.builtin.debug:
-        var: ssh_listening
+        var: molecule_ssh_listening
 
+    - name: Audit SSH and generate JSON output
+      ansible.builtin.command: "ssh-audit -j {{ ansible_default_ipv4.address }}"
+      check_mode: false
+      changed_when: false
+      register: molecule_ssh_audit_json
+      failed_when: molecule_ssh_audit_json.rc is not regex('0|2|3')
+
+    - name: Set a fact for the SSH audit results
+      ansible.builtin.set_fact:
+        molecule_ssh_audit_results: "{{ molecule_ssh_audit_json.stdout | from_json }}"
+
+    - name: Debug the SSH audit results
+      ansible.builtin.debug:
+        var: molecule_ssh_audit_results
 ...

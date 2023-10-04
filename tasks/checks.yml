@@ -32,6 +32,27 @@
         var: ssh_init
       when: ssh_init != "systemd"
 
+    - name: Check the runing services
+      ansible.builtin.service_facts:
+      register: ssh_service_facts
+
+    - name: Debug ssh service status
+      ansible.builtin.debug:
+        msg: "{{ ssh_service_facts | community.general.json_query(ssh_jpq.service) }}"
+        verbosity: 2
+
+    - name: Check that sshd is enabled and running
+      ansible.builtin.assert:
+        that:
+          - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).status == "enabled"
+          - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).state == "running"
+        quiet: true
+      when:
+        - ssh_init is defined
+        - ssh_init == "systemd"
+        - ssh_first_check is defined
+        - not ssh_first_check | bool
+
     - name: Gather facts on listening ports
       community.general.listen_ports_facts:
 

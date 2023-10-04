@@ -151,11 +151,6 @@
     - name: OpenSSH server configured
       ansible.builtin.include_tasks: configure.yml
 
-    - name: Run post-update checks
-      ansible.builtin.include_tasks: checks.yml
-      vars:
-        ssh_first_check: false
-
     - name: Generate OpenSSH keypair for root user
       ansible.builtin.include_tasks: root.yml
       when: (ssh_root_keypair is defined) and (ssh_root_keypair | bool)
@@ -163,6 +158,23 @@
     - name: Include OpenSSH key pair generation for CI
       ansible.builtin.include_tasks: ci.yml
       when: (ssh_ci_ips is defined) and (ssh_ci_ips != [])
+
+    - name: Run post-update checks
+      ansible.builtin.include_tasks: checks.yml
+      vars:
+        ssh_first_check: false
+
+    - name: Include ssh-audit tasks
+      ansible.builtin.include_tasks: ssh_audit.yml
+      vars:
+        ssh_first_check: true
+      when:
+        - ssh_init is defined
+        - ssh_init == "systemd"
+        - ssh_listening is defined
+        - ssh_listening != []
+        - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).status == "enabled"
+        - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).state == "running"
 
   when:
     - ssh is defined

@@ -41,7 +41,9 @@
               - ssh_version is regex('^[0-9]{1,2}[.][0-9]{1,2}$')
             quiet: true
 
-      when: ssh_init == "systemd"
+      when:
+        - ssh_init is defined
+        - ssh_init == "systemd"
 
     - name: Ensure that /run/sshd exists when init system is not systemd
       ansible.builtin.file:

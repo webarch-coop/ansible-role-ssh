@@ -33,5 +33,6 @@
         name: ssh
       vars:  # noqa var-naming[no-role-prefix]
         ssh: true
+        ssh_audit: true
         ssh_localhost: "{{ ansible_default_ipv4.address }}"
 ...
