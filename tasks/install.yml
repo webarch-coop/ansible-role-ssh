@@ -82,8 +82,10 @@
             ssh_first_check: true
 
       when: >-
-        ( ssh_install_backports is defined ) and ( ssh_install_backports.changed | bool ) ) or
-        ( ( ssh_install is defined ) and ( ssh_install.changed | bool ) )
+        ( ( ssh_install_backports is defined ) and
+        ( ssh_install_backports.changed | bool ) ) or
+        ( ( ssh_install is defined ) and
+        ( ssh_install.changed | bool ) )
 
   tags:
     - ssh
