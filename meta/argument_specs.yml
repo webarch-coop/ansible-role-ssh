@@ -35,6 +35,10 @@ argument_specs:
         type: str
         required: false
         description: An internal variable for the name of the backports repo.
+      ssh_audit:
+        type: bool
+        required: true
+        description: Run the SSH audit tasks.
       ssh_authentication_methods:
         type: str
         required: true
@@ -90,6 +94,14 @@ argument_specs:
         elements: str
         required: false
         description: ListenAddress, IP addresses that SSH should listen for connections on.
+      ssh_listen_jpq:
+        type: str
+        required: true
+        description: Internal JMESPath query to get the sshd listening address from ansible_facts.
+      ssh_localhost:
+        type: str
+        required: true
+        description: The localhost address to use for SSH audit scans.
       ssh_local_hosts:
         type: bool
         required: false

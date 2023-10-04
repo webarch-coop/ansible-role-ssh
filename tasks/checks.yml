@@ -16,7 +16,6 @@
         ssh_first_check: false
       when: ssh_first_check is not defined
 
-
     # When in a docker container ssh_init.stdout == "sh" or "bash"
     - name: Check if system has been booted with systemd as init system
       ansible.builtin.command: ps -p 1 -o comm=
@@ -32,6 +31,22 @@
       ansible.builtin.debug:
         var: ssh_init
       when: ssh_init != "systemd"
+
+    - name: Gather facts on listening ports
+      community.general.listen_ports_facts:
+
+    - name: Debug TCP ports
+      ansible.builtin.debug:
+        var: ansible_facts.tcp_listen
+        verbosity: 2
+
+    - name: Set a fact for the port that SSH is listening on
+      ansible.builtin.set_fact:
+        ssh_listening: "{{ ansible_facts.tcp_listen | community.general.json_query(ssh_listen_jpq) }}"
+
+    - name: Debug SSH listening ports
+      ansible.builtin.debug:
+        var: ssh_listening
 
     - name: Check ssh_allow_agent_forwarding variable
       ansible.builtin.assert:

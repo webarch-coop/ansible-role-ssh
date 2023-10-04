@@ -9,6 +9,7 @@
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 ssh_apt_backports: "{{ ansible_distribution_release }}-backports"
+ssh_listen_jpq: "[?name=='sshd'].address"
 
 # https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
 sshvarnames: "{{ q('varnames', '^ssh_') | sort }}"

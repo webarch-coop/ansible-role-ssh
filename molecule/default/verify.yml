@@ -35,4 +35,43 @@
     - name: Debug ssh version
       ansible.builtin.debug:
         var: molecule_ssh_v.stderr
+
+    - name: Check the runing services
+      ansible.builtin.service_facts:
+      register: molecule_ssh_service_facts
+
+    - name: Debug ssh service status
+      ansible.builtin.debug: 
+        msg: "{{ molecule_service_facts | community.general.json_query(molecule_service_jpq) }}"
+        verbosity: 3
+      vars:
+        molecule_service_jpq: 'ansible_facts.services.["ssh.service"]|[0]'
+  
+    - name: Check that sshd is enabled and running
+      ansible.builtin.assert:
+        that:
+          - (molecule_service_facts | community.general.json_query(molecule_service_jpq)).status == "enabled"
+          - (molecule_service_facts | community.general.json_query(molecule_service_jpq)).state == "running"
+        quiet: true
+      vars:
+        molecule_service_jpq: 'ansible_facts.services.["ssh.service"]|[0]'
+
+    - name: Gather facts on listening ports
+      community.general.listen_ports_facts:
+
+    - name: Debug TCP ports
+      ansible.builtin.debug:
+        var: ansible_facts.tcp_listen
+        verbosity: 2
+
+    - name: Set a fact for the port that SSH is listening on
+      ansible.builtin.set_fact:
+        molecule_ssh_listening: "{{ ansible_facts.tcp_listen | community.general.json_query(molecule_ssh_listen_jpq) }}"
+      vars:
+        molecule_ssh_listen_jpq: "[?name=='sshd'].address"
+
+    - name: Debug SSH listening ports
+      ansible.builtin.debug:
+        var: ssh_listening
+
 ...

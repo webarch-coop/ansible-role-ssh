@@ -24,7 +24,7 @@
         verbosity: 1
 
     - name: Audit SSH server and generate JSON output
-      ansible.builtin.command: ssh-audit -j localhost
+      ansible.builtin.command: "ssh-audit -j {{ ssh_localhost }}"
       check_mode: false
       changed_when: false
       register: ssh_audit_json

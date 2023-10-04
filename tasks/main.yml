@@ -11,13 +11,15 @@
 - name: Skip the tasks in this role as ssh is false
   ansible.builtin.debug:
     msg: "The ssh variable need to be true for the tasks in this role to run."
-  when: not ssh | bool
+  when: ( ssh is not defined ) or ( not ssh | bool )
   tags:
     - ssh
 
 - name: Debug variables
   ansible.builtin.include_tasks: debug.yml
-  when: ssh | bool
+  when:
+    - ssh is defined
+    - ssh | bool
   tags:
     - ssh
     - ssh_debug
@@ -25,7 +27,9 @@
 - name: Verify variables
   ansible.builtin.include_tasks: verify.yml
   when:
+    - ssh is defined
     - ssh | bool
+    - ssh_verify is defined
     - ssh_verify | bool
     - ansible_version.full is version('2.11', '>=')
   tags:
@@ -36,7 +40,9 @@
   ansible.builtin.include_tasks: checks.yml
   vars:
     ssh_first_check: true
-  when: ssh | bool
+  when:
+    - ssh is defined
+    - ssh | bool
   tags:
     - ssh
     - ssh_check
@@ -98,7 +104,11 @@
         ssh_first_check: true
       when: ssh_init == "systemd"
 
-  when: ssh | bool
+  when:
+    - ssh is defined
+    - ssh | bool
+    - ssh_audit is defined
+    - ssh_audit | bool
   tags:
     - ssh
     - ssh_audit
@@ -150,15 +160,19 @@
       ansible.builtin.include_tasks: ci.yml
       when: (ssh_ci_ips is defined) and (ssh_ci_ips != [])
 
-  when: ssh | bool
+  when:
+    - ssh is defined
+    - ssh | bool
   tags:
     - ssh
 
 - name: Include local OpenSSH client configuration tasks
   ansible.builtin.include_tasks: local_hosts.yml
   when:
+    - ssh is defined
     - ssh | bool
-    - (ssh_local_hosts is defined) and (ssh_local_hosts | bool)
+    - ssh_local_hosts is defined
+    - ssh_local_hosts | bool
   tags:
     - ssh
     - ssh_local_hosts

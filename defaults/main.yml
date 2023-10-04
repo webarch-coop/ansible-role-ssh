@@ -10,6 +10,12 @@
 ---
 # See also meta/argument_specs.yml
 
+# Set ssh to true for the tasks in this role to be run
+ssh: false
+
+# Set ssh_audit to fasle to skip SSH auditing tasks
+ssh_audit: true
+
 # https://man.openbsd.org/sshd_config#AllowAgentForwarding
 ssh_allow_agent_forwarding: false
 
@@ -105,6 +111,9 @@ ssh_kex_algorithms:
 ssh_listen_addresses:
   - 0.0.0.0
 
+# ssh_localhost might need to be set to 127.0.0.1
+ssh_localhost: localhost
+
 # Enable generation of local configuration files
 ssh_local_hosts: false
 
@@ -137,9 +146,9 @@ ssh_local_hosts_readme: "{{ ssh_local_hosts_directory }}/README.md"
 ssh_local_hosts_readme_host: |
   ## {{ inventory_hostname }}
   SSH server fingerprints for `{{ inventory_hostname }}` at `{{ ssh_local_hosts_hostname }}`:
-  {% if ssh_audit is defined %}
+  {% if ssh_audit_results is defined %}
   ```yml
-  {{ ssh_audit.fingerprints | to_nice_yaml }}
+  {{ ssh_audit_results.fingerprints | to_nice_yaml }}
   {% endif %}
   ```
   The above YAML can generated using `ssh-audit -j {{ ssh_local_hosts_hostname }} | jq .fingerprints | yq -P`
