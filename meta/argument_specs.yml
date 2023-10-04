@@ -77,9 +77,29 @@ argument_specs:
         description: HostKeyAlgorithms, an optional list of algorithms to override the defaults.
       ssh_host_keys:
         type: list
-        elements: str
-        required: false
+        required: true
         description: HostKey, a list of file paths to keys.
+        elements: dict
+        options:
+          bits:
+            type: int
+            required: false
+            description: The number of bit that the SSH key should have.
+          name:
+            type: str
+            required: true
+            description: The SSH key type.
+            choices:
+              - dsa
+              - ecdsa
+              - ecdsa-sk
+              - ed25519
+              - ed25519-sk
+              - rsa
+          path:
+            type: str
+            required: true
+            description: The path to the SSH private key.
       ssh_jpq:
         type: dict
         required: true

@@ -38,8 +38,8 @@ ListenAddress {{ a }}
 
 # Supported HostKey algorithms by order of preference.
 {% if ssh_host_keys is defined %}
-{% for key in ssh_host_keys %}
-HostKey {{ key }}
+{% for ssh_key in ssh_host_keys %}
+HostKey {{ ssh_key.path }}
 {% endfor %}
 {% else %}
 #HostKey /etc/ssh/ssh_host_rsa_key

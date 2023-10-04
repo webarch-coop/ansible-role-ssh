@@ -306,73 +306,11 @@
       when: ssh_host_key_algorithms is defined
 
     - name: Host keys checks
-      block:
-
-        - name: Check ssh_host_keys variable
-          ansible.builtin.assert:
-            that:
-              - ssh_host_keys | type_debug == "list"
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-
-        - name: Check that the ssh_host_keys are present
-          ansible.builtin.stat:
-            path: "{{ file }}"
-          loop: "{{ ssh_host_keys }}"
-          loop_control:
-            loop_var: file
-          register: ssh_host_keys_stat
-
-        - name: Debug the results of the host key check
-          ansible.builtin.debug:
-            var: ssh_host_keys_stat
-            verbosity: 2
-
-        - name: Host key checks
-          block:
-
-            - name: Check that all the host keys exist
-              ansible.builtin.assert:
-                that:
-                  - file.stat.exists | bool
-                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-              loop: "{{ ssh_host_keys_stat.results }}"
-              loop_control:
-                loop_var: file
-                label: "{{ file.file | basename }}"
-
-            - name: Check the host keys attributes
-              ansible.builtin.assert:
-                that:
-                  - file.stat.isreg | bool
-                  - file.stat.mode == "0600"
-                  - file.stat.gid == 0
-                  - file.stat.gr_name == "root"
-                  - file.stat.uid == 0
-                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-              when: file.stat.exists | bool
-              loop: "{{ ssh_host_keys_stat.results }}"
-              loop_control:
-                loop_var: file
-                label: "{{ file.file | basename }}"
-
-          rescue:
-
-            - name: It appears that some SSH host keys are missing
-              ansible.builtin.fail:
-                msg:
-                  - "Please generate missing host keys, for example using the following commands"
-                  - "cd /etc/ssh"
-                  - "rm -i ssh_host_*"
-                  - "ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N ''"
-                  - "ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N ''"
-                  - "For more infformation see:"
-                  - "https://www.ssh-audit.com/hardening_guides.html"
-              when: >-
-                ( ssh_first_check is not defined ) or
-                ( not ssh_first_check | bool )
-
-          when: ssh_check_fail | bool
-
+      ansible.builtin.include_tasks: check_host_key.yml
+      loop: "{{ ssh_host_keys }}"
+      loop_control:
+        loop_var: ssh_host_key
+        label: "{{ ssh_host_key.name }}"
       when: ssh_host_keys is defined
 
     - name: Kex algorithm checks

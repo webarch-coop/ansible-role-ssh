@@ -127,7 +127,8 @@
       ansible.builtin.include_tasks: host_key.yml
       loop: "{{ ssh_host_keys }}"
       loop_control:
-        loop_var: ssh_host_key_path
+        loop_var: ssh_host_key
+        label: "{{ ssh_host_key.name }}"
 
     - name: SSH allow groups present
       ansible.builtin.group:

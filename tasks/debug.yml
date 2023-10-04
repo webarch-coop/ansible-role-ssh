@@ -23,7 +23,7 @@
       - "DenyUsers{% if ssh_deny_users is defined %}{% for u in ssh_deny_users %} {{ u }}{% endfor %}{% endif %} # ssh_deny_users"
       - "HostKeyAlgorithms{% if ssh_host_key_algorithms is defined %} {% for a in ssh_host_key_algorithms %}{{ a }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_host_key_algorithms"
       - "ssh_gitlab{% if ssh_gitlab is defined %} {{ ssh_gitlab | lower }}{% endif %}"
-      - "HostKey{% if ssh_host_keys is defined %}{% for key in ssh_host_keys %} {{ key }}{% endfor %}{% endif %} # ssh_host_keys"
+      - "HostKey{% if ssh_host_keys is defined %}{% for ssh_key in ssh_host_keys %} name: {{ ssh_key.name }}{% if ssh_key.bits is defined %} bits: {{ ssh_key.bits }}{% endif %} path: {{ ssh_key.path }} {% endfor %}{% endif %} # ssh_host_keys"
       - "KexAlgorithms{% if ssh_kex_algorithms is defined %} {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_kex_algorithms"
       - "ListenAddress{% if ssh_listen_addresses is defined %} {% for a in ssh_listen_addresses %}{{ a }}{% endfor %}{% endif %} # ssh_listen_addresses"
       - "ssh_local_hosts{% if ssh_local_hosts is defined %} {{ ssh_local_hosts }}{% endif %}"

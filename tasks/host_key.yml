@@ -11,16 +11,125 @@
 - name: Check that SSH host keys are present
   block:
 
-    - name: "Stat {{ ssh_host_key_path }}"
+    - name: "Stat {{ ssh_host_key.path }}"
       ansible.builtin.stat:
-        path: "{{ ssh_host_key_path }}"
+        path: "{{ ssh_host_key.path }}"
       register: ssh_host_key_state
 
-    - name: Reconfigure SSH
-      ansible.builtin.command: dpkg-reconfigure openssh-server
-      changed_when: true
-      when: not ssh_host_key_state.stat.exists
-      notify: Restart ssh
+    - name: Check if the SSH key is present
+      ansible.builtin.stat:
+        path: "{{ ssh_host_key.path }}"
+      register: ssh_host_key_path
+
+    - name: Debug the results of the host SSH key path check
+      ansible.builtin.debug:
+        var: ssh_host_key_path
+        verbosity: 2
+
+    - name: Run additional checks when the host key exists
+      block:
+
+        - name: Check the host SSH keys attributes
+          ansible.builtin.assert:
+            that:
+              - ssh_host_key_path.stat.isreg | bool
+              - ssh_host_key_path.stat.mode == "0600"
+              - ssh_host_key_path.stat.gid == 0
+              - ssh_host_key_path.stat.gr_name == "root"
+              - ssh_host_key_path.stat.uid == 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+        - name: Check host SSH key fingerprint
+          ansible.builtin.command: "ssh-keygen -l -f {{ ssh_host_key.path }}"
+          check_mode: false
+          changed_when: false
+          register: ssh_host_key_gen_fingerprint
+
+        - name: Set a fact for the SSH key fingerprint results
+          ansible.builtin.set_fact:
+            ssh_host_key_fingerprint: "{{ ssh_host_key_gen_fingerprint.stdout | split(' ') | list }}"
+
+        - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
+          ansible.builtin.debug:
+            var: ssh_host_key_fingerprint
+
+      when: ssh_host_key_path.stat.exists | bool
+
+    - name: Generate new keys
+      block:
+
+        - name: Set a fact for the date to be used in the backup path
+          ansible.builtin.set_fact:
+            ssh_date: "{{ ansible_date_time.iso8601_basic_short }}"
+          when: ssh_host_key_path.stat.exists | bool
+
+        - name: Backup the old public SSH key
+          ansible.builtin.command:
+            cmd: "mv {{ ssh_host_key.path }}.pub {{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.pub.{{ ssh_date }}.bak"
+            creates: "{{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.pub.{{ ssh_date }}.bak"
+            removes: "{{ ssh_host_key.path }}.pub"
+
+        - name: Backup the old private SSH key
+          ansible.builtin.command:
+            cmd: "mv {{ ssh_host_key.path }} {{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.{{ ssh_date }}.bak"
+            creates: "{{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.{{ ssh_date }}.bak"
+            removes: "{{ ssh_host_key.path }}"
+
+        - name: Generate new RSA SSH key pair
+          ansible.builtin.command:
+            cmd: ssh-keygen -t rsa -b {{ ssh_host_key.bits }} -f /etc/ssh/ssh_host_rsa_key -N "root@{{ inventory_hostname }}"
+            creates: /etc/ssh/ssh_host_rsa_key
+          when: ssh_host_key.name == "rsa"
+
+        - name: Generate new SSH key pair
+          ansible.builtin.command:
+            cmd: ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N "root@{{ inventory_hostname }}"
+            creates: /etc/ssh/ssh_host_rsa_key
+          when: ssh_host_key.name == "ed25519"
+
+      when: >-
+        ( not ssh_host_key_path.stat.exists ) or
+        ( ( ssh_host_key.name == "rsa" ) and ( ssh_host_key.bits != ssh_host_key_fingerprint[0] | int ) ) or
+        ( ( ssh_host_key.name == "ecdsa" ) and ( ssh_host_key.bits != ssh_host_key_fingerprint[0] | int ) )
+
+    - name: Check if the SSH key is present
+      ansible.builtin.stat:
+        path: "{{ ssh_host_key.path }}"
+      register: ssh_host_key_path
+
+    - name: Debug the results of the host SSH key path check
+      ansible.builtin.debug:
+        var: ssh_host_key_path
+        verbosity: 2
+
+    - name: Run additional checks when the host key exists
+      block:
+
+        - name: Check the host SSH keys attributes
+          ansible.builtin.assert:
+            that:
+              - ssh_host_key_path.stat.isreg | bool
+              - ssh_host_key_path.stat.mode == "0600"
+              - ssh_host_key_path.stat.gid == 0
+              - ssh_host_key_path.stat.gr_name == "root"
+              - ssh_host_key_path.stat.uid == 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+        - name: Check host SSH key fingerprint
+          ansible.builtin.command: "ssh-keygen -l -f {{ ssh_host_key.path }}"
+          check_mode: false
+          changed_when: false
+          register: ssh_host_key_gen_fingerprint
+
+        - name: Set a fact for the SSH key fingerprint results
+          ansible.builtin.set_fact:
+            ssh_host_key_fingerprint: "{{ ssh_host_key_gen_fingerprint.stdout | split(' ') | list }}"
+
+        - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
+          ansible.builtin.debug:
+            var: ssh_host_key_fingerprint
+
+      when: ssh_host_key_path.stat.exists | bool
 
   tags:
     - ssh
