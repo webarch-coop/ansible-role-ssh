@@ -80,7 +80,7 @@
 
         - name: Set a fact for the version of OpenSSH installed
           ansible.builtin.set_fact:
-            ssh_version: "{{ ssh_audit_results.banner.software | regex_replace('^OpenSSH_') | regex_replace('p1$') }}"
+            ssh_version: "{{ ssh_audit_results.banner.software | regex_replace('^OpenSSH_') | regex_replace('p[1-9]$') }}"
 
       when:
         - ssh_which_ssh_audit.rc == 0
