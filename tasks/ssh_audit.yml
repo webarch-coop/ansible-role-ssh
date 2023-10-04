@@ -182,7 +182,9 @@
             that:
               - ssh_audit_policy_result.passed | bool
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-            fail_msg: "{{ ssh_audit_policy_result.errors }}"
+            fail_msg:
+              - "The ssh-audit pliicy check failed, you can check manually using the following command"
+              - "ssh-audit -nP '{{ ssh_audit_policy }}' {{ ssh_localhost }}"
           when: ssh_audit_policy_result is defined
 
       when:
