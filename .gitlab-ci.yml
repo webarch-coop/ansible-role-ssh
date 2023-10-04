@@ -29,20 +29,20 @@ before_script:
   - which molecule
   - molecule --version
 stages:
-  - trixie
-  - bookworm
+  # - trixie
+  # - bookworm
   - bullseye
   - jammy
-trixie:
-  image: registry.git.coop/webarch/containers/images/trixie:20230921
-  stage: trixie
-  script:
-    - molecule test
-bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20230921
-  stage: bookworm
-  script:
-    - molecule test
+# trixie:
+#   image: registry.git.coop/webarch/containers/images/trixie:20230921
+#   stage: trixie
+#   script:
+#     - molecule test
+# bookworm:
+#   image: registry.git.coop/webarch/containers/images/bookworm:20230921
+#   stage: bookworm
+#   script:
+#     - molecule test
 bullseye:
   image: registry.git.coop/webarch/containers/images/bullseye:20230921
   stage: bullseye

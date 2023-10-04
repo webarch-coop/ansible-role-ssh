@@ -325,10 +325,22 @@
 
       rescue:
 
-        - name: Host key algorithms check failed
+        - name: SSH host key algorithms check failed
           ansible.builtin.debug:
             var: ssh_q_host_key_algorithms.stderr
           when: ssh_q_host_key_algorithms.rc == 255
+
+        - name: Fail when the check for host key algorithms failed
+          ansible.builtin.fail:
+          when: ssh_q_host_key_algorithms.rc == 255
+
+        - name: Omit unsupported SSH host key algorithms
+          ansible.builtin.set_fact:
+            ssh_host_key_algorithms: "{{ ssh_host_key_algorithms_available | ansible.builtin.intersect(ssh_host_key_algorithms) }}"
+
+        - name: List omitted SSH host key algorithms
+          ansible.builtin.debug:
+            msg: "{{ ssh_host_key_algorithms | ansible.builtin.difference(ssh_host_key_algorithms_available) }}"
 
       when: ssh_host_key_algorithms is defined
 
@@ -364,7 +376,7 @@
             var: ssh_kex_algorithms_available
             verbosity: 2
 
-        - name: Check that the ciphers wanted are available
+        - name: Check that the kex algorithms wanted are available
           ansible.builtin.assert:
             that:
               - algo in ssh_kex_algorithms_available
@@ -379,6 +391,18 @@
           ansible.builtin.debug:
             var: ssh_q_kex_algorithms.stderr
           when: ssh_q_kex_algorithms.rc == 255
+
+        - name: Fail when the check for kex algorithms failed
+          ansible.builtin.fail:
+          when: ssh_q_kex_algorithms.rc == 255
+
+        - name: Omit unsupported SSH kex algorithms
+          ansible.builtin.set_fact:
+            ssh_kex_algorithms: "{{ ssh_kex_algorithms_available | ansible.builtin.intersect(ssh_kex_algorithms) }}"
+
+        - name: List omitted SSH kex algorithms
+          ansible.builtin.debug:
+            msg: "{{ ssh_kex_algorithms | ansible.builtin.difference(ssh_kex_algorithms_available) }}"
 
       when: ssh_kex_algorithms is defined
 
