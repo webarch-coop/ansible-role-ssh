@@ -181,7 +181,7 @@
           block:
 
             - name: SSH profile audit human readable output
-              ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
+              ansible.builtin.command: "ssh-audit -nP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
               check_mode: false
               changed_when: false
               register: ssh_audit_policy
