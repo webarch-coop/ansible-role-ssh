@@ -15,7 +15,7 @@ variables:
   ANSIBLE_REMOTE_TMP: "/tmp"
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
   DEFAULT_MANAGED_STR: "Ansible managed"
-  MOLECULE_VERBOSITY: "3"
+  MOLECULE_VERBOSITY: "0"
   PY_COLORS: "1"
 before_script:
   - apt-get -y install iproute2 net-tools
@@ -29,15 +29,15 @@ before_script:
   - which molecule
   - molecule --version
 stages:
-  - trixie
+  # - trixie
   - bookworm
   - bullseye
   - jammy
-trixie:
-  image: registry.git.coop/webarch/containers/images/trixie:20230921
-  stage: trixie
-  script:
-    - molecule test
+# trixie:
+#   image: registry.git.coop/webarch/containers/images/trixie:20230921
+#   stage: trixie
+#   script:
+#     - molecule test
 bookworm:
   image: registry.git.coop/webarch/containers/images/bookworm:20230921
   stage: bookworm

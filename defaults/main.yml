@@ -113,7 +113,8 @@ ssh_host_keys:
 
 # https://man.openbsd.org/sshd_config#KexAlgorithms
 ssh_kex_algorithms:
-  - sntrup761x25519-sha512@openssh.com
+  # uncomment the following algo for trixie
+  # - sntrup761x25519-sha512@openssh.com
   - curve25519-sha256
   - curve25519-sha256@libssh.org
   # - diffie-hellman-group14-sha256
