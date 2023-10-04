@@ -18,7 +18,7 @@ provisioner:
     defaults:
       ansible_managed: Ansible managed
     # host_vars:
-    #   instance: 
+    #   instance:
     #     ansible_user: ansible
   options:
     D: true
