@@ -42,7 +42,7 @@
 
     - name: Set a fact for the port that SSH is listening on
       ansible.builtin.set_fact:
-        ssh_listening: "{{ ansible_facts.tcp_listen | community.general.json_query(ssh_listen_jpq) }}"
+        ssh_listening: "{{ ansible_facts.tcp_listen | community.general.json_query(ssh_jpq.listen) }}"
 
     - name: Debug SSH listening ports
       ansible.builtin.debug:

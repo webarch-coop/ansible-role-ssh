@@ -142,7 +142,7 @@
         mode: "0644"
         owner: root
         group: root
-      notify: restart ssh
+      notify: Restart ssh
 
     - name: OpenSSH server configured
       ansible.builtin.include_tasks: configure.yml

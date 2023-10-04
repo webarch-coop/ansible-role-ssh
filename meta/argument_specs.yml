@@ -80,6 +80,10 @@ argument_specs:
         elements: str
         required: false
         description: HostKey, a list of file paths to keys.
+      ssh_jpq:
+        type: dict
+        required: true
+        description: Disctionary of Internal JMESPath queries.
       ssh_init:
         type: str
         required: false
@@ -94,10 +98,6 @@ argument_specs:
         elements: str
         required: false
         description: ListenAddress, IP addresses that SSH should listen for connections on.
-      ssh_listen_jpq:
-        type: str
-        required: true
-        description: Internal JMESPath query to get the sshd listening address from ansible_facts.
       ssh_localhost:
         type: str
         required: true

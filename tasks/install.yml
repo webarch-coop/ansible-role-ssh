@@ -32,7 +32,7 @@
         default_release: "{{ ansible_distribution_release }}-backports"
         install_recommends: true
       register: ssh_install_backports
-      notify: restart ssh
+      notify: Restart ssh
       when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
     - name: OpenSSH and related packages present
@@ -47,7 +47,27 @@
         state: present
         install_recommends: true
       register: ssh_install
-      notify: restart ssh
+      notify: Restart ssh
+
+    - name: Stat /lib/systemd/system/ssh.service
+      ansible.builtin.stat:
+        path: /lib/systemd/system/ssh.service
+      register: ssh_system_service
+
+    - name: Stat /etc/systemd/system/multi-user.target.wants/ssh.service
+      ansible.builtin.stat:
+        path: /etc/systemd/system/multi-user.target.wants/ssh.service
+      register: ssh_system_service_symlink
+
+    - name: OpenSSH enabled and started
+      ansible.builtin.systemd_service:
+        name: ssh
+        enabled: true
+        state: started
+      register: ssh_service
+      when:
+        - ssh_system_service.stat.exists | bool
+        - ssh_system_service_symlink.stat.exists | bool
 
     - name: Restart SSH and re-run checks if when new packages are installed
       block:
@@ -60,7 +80,9 @@
           vars:
             ssh_first_check: true
 
-      when: (ssh_install_backports is defined and ssh_install_backports.changed | bool) or (ssh_install is defined and ssh_install.changed | bool)
+      when: >-
+        (ssh_install_backports is defined and ssh_install_backports.changed | bool) or
+        (ssh_install is defined and ssh_install.changed | bool)
 
   tags:
     - ssh
