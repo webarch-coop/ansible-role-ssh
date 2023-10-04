@@ -104,6 +104,7 @@
           ansible.builtin.debug:
             var: ssh_audit_policies
             verbosity: 2
+          when: ssh_audit_policies is defined
 
         - name: Ubuntu SSH policy audit
           block:
@@ -123,9 +124,11 @@
               when:
                 - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | type_debug == "list"
                 - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | type_debug != []
-                - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') | length > 0
 
-          when: ansible_distribution == "Ubuntu"
+          when:
+            - ansible_distribution == "Ubuntu"
+            - ssh_audit_policies is defined
+            - ssh_audit_policies != []
 
         - name: OpenSSH policy audit
           block:
@@ -145,9 +148,11 @@
               when:
                 - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug == "list"
                 - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug != []
-                - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
 
-          when: ansible_distribution != "Ubuntu"
+          when:
+            - ansible_distribution != "Ubuntu"
+            - ssh_audit_policies is defined
+            - ssh_audit_policies != []
 
         - name: SSH profile audit
           ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
@@ -165,6 +170,13 @@
           when:
             - ssh_audit_policy_json is defined
             - ssh_audit_policy_json.stdout_lines is defined
+
+        - name: Ensure that the SSH policy audit passed
+          ansible.builtin.assert:
+            that:
+              - ssh_audit_policy_result.passed | bool
+            fail_msg: "{{ ssh_audit_policy_result.errors }}"
+          when: ssh_audit_policy_result is defined
 
       when:
         - ssh_which_ssh_audit.rc == 0

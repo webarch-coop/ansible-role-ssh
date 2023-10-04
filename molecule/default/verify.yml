@@ -143,10 +143,15 @@
     - name: Set a fact for the results of the SSH policy audit
       ansible.builtin.set_fact:
         molecule_ssh_audit_policy_result: "{{ molecule_ssh_audit_policy_json.stdout_lines[0] | ansible.builtin.from_json }}"
-      when: molecule_ssh_audit_policy_json.stdout_lines is defined
 
     - name: Debug the results of the SSH policy audit
       ansible.builtin.debug:
         var: molecule_ssh_audit_policy_result
+        verbosity: 2
 
+    - name: Check that the SSH policy audit passed
+      ansible.builtin.assert:
+        that:
+          - molecule_ssh_audit_policy_result.passed | bool
+        fail_msg: "{{ molecule_ssh_audit_policy_result }}"
 ...

@@ -39,6 +39,10 @@ argument_specs:
         type: bool
         required: true
         description: Run the SSH audit tasks.
+      ssh_audit_fail:
+        type: bool
+        required: true
+        description: Fail when the ssh-autit policy check fails.
       ssh_authentication_methods:
         type: str
         required: true
