@@ -48,16 +48,19 @@
 
             - name: Set a fact for the SSH audit policy to use for Ubuntu
               ansible.builtin.set_fact:
-                ssh_audit_policy: "{{ (ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex))[0] }}"
+                ssh_audit_policy: "{{ ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') }}"
               vars:
                 ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_distribution_version }} LTS"
               when:
                 - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | type_debug == "list"
                 - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | type_debug != []
+                - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') | length > 0
 
             - name: Ubuntu profile audit
               ansible.builtin.include_tasks: ssh_audit_ubuntu_profile.yml
-              when: ssh_audit_policy is defined
+              when:
+                - ssh_audit_policy is defined
+                - ssh_audit_policy | length > 0
 
           when: ansible_distribution == "Ubuntu"
 
@@ -73,12 +76,13 @@
 
             - name: Set a fact for the SSH audit policy to use for OpenSSH
               ansible.builtin.set_fact:
-                ssh_audit_policy: "{{ (ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex)) | community.general.json_query('[0]') }}"
+                ssh_audit_policy: "{{ ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') }}"
               vars:
                 ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ ssh_version }}"
               when:
                 - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug == "list"
                 - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug != []
+                - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
 
             - name: SSH version audit
               ansible.builtin.include_tasks: ssh_audit_openssh_profile.yml
