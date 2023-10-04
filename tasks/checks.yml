@@ -70,6 +70,17 @@
         var: ssh_listening
         verbosity: 2
 
+    - name: Check that the SSH listening ports match the configuration
+      ansible.builtin.assert:
+        that:
+          - ssh_listening | sort == ssh_listen_addresses | sort
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+      when:
+        - ssh_init is defined
+        - ssh_init == "systemd"
+        - ssh_first_check is defined
+        - not ssh_first_check | bool
+
     - name: Check the version of SSH installed
       ansible.builtin.command: ssh -V
       check_mode: false
