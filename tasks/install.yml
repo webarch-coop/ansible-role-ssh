@@ -14,6 +14,7 @@
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: true
+      changed_when: false
       when: not ansible_check_mode | bool
 
     - name: Run apt-cache policy
@@ -81,8 +82,8 @@
             ssh_first_check: true
 
       when: >-
-        (ssh_install_backports is defined and ssh_install_backports.changed | bool) or
-        (ssh_install is defined and ssh_install.changed | bool)
+        ( ssh_install_backports is defined ) and ( ssh_install_backports.changed | bool ) ) or
+        ( ( ssh_install is defined ) and ( ssh_install.changed | bool ) )
 
   tags:
     - ssh

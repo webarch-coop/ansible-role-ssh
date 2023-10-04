@@ -171,6 +171,12 @@
             - ssh_audit_policy_json is defined
             - ssh_audit_policy_json.stdout_lines is defined
 
+        - name: Debug the SSH policy audit errors
+          ansible.builtin.debug:
+            var: ssh_audit_policy_result.errors
+            verbosity: 2
+          when: ssh_audit_policy_result.errors is defined
+
         - name: Ensure that the SSH policy audit passed
           ansible.builtin.assert:
             that:
