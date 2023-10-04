@@ -175,7 +175,7 @@
           ansible.builtin.assert:
             that:
               - ssh_audit_policy_result.passed | bool
-            fail_msg: "{{ ssh_audit_policy_result.errors }}"
+            fail_msg: "{{ ssh_audit_policy_result }}"
           when: ssh_audit_policy_result is defined
 
       when:
