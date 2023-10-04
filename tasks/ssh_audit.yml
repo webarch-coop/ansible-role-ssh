@@ -154,7 +154,7 @@
             - ssh_audit_policies is defined
             - ssh_audit_policies != []
 
-        - name: SSH profile audit
+        - name: SSH profile audit JSON output
           ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
@@ -177,13 +177,31 @@
             verbosity: 2
           when: ssh_audit_policy_result.errors is defined
 
+        - name: Debug SSH policy audit failure
+          block:
+
+            - name: SSH profile audit human readable output
+              ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
+              check_mode: false
+              changed_when: false
+              register: ssh_audit_policy
+              failed_when: ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
+
+            - name: Debug the SSH profile audit human readable output
+              ansible.builtin.debug:
+                var: ssh_audit_policy.stdout_lines
+
+          when:
+            - ssh_audit_policy_result is defined
+            - not ssh_audit_policy_result.passed | bool
+
         - name: Ensure that the SSH policy audit passed
           ansible.builtin.assert:
             that:
               - ssh_audit_policy_result.passed | bool
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
             fail_msg:
-              - "The ssh-audit pliicy check failed, you can check manually using the following command"
+              - "The ssh-audit policy check failed, you can check manually using the following command"
               - "ssh-audit -nP '{{ ssh_audit_policy }}' {{ ssh_localhost }}"
           when: ssh_audit_policy_result is defined
 
