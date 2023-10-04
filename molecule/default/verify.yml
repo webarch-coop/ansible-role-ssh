@@ -109,7 +109,7 @@
             - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | type_debug != []
             - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') | length > 0
 
-       when: ansible_distribution == "Ubuntu"
+      when: ansible_distribution == "Ubuntu"
 
     - name: OpenSSH policy audit config
       block:
@@ -131,7 +131,7 @@
             - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug != []
             - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
 
-       when: ansible_distribution != "Ubuntu"
+      when: ansible_distribution != "Ubuntu"
 
     - name: SSH version audit
       ansible.builtin.command: "ssh-audit -njP {{ molecule_ssh_audit_policy | quote }} {{ ansible_default_ipv4.address }}"
