@@ -52,9 +52,9 @@ ssh_check_fail: true
 
 # https://man.openbsd.org/sshd_config#Ciphers
 ssh_ciphers:
-  - "chacha20-poly1305@openssh.com"
-  - "aes256-gcm@openssh.com"
-  - "aes128-gcm@openssh.com"
+  - chacha20-poly1305@openssh.com
+  - aes256-gcm@openssh.com
+  - aes128-gcm@openssh.com
   - aes256-ctr
   - aes192-ctr
   - aes128-ctr
@@ -67,17 +67,15 @@ ssh_ciphers:
 ssh_gitlab: false
 
 # https://man.openbsd.org/sshd_config#HostKeyAlgorithms
-# Comment the sk algos for OpenSSH < 8.4
 ssh_host_key_algorithms:
-  - "sk-ssh-ed25519@openssh.com"
-  - "ssh-ed25519-cert-v01@openssh.com"
-  - "sk-ssh-ed25519-cert-v01@openssh.com"
-  - "rsa-sha2-256-cert-v01@openssh.com"
-  - "rsa-sha2-512-cert-v01@openssh.com"
-  - rsa-sha2-512
-  - rsa-sha2-256
   - ssh-ed25519
-  - "ssh-ed25519-cert-v01@openssh.com"
+  - ssh-ed25519-cert-v01@openssh.com
+  - sk-ssh-ed25519@openssh.com
+  - sk-ssh-ed25519-cert-v01@openssh.com
+  - rsa-sha2-512
+  - rsa-sha2-512-cert-v01@openssh.com
+  - rsa-sha2-256
+  - rsa-sha2-256-cert-v01@openssh.com
 
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
@@ -86,27 +84,20 @@ ssh_host_keys:
     path: /etc/ssh/ssh_host_rsa_key
   - name: ed25519
     path: /etc/ssh/ssh_host_ed25519_key
-  # Uncomment the following line for
-  # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
   # - name: ecdsa
   #   bits: 521
   #   path: /etc/ssh/ssh_host_ecdsa_key
 
 # https://man.openbsd.org/sshd_config#KexAlgorithms
 ssh_kex_algorithms:
-  - "sntrup761x25519-sha512@openssh.com"
-  - "sntrup4591761x25519-sha512@tinyssh.org"
+  - sntrup761x25519-sha512@openssh.com
+  # OpenSSH < 8.5 uses the following, see https://www.openssh.com/txt/release-8.5
+  # - "sntrup4591761x25519-sha512@tinyssh.org"
   - curve25519-sha256
-  - "curve25519-sha256@libssh.org"
-  # - diffie-hellman-group14-sha256
+  - curve25519-sha256@libssh.org
   - diffie-hellman-group16-sha512
   - diffie-hellman-group18-sha512
   - diffie-hellman-group-exchange-sha256
-  # Uncomment the following lines for
-  # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
-  # - ecdh-sha2-nistp521
-  # - ecdh-sha2-nistp384
-  # - ecdh-sha2-nistp256
 
 # https://man.openbsd.org/sshd_config#ListenAddress
 ssh_listen_addresses:
@@ -156,14 +147,9 @@ ssh_local_hosts_readme_host: |
 
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
-  - "hmac-sha2-256-etm@openssh.com"
-  - "hmac-sha2-512-etm@openssh.com"
+  - hmac-sha2-256-etm@openssh.com
+  - hmac-sha2-512-etm@openssh.com
   - umac-128-etm@openssh.com
-  # Uncomment the following lines for
-  # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
-  # - hmac-sha2-512
-  # - hmac-sha2-256
-  # - "umac-128@openssh.com"
 
 # https://man.openbsd.org/sshd_config#MACs
 # Use `append` for `+`, `head` for `^` and `remove` for `-` to be used as a
