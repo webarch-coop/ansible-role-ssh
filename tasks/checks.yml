@@ -344,14 +344,14 @@
 
         - name: Omit SSH host key algorithms
           ansible.builtin.set_fact:
-            ssh_host_key_algorithms: "{{ ssh_host_key_algorithms_omit | reject('search', ssh_host_key_algorithm_omit) }}"
+            ssh_host_key_algorithms: "{{ ssh_host_key_algorithms | reject('search', ssh_host_key_algorithm_omit) }}"
           loop: "{{ ssh_host_key_algorithms_omit }}"
           loop_control:
             loop_var: ssh_host_key_algorithm_omit
 
         - name: List SSH host key algorithms without the ones that can't be used
           ansible.builtin.debug:
-            msg: ssh_host_key_algorithms
+            var: ssh_host_key_algorithms
 
         - name: Check that the host key algorithms wanted are available
           ansible.builtin.assert:
@@ -426,14 +426,14 @@
 
         - name: Omit SSH kex algorithms
           ansible.builtin.set_fact:
-            ssh_kex_algorithms: "{{ ssh_kex_algorithms_omit | reject('search', ssh_kex_algorithm_omit) }}"
+            ssh_kex_algorithms: "{{ ssh_kex_algorithms | reject('search', ssh_kex_algorithm_omit) }}"
           loop: "{{ ssh_kex_algorithms_omit }}"
           loop_control:
             loop_var: ssh_kex_algorithm_omit
 
         - name: List SSH kex algorithms without the ones that can't be used
           ansible.builtin.debug:
-            msg: ssh_kex_algorithms
+            var: ssh_kex_algorithms
 
         - name: Check that the kex algorithms wanted are available
           ansible.builtin.assert:
