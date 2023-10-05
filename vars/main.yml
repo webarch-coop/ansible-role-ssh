@@ -12,9 +12,9 @@ ssh_apt_backports: "{{ ansible_distribution_release }}-backports"
 
 # JMESPath queries
 ssh_jpq:
-  listening_addresses: "[?name=='sshd'].address | unique | sort"
-  listening_ports: "[?name=='sshd'].port | unique | sort"
-  not_listening_ports: "[?name!='sshd'].port | unique | sort"
+  listening_addresses: "[?name=='sshd'].address"
+  listening_ports: "[?name=='sshd'].port"
+  not_listening_ports: "[?name!='sshd'].port"
   service: 'ansible_facts.services.["ssh.service"]|[0]'
 
 # https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
