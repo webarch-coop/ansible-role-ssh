@@ -2,21 +2,23 @@
 
 [![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
+An Ansible role to configure and harden [OpenSSH](https://www.openssh.com/) on Debian and Ubuntu LTS.
+
 This role is tested on Debian Bullseye (11), Debian Bookworm (12), Debian Trixie (13) and Ubuntu Jammy Jellyfish (22.04), using GitLab CI and Molecule, on Debian Buster [backports](https://backports.debian.org/) is required for [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server).
 
-This role uses [ssh-audit policy audits](https://github.com/jtesta/ssh-audit#server-policy-audit-example) to test the [OpenSSH](https://www.openssh.com/) configuration, [ciphers](https://man.openbsd.org/sshd_config#Ciphers), [host key algoithms](https://man.openbsd.org/sshd_config#HostKeyAlgorithms) and [kex algroithms](https://man.openbsd.org/sshd_config#KexAlgorithms) that are not supported by older versions of OpenSSH are automatically exclude from the configuration, if the host RSA key is less that 4096 bits in size it is backed up and a new one is generated.
+This role uses [ssh-audit policy audits](https://github.com/jtesta/ssh-audit#server-policy-audit-example) to test the [OpenSSH](https://www.openssh.com/) configuration, [ciphers](https://man.openbsd.org/sshd_config#Ciphers), [host key algoithms](https://man.openbsd.org/sshd_config#HostKeyAlgorithms) and [kex algroithms](https://man.openbsd.org/sshd_config#KexAlgorithms) that are not supported by older versions of OpenSSH are automatically exclude from the configuration, if the RSA host key is less that 4096 bits in size it is backed up and a new one is generated, the defaults settings should result in a *A+* rating from [the online ssh-audit.com test](https://www.ssh-audit.com/).
 
 ## Local SSH client configuration files
 
-If the `ssh_local_hosts` variable to set to `True` then this role will generate local SSH `config` and `known_hosts` files, either one file per host or one file for all hosts, see the [Webarchitects SSH fingerprints](https://git.coop/webarch/webarch-ssh) git repo for an example of the generated configuration.
+If the `ssh_local_hosts` variable to set to `true` then this role will generate local SSH `config` and `known_hosts` files, either one file per host or one file for all hosts, see the [Webarchitects SSH fingerprints](https://git.coop/webarch/webarch-ssh) git repo for an example of the generated configuration.
 
-## Role tags
+## Usage
 
-The suggested way to run this role is to first run it with the `ssh_audit` tag to ensure that `ssh-audit` is installed.
+The suggested way to run this role is to first run it with the `ssh_audit` tag to ensure that [the latest version of `ssh-audit`](https://github.com/jtesta/ssh-audit/releases/latest) is installed.
 
 Then run it with the `ssh` tag and `--check --diff --extra-vars="ssh_audit_fail=false,ssh_check_fail=false"` to see what changes, if any, are to be made and to ensure that check failures don't stop the role from running.
 
-Then once your are sure everything looks OK it run the additional command line arguments.
+Then once your are sure everything looks OK it run the role without the additional command line arguments.
 
 In order to just update / create local SSH configuration files run with the `ssh_fingerprint` tag.
 
