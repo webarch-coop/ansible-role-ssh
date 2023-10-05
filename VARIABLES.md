@@ -66,7 +66,9 @@ The main entry point for the OpenSSH role.
 | local |
 | no |
 | remote |
-| yes |### Choices for main > ssh_ciphers
+| yes |
+
+### Choices for main > ssh_ciphers
 
 |Choice|
 |---|
@@ -79,7 +81,9 @@ The main entry point for the OpenSSH role.
 | aes256-cbc |
 | aes256-ctr |
 | aes256-gcm@openssh.com |
-| chacha20-poly1305@openssh.com |### Choices for main > ssh_host_keys > name
+| chacha20-poly1305@openssh.com |
+
+### Choices for main > ssh_host_keys > name
 
 |Choice|
 |---|
@@ -88,7 +92,9 @@ The main entry point for the OpenSSH role.
 | ecdsa-sk |
 | ed25519 |
 | ed25519-sk |
-| rsa |### Choices for main > ssh_macs
+| rsa |
+
+### Choices for main > ssh_macs
 
 |Choice|
 |---|
@@ -107,7 +113,9 @@ The main entry point for the OpenSSH role.
 | hmac-sha2-256-etm@openssh.com |
 | hmac-sha2-512-etm@openssh.com |
 | umac-64-etm@openssh.com |
-| umac-128-etm@openssh.com |### Choices for main > ssh_permit_root_login
+| umac-128-etm@openssh.com |
+
+### Choices for main > ssh_permit_root_login
 
 |Choice|
 |---|
