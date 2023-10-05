@@ -1,20 +1,10 @@
-# Webarchitects Ansible role to install, configure and check the OpenSSH server on Debian
+# Webarchitects OpenSSH Ansible Role
 
 [![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
-This role follows the [SSH Hardening Guides](https://www.ssh-audit.com/hardening_guides.html) and uses [`ssh-audit`](https://github.com/jtesta/ssh-audit) to ensure that recent security recomendations are followed when configuring [OpenSSH](https://www.openssh.com/), see the [man page for the OpenSSH daemon configuration file](https://man.openbsd.org/sshd_config) for all the available options.
+This role is tested on Debian Bullseye (11), Debian Bookworm (12) and Debian Trixie (13) and Ubuntu Jammy Jellyfish (22.04), using GitLab CI and Molecule, on Debian Buster [backports](https://backports.debian.org/) is required for [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server).
 
-This role expects Buster [backports](https://backports.debian.org/) to be enabled so that [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server) can be installed, the default settings of this role are designed for [OpenSSH 8.4 (2020-09-27)](https://www.openssh.com/txt/release-8.4) or newer.
-
-This role has only been recently tested on Debian Buster (10), Bullseye (11) and Bookworm (12), see the [production releases list on the Debian wiki](https://wiki.debian.org/DebianReleases#Production_Releases).
-
-## SSH hardening
-
-This role defaults to the recomendations from `ssh-audit` for [Debian Bullseye (Debian 11)](https://www.ssh-audit.com/hardening_guides.html#debian_11) and therefore results in A+ when testing with the [online web front-end to `ssh-audit`](https://www.ssh-audit.com/), see the [example here](https://docs.webarch.net/w/images/3/38/Ssh_audit.png).
-
-For servers running OpenSSH older than OpenSSH 8.4, the `sk` algorithms need to be omitted from the `ssh_host_key_algorithms` array.
-
-The [Mozilla Modern (OpenSSH 6.7+)](https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67) recomendations can be followed by copying and uncommenting the commented list items in the [defaults file](defaults/main.yml), however note that [OpenSSH 6.7](https://www.openssh.com/txt/release-6.7) was released eight years ago (2014-10-06) so this is a legacy, not a modern, configuration guide.
+This role uses [ssh-audit policy audits](https://github.com/jtesta/ssh-audit#server-policy-audit-example) to test the [OpenSSH](https://www.openssh.com/) configuration.
 
 ## Local SSH client configuration files
 
@@ -85,7 +75,7 @@ The content of the private key and the known hosts files can be used as GitLab C
 
 ## Repo
 
-The primary URL of this repo is [`https://git.coop/webarch/ssh`](https://git.coop/webarch/ssh), it is additionally [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-ssh) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/ssh).
+The primary URL of this repo is [`https://git.coop/webarch/ssh`](https://git.coop/webarch/ssh), it is additionally [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-ssh) and [available via Ansible Galaxy](https://galaxy.ansible.com/ui/standalone/roles/chriscroome/ssh/).
 
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/ssh/-/releases) as the `master` branch is used for development and testing.
 
