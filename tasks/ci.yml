@@ -13,7 +13,7 @@
 
     - name: Directories present for CI key pairs
       ansible.builtin.file:
-        path: "{{ dir }}"
+        path: "{{ ssh_dir }}"
         state: directory
         mode: 0700
         owner: root
@@ -22,7 +22,7 @@
         - /root/.ssh/ci
         - /root/.ssh/authorized_keys.d
       loop_control:
-        loop_var: dir
+        loop_var: ssh_dir
 
     - name: SSH CI key pair present
       community.crypto.openssh_keypair:

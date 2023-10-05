@@ -21,13 +21,13 @@
 
     - name: Stat the root SSH ECDSA keypair
       ansible.builtin.stat:
-        path: "{{ file }}"
+        path: "{{ ssh_file }}"
       loop:
         - /root/.ssh/id_ed25519
         - /root/.ssh/id_ed25519.pub
       loop_control:
-        loop_var: file
-        label: "{{ file | basename }}"
+        loop_var: ssh_file
+        label: "{{ ssh_file | basename }}"
       register: ssh_root_id_ed25519
 
     - name: SSH ECDSA keypair for root present

@@ -13,23 +13,23 @@
 
     - name: Debug IP address
       ansible.builtin.debug:
-        var: ip
+        var: ssh_ip
         verbosity: 2
-      when: ip is defined
+      when: ssh_ip is defined
 
     - name: Debug port
       ansible.builtin.debug:
-        var: port
+        var: ssh_port
         verbosity: 2
-      when: port is defined
+      when: ssh_port is defined
 
     # https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
     - name: SSH key scan
       ansible.builtin.command: >-
-        {% if port != 22 %}
-        ssh-keyscan -p {{ port }} {{ ip }}
+        {% if ssh_port != 22 %}
+        ssh-keyscan -p {{ ssh_port }} {{ ssh_ip }}
         {% else %}
-        ssh-keyscan {{ ip }}
+        ssh-keyscan {{ ssh_ip }}
         {% endif %}
       check_mode: false
       changed_when: false
@@ -60,7 +60,7 @@
         path: "{{ ssh_local_hosts_user_known_hosts_file }}"
         mode: 0600
         create: true
-        marker: "{% if port == 22 %}# {mark} {{ ip }}{% else %}# {mark} {{ ip }}:{{ port }}{% endif %}"
+        marker: "{% if ssh_port == 22 %}# {mark} {{ ssh_ip }}{% else %}# {mark} {{ ssh_ip }}:{{ ssh_port }}{% endif %}"
         block: |
           {%- for ssh_fingerprint in ssh_keyscan_command.stdout_lines | sort %}
           {{ ssh_fingerprint }}

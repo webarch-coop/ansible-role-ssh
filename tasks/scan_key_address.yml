@@ -15,7 +15,7 @@
       ansible.builtin.include_tasks: scan_key_port.yml
       loop: "{{ ssh_ports }}"
       loop_control:
-        loop_var: port
+        loop_var: ssh_port
 
   tags:
     - ssh

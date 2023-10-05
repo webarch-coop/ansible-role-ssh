@@ -115,11 +115,11 @@
         - name: Check that the groups in ssh_allow_groups are present
           ansible.builtin.getent:
             database: group
-            key: "{{ group }}"
+            key: "{{ ssh_group }}"
             fail_key: "{{ ssh_check_fail }}"
           loop: "{{ ssh_allow_groups }}"
           loop_control:
-            loop_var: group
+            loop_var: ssh_group
           when:
             - ssh_check_fail | bool
             - not ssh_first_check | bool
@@ -198,11 +198,11 @@
         - name: Check that ssh_ci_ips are IP addresses when defined
           ansible.builtin.assert:
             that:
-              - ip | ansible.utils.ipaddr == ip
+              - ssh_ip | ansible.utils.ipaddr == ssh_ip
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_ci_ips }}"
           loop_control:
-            loop_var: ip
+            loop_var: ssh_ip
 
       when: ssh_ci_ips is defined
 
@@ -233,11 +233,11 @@
         - name: Check that the ciphers wanted are available
           ansible.builtin.assert:
             that:
-              - cipher in ssh_ciphers_available
+              - ssh_cipher in ssh_ciphers_available
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_ciphers }}"
           loop_control:
-            loop_var: cipher
+            loop_var: ssh_cipher
 
       when: ssh_ciphers is defined
 
@@ -253,11 +253,11 @@
         - name: Check that the users in ssh_deny_users are present
           ansible.builtin.getent:
             database: passwd
-            key: "{{ user }}"
+            key: "{{ ssh_user }}"
             fail_key: "{{ ssh_check_fail }}"
           loop: "{{ ssh_deny_users }}"
           loop_control:
-            loop_var: user
+            loop_var: ssh_user
           when:
             - ssh_check_fail | bool
             - not ssh_first_check | bool
@@ -426,10 +426,10 @@
 
         - name: Omit SSH kex algorithms
           ansible.builtin.set_fact:
-            ssh_kex_algorithms: "{{ ssh_kex_algorithms | reject('search', ssh_kex_algorithm_omit) }}"
+            ssh_kex_algorithms: "{{ ssh_kex_algorithms | reject('search', ssh_algo_omit) }}"
           loop: "{{ ssh_kex_algorithms_omit }}"
           loop_control:
-            loop_var: ssh_kex_algorithm_omit
+            loop_var: ssh_algo_omit
 
         - name: List SSH kex algorithms without the ones that can't be used
           ansible.builtin.debug:
@@ -458,14 +458,14 @@
         - name: Ensure that all ListenAddress are IP addresses
           ansible.builtin.assert:
             that:
-              - ip | ansible.utils.ipaddr == ip
+              - ssh_ip | ansible.utils.ipaddr == ssh_ip
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when:
-            - ip != "0.0.0.0"
-            - ip != "::"
+            - ssh_ip != "0.0.0.0"
+            - ssh_ip != "::"
           loop: "{{ ssh_listen_addresses }}"
           loop_control:
-            loop_var: ip
+            loop_var: ssh_ip
 
       when: ssh_listen_addresses is defined
 
@@ -573,11 +573,11 @@
         - name: Check that the macs wanted are available
           ansible.builtin.assert:
             that:
-              - mac in ssh_macs_available
+              - ssh_mac in ssh_macs_available
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_macs }}"
           loop_control:
-            loop_var: mac
+            loop_var: ssh_mac
 
       when: ssh_macs is defined
 
