@@ -199,7 +199,7 @@
       ansible.builtin.command: ssh -Q cipher
       check_mode: false
       changed_when: false
-      register: ssh_q_ciphers
+      register: ssh_q_cipher
       failed_when: ssh_q_cipher.rc is not regex('^0|255$')
 
     - name: Fail when the check for SSH ciphers failed
