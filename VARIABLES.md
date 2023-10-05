@@ -25,7 +25,7 @@ The main entry point for the OpenSSH role.
 | ssh_host_keys | HostKey, a list of file paths to keys. | list of dicts of 'ssh_host_keys' options | yes |
 | ssh_jpq | Disctionary of Internal JMESPath queries. | dict | yes |
 | ssh_init | An internal variable for the init system. | str | no |
-| ssh_kex_algorithms | KexAlgorithms, an optional list of algorithms list to override the defaults. | list of 'str' | no |
+| ssh_kex_algorithms | A list of allowed KexAlgorithms. | list of 'str' | no |
 | ssh_listen_addresses | ListenAddress, IP addresses that SSH should listen for connections on. | list of 'str' | no |
 | ssh_localhost | The localhost address to use for SSH audit scans. | str | yes |
 | ssh_local_hosts | Generate local SSH client configuration files. | bool | no |
@@ -37,7 +37,7 @@ The main entry point for the OpenSSH role.
 | ssh_local_hosts_port | Port to use in the local Host file. | int | no |
 | ssh_local_hosts_readme | Path to a local README.md file. | str | no |
 | ssh_local_hosts_readme_host | Template for each Host for the local README.md file. | str | no |
-| ssh_macs | A list of message authentication code algorithms for MACs. | list of 'str' | yes |
+| ssh_macs | A list of allowed message authentication code algorithms for MACs. | list of 'str' | yes |
 | ssh_password_authentication | Enable or disable password authentication using PasswordAuthentication. | bool | yes |
 | ssh_permit_root_login | The option for PermitRootLogin. | str | yes |
 | ssh_ports | Port, a list of ports for SSH to listen on. | list of 'int' | no |
@@ -93,6 +93,25 @@ The main entry point for the OpenSSH role.
 | ed25519 |
 | ed25519-sk |
 | rsa |
+
+### Choices for main > ssh_kex_algorithms
+
+|Choice|
+|---|
+| diffie-hellman-group1-sha1 |
+| diffie-hellman-group14-sha1 |
+| diffie-hellman-group14-sha256 |
+| diffie-hellman-group16-sha512 |
+| diffie-hellman-group18-sha512 |
+| diffie-hellman-group-exchange-sha1 |
+| diffie-hellman-group-exchange-sha256 |
+| ecdh-sha2-nistp256 |
+| ecdh-sha2-nistp384 |
+| ecdh-sha2-nistp521 |
+| curve25519-sha256 |
+| curve25519-sha256@libssh.org |
+| sntrup761x25519-sha512@openssh.com |
+| sntrup4591761x25519-sha512@tinyssh.org |
 
 ### Choices for main > ssh_macs
 

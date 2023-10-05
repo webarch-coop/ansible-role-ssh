@@ -105,6 +105,7 @@ argument_specs:
             type: str
             required: true
             description: The SSH key type.
+            # https://man.openbsd.org/sshd_config#HostKey
             choices:
               - dsa
               - ecdsa
@@ -128,7 +129,23 @@ argument_specs:
         type: list
         elements: str
         required: false
-        description: KexAlgorithms, an optional list of algorithms list to override the defaults.
+        description: A list of allowed KexAlgorithms.
+        # https://man.openbsd.org/sshd_config#KexAlgorithms
+        choices:
+          - diffie-hellman-group1-sha1
+          - diffie-hellman-group14-sha1
+          - diffie-hellman-group14-sha256
+          - diffie-hellman-group16-sha512
+          - diffie-hellman-group18-sha512
+          - diffie-hellman-group-exchange-sha1
+          - diffie-hellman-group-exchange-sha256
+          - ecdh-sha2-nistp256
+          - ecdh-sha2-nistp384
+          - ecdh-sha2-nistp521
+          - curve25519-sha256
+          - curve25519-sha256@libssh.org
+          - sntrup761x25519-sha512@openssh.com
+          - sntrup4591761x25519-sha512@tinyssh.org
       ssh_listen_addresses:
         type: list
         elements: str
@@ -178,7 +195,8 @@ argument_specs:
         type: list
         elements: str
         required: true
-        description: A list of message authentication code algorithms for MACs.
+        description: A list of allowed message authentication code algorithms for MACs.
+        # https://man.openbsd.org/sshd_config#MACs
         choices:
           - hmac-md5
           - hmac-md5-96
