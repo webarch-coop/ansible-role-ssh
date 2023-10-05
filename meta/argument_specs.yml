@@ -63,8 +63,20 @@ argument_specs:
       ssh_ciphers:
         type: list
         elements: str
-        required: false
-        description: Ciphers, an optional list of ciphers to override the defaults.
+        required: true
+        description: A list of allowed OpenSSH ciphers.
+        # https://man.openbsd.org/sshd_config#Ciphers
+        choices:
+          - 3des-cbc
+          - aes128-cbc
+          - aes128-ctr
+          - aes128-gcm@openssh.com
+          - aes192-cbc
+          - aes192-ctr
+          - aes256-cbc
+          - aes256-ctr
+          - aes256-gcm@openssh.com
+          - chacha20-poly1305@openssh.com
       ssh_deny_users:
         type: list
         elements: str

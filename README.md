@@ -2,9 +2,9 @@
 
 [![pipeline status](https://git.coop/webarch/ssh/badges/master/pipeline.svg)](https://git.coop/webarch/ssh/-/commits/master)
 
-This role is tested on Debian Bullseye (11), Debian Bookworm (12) and Debian Trixie (13) and Ubuntu Jammy Jellyfish (22.04), using GitLab CI and Molecule, on Debian Buster [backports](https://backports.debian.org/) is required for [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server).
+This role is tested on Debian Bullseye (11), Debian Bookworm (12), Debian Trixie (13) and Ubuntu Jammy Jellyfish (22.04), using GitLab CI and Molecule, on Debian Buster [backports](https://backports.debian.org/) is required for [OpenSSH 8.4](https://packages.debian.org/buster-backports/openssh-server).
 
-This role uses [ssh-audit policy audits](https://github.com/jtesta/ssh-audit#server-policy-audit-example) to test the [OpenSSH](https://www.openssh.com/) configuration.
+This role uses [ssh-audit policy audits](https://github.com/jtesta/ssh-audit#server-policy-audit-example) to test the [OpenSSH](https://www.openssh.com/) configuration, [host key algoithms](https://man.openbsd.org/sshd_config#HostKeyAlgorithms) and [kex algroithms](https://man.openbsd.org/sshd_config#KexAlgorithms) that are not supported by older versions of OpenSSH are automatically exclude from configurations, the the host RSA key is less that 4096 in size it is backed up and a new one is generated.
 
 ## Local SSH client configuration files
 

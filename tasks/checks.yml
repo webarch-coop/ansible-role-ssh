@@ -16,16 +16,23 @@
         ssh_first_check: false
       when: ssh_first_check is not defined
 
-    # When in a docker container ssh_init.stdout == "sh" or "bash"
+    # When in a docker container ssh_init.stdout is usually "sh" or "bash"
     - name: Check if system has been booted with systemd as init system
       ansible.builtin.command: ps -p 1 -o comm=
-      changed_when: false
       check_mode: false
+      changed_when: false
       register: ssh_ps
+      failed_when: ssh_ps.rc is not regex('^0|47$')
 
     - name: Set a fact for the init system
       ansible.builtin.set_fact:
         ssh_init: "{{ ssh_ps.stdout }}"
+      when: ssh_ps.rc == 0
+
+    - name: When the init check exit code is 47 assume is is because this is a chroot
+      ansible.builtin.set_fact:
+        ssh_init: chroot
+      when: ssh_ps.rc == 47
 
     - name: Debug the ini system when it is not systemd
       ansible.builtin.debug:
@@ -96,21 +103,8 @@
         var: ssh_version
         verbosity: 2
 
-    - name: Check ssh_allow_agent_forwarding variable
-      ansible.builtin.assert:
-        that:
-          - ssh_allow_agent_forwarding | type_debug == "bool"
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_allow_agent_forwarding is defined
-
     - name: AllowGroups checks
       block:
-
-        - name: Check ssh_allow_groups variable
-          ansible.builtin.assert:
-            that:
-              - ssh_allow_groups | type_debug == "list"
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
         - name: Check that the groups in ssh_allow_groups are present
           ansible.builtin.getent:
@@ -124,36 +118,12 @@
             - ssh_check_fail | bool
             - not ssh_first_check | bool
 
-      when: ssh_allow_groups is defined
-
-    - name: Check ssh_allow_tcp_forwarding variable
-      ansible.builtin.assert:
-        that:
-          - ssh_allow_tcp_forwarding | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-          - ssh_allow_tcp_forwarding is regex('all|local|no|remote|yes')
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ssh_allow_tcp_forwarding is defined
-
-    - name: Check ssh_authentication_methods variable
-      ansible.builtin.assert:
-        that:
-          - ssh_authentication_methods | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-
-    - name: Check ssh_check_fail variable
-      ansible.builtin.assert:
-        that:
-          - ssh_check_fail | type_debug == "bool"
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+      when:
+        - ssh_allow_groups is defined
+        - ssh_allow_groups != []
 
     - name: Chroot checks
       block:
-
-        - name: Check ssh_chroot_users_dir variable
-          ansible.builtin.assert:
-            that:
-              - ssh_chroot_users_dir | type_debug is regex('^str|AnsibleUnicode|AnsibleUnsafeText$')
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
         - name: Check that the chroot users dir is a directory when it is defined
           ansible.builtin.stat:
@@ -171,7 +141,9 @@
             that:
               - ssh_chroot_users_dir is defined
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          when: (ssh_allow_groups is defined) and ("chroot" in ssh_allow_groups)
+          when:
+            - ssh_allow_groups is defined
+            - ( "chroot" in ssh_allow_groups )
 
         - name: Ensure that ssh_chroot_users_dir exists when defined
           ansible.builtin.assert:
@@ -180,7 +152,7 @@
               - ssh_chroot_users_dir_check.stat.isdir | bool
               - ssh_chroot_users_dir_check.stat.uid == 0
               - ssh_chroot_users_dir_check.stat.gid == 0
-              - (ssh_chroot_users_dir_check.stat.mode == "0755") or (ssh_chroot_users_dir_check.stat.mode == "0750")
+              - ssh_chroot_users_dir_check.stat.mode is regex('^075[0|5]$')
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when: ssh_chroot_users_dir_check is defined
 
@@ -188,12 +160,6 @@
 
     - name: Checks for ssh_ci_ips array
       block:
-
-        - name: Check ssh_ci_ips variable
-          ansible.builtin.assert:
-            that:
-              - ssh_ci_ips | type_debug == "list"
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
         - name: Check that ssh_ci_ips are IP addresses when defined
           ansible.builtin.assert:
@@ -206,14 +172,8 @@
 
       when: ssh_ci_ips is defined
 
-    - name: Check the ciphers if specified
+    - name: Check the ciphers
       block:
-
-        - name: Check ssh_ciphers variable
-          ansible.builtin.assert:
-            that:
-              - ssh_ciphers | type_debug == "list"
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
         - name: Get a list of available ciphers
           ansible.builtin.command: ssh -Q cipher
@@ -229,6 +189,45 @@
           ansible.builtin.debug:
             var: ssh_ciphers_available
             verbosity: 2
+
+        - name: Check that the ciphers wanted are available
+          ansible.builtin.assert:
+            that:
+              - ssh_cipher in ssh_ciphers_available
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+          loop: "{{ ssh_ciphers }}"
+          loop_control:
+            loop_var: ssh_cipher
+
+      rescue:
+
+        - name: SSH ciphers check failed
+          ansible.builtin.debug:
+            var: ssh_q_ciphers.stderr
+          when: ssh_q_ciphers.rc == 255
+
+        - name: Fail when the check for ciphers failed
+          ansible.builtin.fail:
+          when: ssh_q_ciphers.rc == 255
+
+        - name: Generate a list of SSH ciphers that need to be omitted
+          ansible.builtin.set_fact:
+            ssh_ciphers_omit: "{{ ssh_ciphers | ansible.builtin.difference(ssh_ciphers_available) }}"
+
+        - name: List the SSH ciphers that need to be omitted
+          ansible.builtin.debug:
+            var: ssh_ciphers_omit
+
+        - name: Omit SSH ciphers
+          ansible.builtin.set_fact:
+            ssh_ciphers: "{{ ssh_ciphers | reject('search', ssh_host_key_algorithm_omit) }}"
+          loop: "{{ ssh_ciphers_omit }}"
+          loop_control:
+            loop_var: ssh_host_key_algorithm_omit
+
+        - name: List SSH ciphers without the ones that can't be used
+          ansible.builtin.debug:
+            var: ssh_ciphers
 
         - name: Check that the ciphers wanted are available
           ansible.builtin.assert:
