@@ -15,7 +15,7 @@
       ansible.builtin.file:
         path: "{{ ssh_dir }}"
         state: directory
-        mode: 0700
+        mode: "0700"
         owner: root
         group: root
       loop:
@@ -30,7 +30,7 @@
         type: ecdsa
         comment: "Ansible managed SSH CI public key"
         state: present
-        mode: 0600
+        mode: "0600"
         owner: root
         group: root
 

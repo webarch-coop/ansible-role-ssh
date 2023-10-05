@@ -108,8 +108,10 @@
       when:
         - ssh_init is defined
         - ssh_init == "systemd"
-        - ssh_listening is defined
-        - ssh_listening != []
+        - ssh_listening_addresses is defined
+        - ssh_listening_addresses != []
+        - ssh_listening_ports is defined
+        - ssh_listening_ports != []
 
   when:
     - ssh is defined
@@ -175,8 +177,10 @@
       when:
         - ssh_init is defined
         - ssh_init == "systemd"
-        - ssh_listening is defined
-        - ssh_listening != []
+        - ssh_listening_addresses is defined
+        - ssh_listening_addresses != []
+        - ssh_listening_ports is defined
+        - ssh_listening_ports != []
         - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).status == "enabled"
         - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).state == "running"
 

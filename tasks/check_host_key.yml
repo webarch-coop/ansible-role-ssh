@@ -11,6 +11,11 @@
 - name: Check OpenSSH host key
   block:
 
+    - name: Debug the SSH host key variables
+      ansible.builtin.debug:
+        var: ssh_host_key
+        verbosity: 2
+
     - name: Check the bits required for SSH DSA keys
       ansible.builtin.assert:
         that:
@@ -28,7 +33,7 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ssh_host_key.name == "rsa"
 
-    - name: Check the bit required for SSH ECDSA keys
+    - name: Check the bits required for SSH ECDSA keys
       ansible.builtin.assert:
         that:
           - ssh_host_key.bits is defined

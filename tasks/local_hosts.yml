@@ -40,8 +40,11 @@
       loop_control:
         loop_var: ssh_ip
       when:
-        - (ssh_scan_keys is defined) and (ssh_scan_keys | bool)
-        - (ssh_scan_ip_addresses is defined) and (ssh_scan_ip_addresses[0] is defined)
+        - ssh_scan_keys is defined
+        - ssh_scan_keys | bool
+        - ssh_scan_ip_addresses is defined
+        - ssh_scan_ip_addresses != []
+        - ssh_scan_ip_addresses[0] is defined
 
     - name: Local Host files
       block:
@@ -86,7 +89,7 @@
           ansible.builtin.file:
             path: "{{ ssh_local_hosts_directory }}"
             state: directory
-            mode: 0700
+            mode: "0700"
           register: ssh_local_hosts_dir
 
         - name: Last line in local Host file present
@@ -96,7 +99,7 @@
             state: present
             insertafter: EOF
             create: true
-            mode: 0600
+            mode: "0600"
           when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
 
         - name: Host present in the local Host file
@@ -122,8 +125,10 @@
               {% endif %}
             insertbefore: "^# vim: syntax=sshconfig$"
             create: true
-            mode: 0600
-          when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
+            mode: "0600"
+          when:
+            - ssh_local_hosts_dir.state is defined
+            - ssh_local_hosts_dir.state == "directory"
 
         - name: First line in local Host file present
           ansible.builtin.lineinfile:
@@ -132,8 +137,10 @@
             state: present
             insertbefore: BOF
             create: true
-            mode: 0600
-          when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
+            mode: "0600"
+          when:
+            - ssh_local_hosts_dir.state is defined
+            - ssh_local_hosts_dir.state == "directory"
 
         - name: Local README.md present
           ansible.builtin.blockinfile:
@@ -142,10 +149,11 @@
             block: "{{ ssh_local_hosts_readme_host }}"
             insertafter: EOF
             create: true
-            mode: 0600
+            mode: "0600"
           when:
             - ssh_local_hosts_readme is defined
-            - (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
+            - ssh_local_hosts_dir.state is defined
+            - ssh_local_hosts_dir.state == "directory"
 
       become: false
       delegate_to: localhost
@@ -153,7 +161,7 @@
         - ssh_local_hosts_directory is defined
         - ssh_local_hosts_file is defined
         - ssh_local_hosts_hostname is defined
-        - ssh_local_hosts_port
+        - ssh_local_hosts_port is defined
 
   tags:
     - ssh

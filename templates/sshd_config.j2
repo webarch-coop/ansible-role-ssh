@@ -17,9 +17,9 @@ Include /etc/ssh/sshd_config.d/*.conf
 # Include /etc/ssh/sshd_config.d/*.conf
 {% endif %}
 
-{% if ssh_ports is defined %}
-{% for p in ssh_ports %}
-Port {{ p }}
+{% if ssh_ports is defined and ssh_ports != [] %}
+{% for ssh_port in ssh_ports %}
+Port {{ ssh_port }}
 {% endfor %}
 {% else %}
 #Port 22
@@ -27,9 +27,9 @@ Port {{ p }}
 
 #AddressFamily any
 
-{% if ssh_listen_addresses is defined %}
-{% for a in ssh_listen_addresses %}
-ListenAddress {{ a }}
+{% if ssh_listen_addresses is defined and ssh_listen_addresses != [] %}
+{% for ssh_listen_address in ssh_listen_addresses %}
+ListenAddress {{ ssh_listen_address }}
 {% endfor %}
 {% else %}
 #ListenAddress 0.0.0.0
@@ -37,7 +37,7 @@ ListenAddress {{ a }}
 {% endif %}
 
 # Supported HostKey algorithms by order of preference.
-{% if ssh_host_keys is defined %}
+{% if ssh_host_keys is defined and ssh_host_keys != [] %}
 {% for ssh_key in ssh_host_keys %}
 HostKey {{ ssh_key.path }}
 {% endfor %}
@@ -50,20 +50,20 @@ HostKey {{ ssh_key.path }}
 # Ciphers and keying
 #RekeyLimit default none
 
-{% if ssh_ciphers is defined %}
-Ciphers {% for c in ssh_ciphers %}{{ c }}{% if not loop.last %},{% endif %}{% endfor %}
+{% if ssh_ciphers is defined  and ssh_ciphers != [] %}
+Ciphers {% for ssh_cipher in ssh_ciphers %}{{ ssh_cipher }}{% if not loop.last %},{% endif %}{% endfor %}
 {% endif %}
 
-{% if ssh_host_key_algorithms is defined %}
-HostKeyAlgorithms {% for a in ssh_host_key_algorithms %}{{ a }}{% if not loop.last %},{% endif %}{% endfor %}
+{% if ssh_host_key_algorithms is defined and ssh_host_key_algorithms != [] %}
+HostKeyAlgorithms {% for ssh_host_key_algorithm in ssh_host_key_algorithms %}{{ ssh_host_key_algorithm }}{% if not loop.last %},{% endif %}{% endfor %}
 {% endif %}
 
-{% if ssh_macs is defined %}
-MACs {% if ssh_mac_list_strategy is defined %}{% if ssh_mac_list_strategy == "append" %}+{% elif ssh_mac_list_strategy == "head" %}^{% elif ssh_mac_list_strategy == "remove" %}-{% endif %}{% endif %}{% for m in ssh_macs %}{{ m }}{% if not loop.last %},{% endif %}{% endfor %}
+{% if ssh_macs is defined and ssh_macs != [] %}
+MACs {% for ssh_mac in ssh_macs %}{{ ssh_mac }}{% if not loop.last %},{% endif %}{% endfor %}
 {% endif %}
 
-{% if ssh_kex_algorithms is defined %}
-KexAlgorithms {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}
+{% if ssh_kex_algorithms is defined and ssh_kex_algorithms != [] %}
+KexAlgorithms {% for ssh_kex_algorithm in ssh_kex_algorithms %}{{ ssh_kex_algorithm }}{% if not loop.last %},{% endif %}{% endfor %}
 {% endif %}
 
 # Logging
@@ -77,11 +77,11 @@ LogLevel VERBOSE
 PermitRootLogin {{ ssh_permit_root_login }}
 
 {% if ssh_deny_users is defined and ssh_deny_users != [] %}
-DenyUsers{% for u in ssh_deny_users %} {{ u }}{% endfor %}
+DenyUsers{% for ssh_deny_user in ssh_deny_users %} {{ ssh_deny_user }}{% endfor %}
 {% endif %}
 
 {% if ssh_allow_groups is defined and ssh_allow_groups != [] %}
-AllowGroups{% for g in ssh_allow_groups %} {{ g }}{% endfor %}
+AllowGroups{% for ssh_allow_group in ssh_allow_groups %} {{ ssh_allow_group }}{% endfor %}
 {% endif %}
 
 #StrictModes yes
@@ -90,7 +90,7 @@ AllowGroups{% for g in ssh_allow_groups %} {{ g }}{% endfor %}
 
 AuthenticationMethods {{ ssh_authentication_methods }}
 
-PasswordAuthentication {% if ssh_password_authentication %}yes{% else %}no{% endif %}
+PasswordAuthentication {% if ssh_password_authentication | bool %}yes{% else %}no{% endif %}
 
 PubkeyAuthentication {% if ssh_pubkey_authentication | bool %}yes{% else %}no{% endif %}
 

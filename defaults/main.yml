@@ -79,26 +79,6 @@ ssh_host_key_algorithms:
   - ssh-ed25519
   - ssh-ed25519-cert-v01@openssh.com
 
-#   - rsa-sha2-512
-#   - rsa-sha2-256
-#   - ssh-ed25519
-#   - ssh-ed25519-cert-v01@openssh.com
-#   # Comment the next two sk lines for OpenSSH < 8.4
-#   - sk-ssh-ed25519@openssh.com
-#   - sk-ssh-ed25519-cert-v01@openssh.com
-#   - rsa-sha2-256-cert-v01@openssh.com
-#   - rsa-sha2-512-cert-v01@openssh.com
-#   # Uncomment the following lines for
-#   # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
-#   # - ecdsa-sha2-nistp521-cert-v01@openssh.com
-#   # - ecdsa-sha2-nistp384-cert-v01@openssh.com
-#   # - ecdsa-sha2-nistp256-cert-v01@openssh.com
-#   # - sk-ecdsa-sha2-nistp256@openssh.com
-#   # - sk-ecdsa-sha2-nistp256-cert-v01@openssh.com
-#   # - ecdsa-sha2-nistp521
-#   # - ecdsa-sha2-nistp384
-#   # - ecdsa-sha2-nistp256
-
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
   - name: rsa
@@ -109,6 +89,7 @@ ssh_host_keys:
   # Uncomment the following line for
   # https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
   # - name: ecdsa
+  #   bits: 521
   #   path: /etc/ssh/ssh_host_ecdsa_key
 
 # https://man.openbsd.org/sshd_config#KexAlgorithms

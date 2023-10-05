@@ -52,7 +52,7 @@
       ansible.builtin.copy:
         src: jtesta_2020-2025.asc
         dest: /root/jtesta_2020-2025.asc
-        mode: 0600
+        mode: "0600"
         owner: root
         group: root
 
@@ -71,7 +71,7 @@
       ansible.builtin.get_url:
         url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
         dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
-        mode: 0644
+        mode: "0644"
         owner: root
         group: root
       register: ssh_audit_sig_get_url
@@ -80,7 +80,7 @@
       ansible.builtin.get_url:
         url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
         dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
-        mode: 0644
+        mode: "0644"
         owner: root
         group: root
       register: ssh_audit_get_url
@@ -115,7 +115,7 @@
             src: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}/ssh-audit.py"
             dest: /usr/local/bin/ssh-audit
             follow: false
-            mode: 0777
+            mode: "0777"
             owner: root
             group: root
 
