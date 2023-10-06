@@ -163,8 +163,8 @@ ssh_password_authentication: false
 ssh_permit_root_login: prohibit-password
 
 # https://man.openbsd.org/sshd_config#Port
-# The first port in this list will be used for the local host file
-# to connect with another specify it on the command line
+# SSH listening ports
+# The first port in this list will be used for the local host file scan
 ssh_ports:
   - 22
 
@@ -179,7 +179,7 @@ ssh_scan_ip_addresses:
   - "{{ ansible_default_ipv4.address | d() }}"
   # - "{{ ansible_default_ipv6.address }}"
 
-# Scan the keys available on the default IPv4 and IPv6 addresses
+# Scan the keys available on the {{ ssh_scan_ip_addresses }}
 ssh_scan_keys: true
 
 # Allow X11 forwarding

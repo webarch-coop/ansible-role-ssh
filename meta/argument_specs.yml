@@ -120,7 +120,7 @@ argument_specs:
       ssh_jpq:
         type: dict
         required: true
-        description: Disctionary of Internal JMESPath queries.
+        description: Internal dictionary of JMESPath queries.
       ssh_init:
         type: str
         required: false
@@ -255,7 +255,7 @@ argument_specs:
       ssh_verify:
         type: bool
         required: true
-        description: Verify all variables that start ssh_ using ther argument spec.
+        description: Verify all variables that start ssh_ using the argument spec.
       ssh_version:
         type: str
         required: false
