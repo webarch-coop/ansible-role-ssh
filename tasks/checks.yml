@@ -207,6 +207,7 @@
         that:
           - ssh_q_cipher.rc == 0
           - ssh_q_cipher.stdout_lines | length > 0
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         msg: "{{ ssh_q_cipher.stderr_lines }}"
       when: ssh_check_fail | bool
 
@@ -334,6 +335,7 @@
         that:
           - ssh_q_host_key_algorithms.rc == 0
           - ssh_q_host_key_algorithms.stdout_lines | length > 0
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: "{{ ssh_q_host_key_algorithms.stderr_lines }}"
       when: ssh_check_fail | bool
 
