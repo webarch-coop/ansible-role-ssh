@@ -103,8 +103,8 @@ ssh_kex_algorithms:
 ssh_listen_addresses:
   - 0.0.0.0
 
-# ssh_localhost might need to be set to 127.0.0.1
-ssh_localhost: localhost
+# The address for ssh-audit to use on the server
+ssh_localhost: 127.0.0.1
 
 # Enable generation of local configuration files
 ssh_local_hosts: false
