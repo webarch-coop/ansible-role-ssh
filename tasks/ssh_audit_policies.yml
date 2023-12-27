@@ -1,0 +1,45 @@
+# Copyright 2019-2023 Chris Croome
+#
+# This file is part of the Webarchitects OpenSSH Ansible role.
+#
+# The Webarchitects OpenSSH Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects OpenSSH Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Local ssh-audit policies
+  block:
+
+    - name: SSH audit policy directory present
+      ansible.builtin.file:
+        path: "{{ ssh_audit_local_policy_file.path | ansible.builtin.dirname }}"
+        state: directory
+        mode: "0755"
+        owner: root
+        group: root
+      when:
+        - ssh_audit_local_policy_file.state is defined
+        - ssh_audit_local_policy_file.state == "present"
+        - ssh_audit_local_policy_file.path is defined
+
+    - name: SSH audit policy absent
+      ansible.builtin.file:
+        path: "{{ ssh_audit_local_policy_file.path }}"
+        state: absent
+      when:
+        - ssh_audit_local_policy_file.state is defined
+        - ssh_audit_local_policy_file.state == "absent"
+
+    - name: SSH audit policy present
+      ansible.builtin.template:
+        src: ssh_audit_local_policy.txt.j2
+        dest: "{{ ssh_audit_local_policy_file.path }}"
+        mode: "0655"
+        owner: root
+        group: root
+
+  tags:
+    - ssh_audit
+    - ssh
+...

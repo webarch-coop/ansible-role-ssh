@@ -39,10 +39,79 @@ argument_specs:
         type: bool
         required: true
         description: Run the SSH audit tasks.
+      ssh_audit_local_policies:
+        type: list
+        elements: dict
+        required: false
+        description: A list of SSH audit policies.
+        options:
+          path:
+            type: str
+            required: true
+            description: The path for the ssh-audit policy file.
+          state:
+            type: str
+            required: true
+            description: The state of the ssh-audit policy file.
+            choices:
+              - absent
+              - present
+          content:
+            type: dict
+            required: false
+            options:
+              name:
+                type: str
+                required: true
+                description: The name of this policy (displayed in the output during scans). Must be in quotes.
+              version:
+                type: str
+                required: true
+                description: The version of this policy (displayed in the output during scans), may be any value.
+              banner:
+                type: str
+                required: false
+                description: Optional banner that must match exactly.
+              compressions:
+                type: str
+                required: false
+                description: Optional compression options that must match exactly (order matters).
+              host_key_sizes:
+                type: str
+                required: true
+                description: Dictionary containing all host key and size information.
+              dh_modulus_sizes:
+                type: str
+                required: true
+                description: Group exchange DH modulus sizes.
+              "host keys":
+                type: str
+                required: true
+                description: The host key types that must match exactly (order matters).
+              "optional host keys":
+                type: str
+                required: false
+                description: Host key types that may optionally appear.
+              "key exchanges":
+                type: str
+                required: true
+                description: The key exchange algorithms that must match exactly (order matters).
+              ciphers:
+                type: str
+                required: true
+                description: The ciphers that must match exactly (order matters).
+              macs:
+                type: str
+                required: true
+                description: The MACs that must match exactly (order matters).
+      ssh_audit_local_policy_file:
+        type: str
+        required: false
+        description: Path to a local ssh-audit policy file.
       ssh_audit_fail:
         type: bool
         required: true
-        description: Fail when the ssh-autit policy check fails.
+        description: Fail when the ssh-audit policy check fails.
       ssh_authentication_methods:
         type: str
         required: true
@@ -132,20 +201,21 @@ argument_specs:
         description: A list of allowed KexAlgorithms.
         # https://man.openbsd.org/sshd_config#KexAlgorithms
         choices:
+          - curve25519-sha256
+          - curve25519-sha256@libssh.org
+          - diffie-hellman-group-exchange-sha1
+          - diffie-hellman-group-exchange-sha256
           - diffie-hellman-group1-sha1
           - diffie-hellman-group14-sha1
           - diffie-hellman-group14-sha256
           - diffie-hellman-group16-sha512
           - diffie-hellman-group18-sha512
-          - diffie-hellman-group-exchange-sha1
-          - diffie-hellman-group-exchange-sha256
           - ecdh-sha2-nistp256
           - ecdh-sha2-nistp384
           - ecdh-sha2-nistp521
-          - curve25519-sha256
-          - curve25519-sha256@libssh.org
-          - sntrup761x25519-sha512@openssh.com
+          - kex-strict-s-v00@openssh.com
           - sntrup4591761x25519-sha512@tinyssh.org
+          - sntrup761x25519-sha512@openssh.com
       ssh_listen_addresses:
         type: list
         elements: str

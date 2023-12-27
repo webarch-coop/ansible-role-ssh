@@ -1,0 +1,82 @@
+# Copyright 2019-2023 Chris Croome
+#
+# This file is part of the Webarchitects OpenSSH Ansible role.
+#
+# The Webarchitects OpenSSH Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects OpenSSH Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Run ssh-audit for fail and info results
+  block:
+
+    - name: Audit SSH to check for failures
+      ansible.builtin.command: "ssh-audit -n -l fail {{ ssh_localhost }}"
+      check_mode: false
+      changed_when: false
+      register: ssh_audit_fail
+      failed_when: ssh_audit_fail.rc is not regex('0|2|3')
+
+    - name: Print the SSH audit failure results if there are any
+      ansible.builtin.debug:
+        var: ssh_audit_fail.stdout_lines
+      when: ssh_audit_fail.stdout_lines != []
+
+    - name: Run SSH audit for info results
+      block:
+
+        - name: Audit SSH to check informational results
+          ansible.builtin.command: "ssh-audit -n -l info {{ ssh_localhost }}"
+          check_mode: false
+          changed_when: false
+          register: ssh_audit_info
+          failed_when:
+            - not ssh_first_check | bool
+            - ssh_audit_info.rc is not regex('0|2|3')
+
+        - name: Debug the SSH audit info results
+          ansible.builtin.debug:
+            var: ssh_audit_info.stdout_lines
+
+      when:
+        - ssh_check_fail | bool
+        - ssh_audit_fail.rc != 0
+
+    - name: Fail due to ssh-audit results
+      ansible.builtin.fail:
+        msg:
+          - "ssh-audit failed with the above results"
+      when:
+        - not ssh_first_check | bool
+        - ssh_check_fail | bool
+        - ssh_audit_fail.rc != 0
+
+    - name: Audit SSH and generate JSON output
+      ansible.builtin.command: "ssh-audit -j {{ ssh_localhost }}"
+      check_mode: false
+      changed_when: false
+      register: ssh_audit_json
+      failed_when: ssh_audit_json.rc is not regex('0|2|3')
+
+    - name: Set a fact for the SSH audit results
+      ansible.builtin.set_fact:
+        ssh_audit_results: "{{ ssh_audit_json.stdout | from_json }}"
+
+    - name: Debug the SSH audit results
+      ansible.builtin.debug:
+        var: ssh_audit_results
+        verbosity: 2
+
+    - name: Set a fact for the version of OpenSSH installed
+      ansible.builtin.set_fact:
+        ssh_version: "{{ ssh_audit_results.banner.software | regex_replace('^OpenSSH_') | regex_replace('p[1-9]$') }}"
+
+  when:
+    - ssh_which_ssh_audit.rc == 0
+    - ssh_init is defined
+    - ssh_init == "systemd"
+  tags:
+    - ssh
+    - ssh_audit
+...
