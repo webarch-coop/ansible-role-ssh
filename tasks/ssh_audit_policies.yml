@@ -13,28 +13,28 @@
 
     - name: SSH audit policy directory present
       ansible.builtin.file:
-        path: "{{ ssh_audit_local_policy_file.path | ansible.builtin.dirname }}"
+        path: "{{ ssh_audit_local_policy.path | ansible.builtin.dirname }}"
         state: directory
         mode: "0755"
         owner: root
         group: root
       when:
-        - ssh_audit_local_policy_file.state is defined
-        - ssh_audit_local_policy_file.state == "present"
-        - ssh_audit_local_policy_file.path is defined
+        - ssh_audit_local_policy.state is defined
+        - ssh_audit_local_policy.state == "present"
+        - ssh_audit_local_policy.path is defined
 
     - name: SSH audit policy absent
       ansible.builtin.file:
-        path: "{{ ssh_audit_local_policy_file.path }}"
+        path: "{{ ssh_audit_local_policy.path }}"
         state: absent
       when:
-        - ssh_audit_local_policy_file.state is defined
-        - ssh_audit_local_policy_file.state == "absent"
+        - ssh_audit_local_policy.state is defined
+        - ssh_audit_local_policy.state == "absent"
 
     - name: SSH audit policy present
       ansible.builtin.template:
         src: ssh_audit_local_policy.txt.j2
-        dest: "{{ ssh_audit_local_policy_file.path }}"
+        dest: "{{ ssh_audit_local_policy.path }}"
         mode: "0655"
         owner: root
         group: root
