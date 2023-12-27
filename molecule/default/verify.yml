@@ -98,6 +98,7 @@
         molecule_ssh_audit_local_policy_present: true
       when:
         - molecule_ssh_audit_local_policy_file_path is defined
+        - molecule_ssh_audit_local_policy_file_path.stat is defined
         - molecule_ssh_audit_local_policy_file_path.stat.exists | bool
 
     - name: Debug molecule_ssh_audit_local_policy_present

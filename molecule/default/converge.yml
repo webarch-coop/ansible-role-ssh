@@ -35,4 +35,5 @@
         ssh: true
         ssh_audit: true
         ssh_localhost: "{{ ansible_default_ipv4.address }}"
+        ssh_audit_local_policy_file: "/usr/local/share/ssh-audit/policies/{{ ansible_distribution_release }}.txt"
 ...
