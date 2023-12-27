@@ -38,6 +38,9 @@
         mode: "0655"
         owner: root
         group: root
+      when:
+        - ssh_audit_local_policy.state is defined
+        - ssh_audit_local_policy.state == "present"
 
   tags:
     - ssh_audit
