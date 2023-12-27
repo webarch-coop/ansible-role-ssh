@@ -88,6 +88,11 @@
         - ssh_audit_local_policy_file is defined
         - ssh_audit_local_policy_file | length > 0
 
+    - name: Debug molecule_ssh_audit_local_policy_file_path
+      ansible.builtin.debug:
+        var: molecule_ssh_audit_local_policy_file_path
+        verbosity: 1
+
     - name: Set a fact for the local SSH audit policy file
       ansible.builtin.set_fact:
         molecule_ssh_audit_local_policy_present: true
