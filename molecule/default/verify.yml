@@ -80,18 +80,10 @@
         var: molecule_ssh_listening
         verbosity: 1
 
-    - name: Debug ssh_audit_local_policy_file
-      ansible.builtin.debug:
-        var: ssh_audit_local_policy_file
-        verbosity: 1
-
     - name: Check if the specified local SSH audit policy file is present
       ansible.builtin.stat:
-        path: "{{ ssh_audit_local_policy_file }}"
+        path: "/usr/local/share/ssh-audit/policies/{{ ansible_distribution_release }}.txt"
       register: molecule_ssh_audit_local_policy_file_path
-      when:
-        - ssh_audit_local_policy_file is defined
-        - ssh_audit_local_policy_file | length > 0
 
     - name: Debug molecule_ssh_audit_local_policy_file_path
       ansible.builtin.debug:
