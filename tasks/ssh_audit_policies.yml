@@ -31,6 +31,14 @@
         - ssh_audit_local_policy.state is defined
         - ssh_audit_local_policy.state == "absent"
 
+    - name: Debug SSH audit policy present
+      ansible.builtin.debug:
+        msg: |-
+          {% for ssh_audit_local_policy_content in ssh_audit_local_policy.content | ansible.builtin.dict2items %}
+          {{ ssh_audit_local_policy_content.key }} = {% if ssh_audit_local_policy_content.key == "name" %}"{% endif %}{{ ssh_audit_local_policy_content.value }}{% if ssh_audit_local_policy_content.key == "name" %}"{% endif %}
+          {% endfor %}
+        verbosity: 1
+
     - name: SSH audit policy present
       ansible.builtin.template:
         src: ssh_audit_local_policy.txt.j2
