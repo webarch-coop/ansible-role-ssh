@@ -12,6 +12,7 @@
   ansible.builtin.debug:
     msg:
       - "Debian version {{ ansible_distribution_release }}"
+      - "ssh_audit_local_policy_file{% if ssh_audit_local_policy_file is defined %} {{ ssh_audit_local_policy_file }}{% endif %}"
       - "AllowAgentForwarding{% if ssh_allow_agent_forwarding is defined and ssh_allow_agent_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_agent_forwarding"
       - "AllowGroups{% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %} # ssh_allow_groups "
       - "AllowTcpForwarding{% if ssh_allow_tcp_forwarding is defined and ssh_allow_tcp_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_tcp_forwarding"
@@ -26,6 +27,7 @@
       - "HostKey{% if ssh_host_keys is defined %}{% for ssh_key in ssh_host_keys %} name: {{ ssh_key.name }}{% if ssh_key.bits is defined %} bits: {{ ssh_key.bits }}{% endif %} path: {{ ssh_key.path }} {% endfor %}{% endif %} # ssh_host_keys"
       - "KexAlgorithms{% if ssh_kex_algorithms is defined %} {% for k in ssh_kex_algorithms %}{{ k }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %} # ssh_kex_algorithms"
       - "ListenAddress{% if ssh_listen_addresses is defined %} {% for a in ssh_listen_addresses %}{{ a }}{% endfor %}{% endif %} # ssh_listen_addresses"
+      - "ssh_localhost{% if ssh_localhost is defined %} {{ ssh_localhost }}{% endif %}"
       - "ssh_local_hosts{% if ssh_local_hosts is defined %} {{ ssh_local_hosts }}{% endif %}"
       - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}"
       - "ssh_local_hosts_file{% if ssh_local_hosts_file is defined %} {{ ssh_local_hosts_file }}{% endif %}"
