@@ -58,54 +58,7 @@
         ( ssh_audit_installed_version is version(ssh_audit_version_latest, '<') )
 
     - name: SSH Audit
-      block:
-
-        - name: Include ssh-audit info tasks
-          ansible.builtin.include_tasks: ssh_audit_info.yml
-          vars:
-            ssh_first_check: true
-
-        - name: SSH audit local policies present
-          ansible.builtin.include_tasks: ssh_audit_policies.yml
-          loop: "{{ ssh_audit_local_policies }}"
-          loop_control:
-            loop_var: ssh_audit_local_policy
-          when:
-            - ssh_audit_local_policies is defined
-            - ssh_audit_local_policies != []
-
-        - name: Check if the specified local SSH audit policy file is present
-          ansible.builtin.stat:
-            path: "{{ ssh_audit_local_policy_file }}"
-          register: ssh_audit_local_policy_file_path
-          when:
-            - ssh_audit_local_policy_file is defined
-            - ssh_audit_local_policy_file | length > 0
-
-        - name: Set a fact for the local SSH audit policy file
-          ansible.builtin.set_fact:
-            ssh_audit_local_policy_present: true
-          when:
-            - ssh_audit_local_policy_file_path is defined
-            - ssh_audit_local_policy_file_path.stat.exists | bool
-
-        - name: Debug ssh_audit_local_policy_present
-          ansible.builtin.debug:
-            var: ssh_audit_local_policy_present
-            verbosity: 1
-
-        - name: Include ssh-audit local policy tasks
-          ansible.builtin.include_tasks: ssh_audit_local.yml
-          when:
-            - ssh_audit_local_policy_present is defined
-            - ssh_audit_local_policy_present | bool
-
-        - name: Include ssh-audit builtin policy tasks
-          ansible.builtin.include_tasks: ssh_audit_builtin.yml
-          when: >-
-            ( ssh_audit_local_policy_present is not defined ) or
-            ( not ssh_audit_local_policy_present | bool )
-
+      ansible.builtin.include_tasks: ssh_audit.yml
       when:
         - ssh_init is defined
         - ssh_init == "systemd"
@@ -174,20 +127,7 @@
         ssh_first_check: false
 
     - name: Include ssh-audit tasks
-      block:
-
-        - name: Include ssh-audit local policy tasks
-          ansible.builtin.include_tasks: ssh_audit_local.yml
-          when:
-            - ssh_audit_local_policy_present is defined
-            - ssh_audit_local_policy_present | bool
-
-        - name: Include ssh-audit builtin policy tasks
-          ansible.builtin.include_tasks: ssh_audit_builtin.yml
-          when: >-
-            ( ssh_audit_local_policy_present is not defined ) or
-            ( not ssh_audit_local_policy_present | bool )
-
+      ansible.builtin.include_tasks: ssh_audit.yml
       when:
         - ssh_init is defined
         - ssh_init == "systemd"
