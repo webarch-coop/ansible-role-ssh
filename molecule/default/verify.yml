@@ -85,8 +85,8 @@
         path: "{{ ssh_audit_local_policy_file }}"
       register: molecule_ssh_audit_local_policy_file_path
       when:
-        - molecule_ssh_audit_local_policy_file is defined
-        - molecule_ssh_audit_local_policy_file | length > 0
+        - ssh_audit_local_policy_file is defined
+        - ssh_audit_local_policy_file | length > 0
 
     - name: Set a fact for the local SSH audit policy file
       ansible.builtin.set_fact:
