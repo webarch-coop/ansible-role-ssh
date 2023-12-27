@@ -82,7 +82,7 @@
 
     - name: Check if the specified local SSH audit policy file is present
       ansible.builtin.stat:
-        path: "{{ molecule_ssh_audit_local_policy_file }}"
+        path: "{{ ssh_audit_local_policy_file }}"
       register: molecule_ssh_audit_local_policy_file_path
       when:
         - molecule_ssh_audit_local_policy_file is defined
@@ -104,7 +104,7 @@
       block:
 
         - name: SSH local policy audit with JSON output
-          ansible.builtin.command: "ssh-audit -njP {{ molecule_ssh_audit_local_policy_file | quote }} {{ ansible_default_ipv4.address }}"
+          ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_local_policy_file | quote }} {{ ansible_default_ipv4.address }}"
           check_mode: false
           changed_when: false
           register: molecule_ssh_audit_local_policy_json
