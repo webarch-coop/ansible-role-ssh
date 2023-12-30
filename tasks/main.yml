@@ -130,6 +130,8 @@
 
     - name: Include ssh-audit tasks
       ansible.builtin.include_tasks: ssh_audit.yml
+      vars:
+        ssh_first_check: false
       when:
         - ssh_init is defined
         - ssh_init == "systemd"
