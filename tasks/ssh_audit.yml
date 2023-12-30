@@ -19,6 +19,7 @@
       loop: "{{ ssh_audit_local_policies }}"
       loop_control:
         loop_var: ssh_audit_local_policy
+        label: ssh_audit_local_policy.name
       when:
         - ssh_audit_local_policies is defined
         - ssh_audit_local_policies != []
