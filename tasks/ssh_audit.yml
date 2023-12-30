@@ -13,8 +13,6 @@
 
     - name: Include ssh-audit info tasks
       ansible.builtin.include_tasks: ssh_audit_info.yml
-      vars:
-        ssh_first_check: true
 
     - name: SSH audit local policies present
       ansible.builtin.include_tasks: ssh_audit_policies.yml

@@ -124,7 +124,9 @@
         fail_msg:
           - "The ssh-audit policy check failed, you can check manually using the following command"
           - "ssh-audit -nP '{{ ssh_audit_policy }}' {{ ssh_localhost }}"
-      when: ssh_audit_policy_result is defined
+      when:
+        - not ssh_first_check | bool
+        - ssh_audit_policy_result is defined
 
   tags:
     - ssh
