@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+# {# j2lint: disable=single-statement-per-line #}
 
 {% for ssh_audit_local_policy_content in ssh_audit_local_policy.content | ansible.builtin.dict2items %}
 {{ ssh_audit_local_policy_content.key }} = {% if ssh_audit_local_policy_content.key == "name" %}"{% endif %}{{ ssh_audit_local_policy_content.value }}{% if ssh_audit_local_policy_content.key == "name" %}"{% endif %}
