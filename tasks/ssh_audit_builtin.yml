@@ -106,7 +106,7 @@
           check_mode: false
           changed_when: false
           register: ssh_audit_policy_human
-          failed_when: ssh_audit_policy_json_human.rc is not ansible.builtin.regex('^0|3$')
+          failed_when: ssh_audit_policy_human.rc is not ansible.builtin.regex('^0|3$')
 
         - name: Debug the SSH profile audit human readable output
           ansible.builtin.debug:
