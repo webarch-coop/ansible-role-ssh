@@ -185,10 +185,13 @@ ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/config"
 # ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/{{ inventory_hostname }}.host"
 
 # Host name(s) to use in the local Host file
-ssh_local_hosts_host: "{{ inventory_hostname_short }} {{ inventory_hostname }}"
+ssh_local_hosts_host: >-
+  {{ inventory_hostname_short }}
+  {{ inventory_hostname }}
+  {{ ansible_host | default(ansible_default_ipv4.address) | d() }}
 
 # Hostname to use in the local Host file
-ssh_local_hosts_hostname: "{{ ansible_default_ipv4.address | d() }}"
+ssh_local_hosts_hostname: "{{ ansible_host | default(ansible_default_ipv4.address) | d() }}"
 
 # UserKnownHostsFile to use in the local Host file
 ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/known_hosts"
