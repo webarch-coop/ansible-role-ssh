@@ -153,6 +153,8 @@
 
     - name: Include ssh-audit tasks
       ansible.builtin.include_tasks: ssh_audit_info.yml
+      vars:
+        ssh_first_check: true
       when: ssh_audit_results is not defined
 
     - name: Include local OpenSSH client configuration tasks
