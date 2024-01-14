@@ -15,13 +15,15 @@
       ansible.builtin.command: "ssh-audit -n -l fail {{ ssh_localhost }}"
       check_mode: false
       changed_when: false
-      register: ssh_audit_fail
-      failed_when: ssh_audit_fail.rc is not regex('0|2|3')
+      register: ssh_audit_fail_check
+      failed_when: ssh_audit_fail_check.rc is not regex('0|2|3')
 
     - name: Print the SSH audit failure results if there are any
       ansible.builtin.debug:
-        var: ssh_audit_fail.stdout_lines
-      when: ssh_audit_fail.stdout_lines != []
+        var: ssh_audit_fail_check.stdout_lines
+      when:
+        - ssh_audit_fail_check.rc != 0
+        - ssh_audit_fail_check.stdout_lines is defined
 
     - name: Run SSH audit for info results
       block:
@@ -41,7 +43,7 @@
 
       when:
         - ssh_check_fail | bool
-        - ssh_audit_fail.rc != 0
+        - ssh_audit_fail_check.rc != 0
 
     - name: Fail due to ssh-audit results
       ansible.builtin.fail:
@@ -50,7 +52,7 @@
       when:
         - not ssh_first_check | bool
         - ssh_check_fail | bool
-        - ssh_audit_fail.rc != 0
+        - ssh_audit_fail_check.rc != 0
 
     - name: Audit SSH and generate JSON output
       ansible.builtin.command: "ssh-audit -j {{ ssh_localhost }}"

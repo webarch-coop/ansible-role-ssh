@@ -14,6 +14,8 @@
     - name: Debug variables
       ansible.builtin.debug:
         msg:
+          - "ansible_host{% if ansible_host is defined %} {{ ansible_host }}{% endif %}"
+          - "ansible_default_ipv4.address{% if ansible_default_ipv4.address is defined %} {{ ansible_default_ipv4.address }}{% endif %}"
           - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}"
           - "ssh_local_hosts_file{% if ssh_local_hosts_file is defined %} {{ ssh_local_hosts_file }}{% endif %}"
           - "ssh_local_hosts_host{% if ssh_local_hosts_host is defined %} {{ ssh_local_hosts_host }}{% endif %}"
@@ -92,6 +94,12 @@
             mode: "0700"
           register: ssh_local_hosts_dir
 
+        - name: Debug ssh_local_hosts_dir
+          ansible.builtin.debug:
+            var: ssh_local_hosts_dir
+            verbosity: 1
+          when: ssh_local_hosts_dir is defined
+
         - name: Last line in local Host file present
           ansible.builtin.lineinfile:
             path: "{{ ssh_local_hosts_file }}"
@@ -100,7 +108,30 @@
             insertafter: EOF
             create: true
             mode: "0600"
-          when: (ssh_local_hosts_dir.state is defined) and (ssh_local_hosts_dir.state == "directory")
+          when:
+            - ssh_local_hosts_dir.state is defined
+            - ssh_local_hosts_dir.state == "directory"
+
+        - name: Debug host present in the local Host file
+          ansible.builtin.debug:
+            msg: |
+              {% if ssh_local_hosts_host is defined %}
+              Host {{ ssh_local_hosts_host }}
+              {%     if ssh_local_hosts_hostname is defined %}
+                Hostname {{ ssh_local_hosts_hostname }}
+              {%     endif %}
+              {%     if ssh_local_hosts_port is defined %}
+                Port {{ ssh_local_hosts_port }}
+              {%     endif %}
+              {%     if ssh_local_hosts_user_known_hosts_file is defined %}
+              {%         if ssh_local_hosts_hostname | ansible.utils.ipaddr == ssh_local_hosts_hostname %}
+                CheckHostIP yes
+              {%         endif %}
+                HashKnownHosts no
+                UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
+              {%     endif %}
+              {% endif %}
+            verbosity: 1
 
         - name: Host present in the local Host file
           ansible.builtin.blockinfile:
