@@ -99,6 +99,8 @@ ssh_allow_groups:
 # https://man.openbsd.org/sshd_config#AllowTcpForwarding
 ssh_allow_tcp_forwarding: "no"
 
+# Set to any to allow either keys or passwords to be used, see also
+# the ssh_password_authentication variable
 # https://man.openbsd.org/sshd_config#AuthenticationMethods
 ssh_authentication_methods: publickey
 
@@ -226,6 +228,7 @@ ssh_macs:
 # prefix to the array of MACs
 # ssh_mac_list_strategy:
 
+# See also ssh_authentication_methods
 # https://man.openbsd.org/sshd_config#PasswordAuthentication
 ssh_password_authentication: false
 
