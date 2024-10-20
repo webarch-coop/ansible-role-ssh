@@ -31,7 +31,7 @@
     - name: Debug the SSH policy audit errors
       ansible.builtin.debug:
         var: ssh_audit_local_policy_result.errors
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_audit_local_policy_result.errors is defined
 
     - name: Debug SSH policy audit failure

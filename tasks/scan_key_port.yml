@@ -14,13 +14,13 @@
     - name: Debug IP address
       ansible.builtin.debug:
         var: ssh_ip
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_ip is defined
 
     - name: Debug port
       ansible.builtin.debug:
         var: ssh_port
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_port is defined
 
     # https://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
@@ -38,7 +38,7 @@
     - name: Debug the key scan result
       ansible.builtin.debug:
         var: ssh_keyscan_command.stdout_lines
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_keyscan_command.stdout_lines is defined
 
     # - name: Set a fact for the sorted key scan result
@@ -52,7 +52,7 @@
     # - name: Debug the sorted key scan result
     #   ansible.builtin.debug:
     #     var: ssh_keyscan_results
-    #     verbosity: 2
+    #     verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
     #   when: (ssh_keyscan_results is defined) and (ssh_keyscan_results != [])
 
     - name: Write any ssh-keyscan results to a local KnownHosts file if one is defined

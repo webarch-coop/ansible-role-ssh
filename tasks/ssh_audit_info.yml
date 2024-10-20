@@ -68,7 +68,7 @@
     - name: Debug the SSH audit results
       ansible.builtin.debug:
         var: ssh_audit_results
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Set a fact for the version of OpenSSH installed
       ansible.builtin.set_fact:

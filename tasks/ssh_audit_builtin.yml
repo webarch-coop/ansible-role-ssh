@@ -24,7 +24,7 @@
     - name: Debug available server policies
       ansible.builtin.debug:
         var: ssh_audit_policies
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_audit_policies is defined
 
     - name: OpenSSH Ubuntu policy audit
@@ -33,7 +33,7 @@
         - name: Debug SSH audit policy regex
           ansible.builtin.debug:
             var: ssh_audit_ubuntu_policy_regex
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           vars:
             ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
 
@@ -57,7 +57,7 @@
         - name: Debug SSH audit policy regex
           ansible.builtin.debug:
             var: ssh_audit_openssh_policy_regex
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           vars:
             ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ ssh_version }}"
 
@@ -95,7 +95,7 @@
     - name: Debug the SSH policy audit errors
       ansible.builtin.debug:
         var: ssh_audit_policy_result.errors
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_audit_policy_result.errors is defined
 
     - name: Debug SSH policy audit failure

@@ -24,7 +24,7 @@
     - name: Debug the results of the host SSH key path check
       ansible.builtin.debug:
         var: ssh_host_key_path
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Run additional checks when the host key exists
       block:
@@ -52,7 +52,7 @@
         - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.debug:
             var: ssh_host_key_fingerprint
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
       when: ssh_host_key_path.stat.exists | bool
 
@@ -100,7 +100,7 @@
     - name: Debug the results of the host SSH key path check
       ansible.builtin.debug:
         var: ssh_host_key_path
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Run additional checks when the host key exists
       block:
@@ -128,7 +128,7 @@
         - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.debug:
             var: ssh_host_key_fingerprint
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
       when: ssh_host_key_path.stat.exists | bool
 

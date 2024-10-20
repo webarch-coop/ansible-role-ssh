@@ -37,7 +37,7 @@
     - name: Print the version of SSH installed
       ansible.builtin.debug:
         var: ssh_version
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     # When in a docker container ssh_init.stdout is usually "sh" or "bash"
     - name: Check if system has been booted with systemd as init system
@@ -69,7 +69,7 @@
     - name: Debug ssh service status
       ansible.builtin.debug:
         msg: "{{ ssh_service_facts | community.general.json_query(ssh_jpq.service) }}"
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Check that sshd is enabled and running
       ansible.builtin.assert:
@@ -90,7 +90,7 @@
     - name: Debug TCP ports
       ansible.builtin.debug:
         var: ansible_facts.tcp_listen
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Set facts for the addresses and ports that SSH is listening on and the active ports SSH is not listening on
       ansible.builtin.set_fact:
@@ -101,17 +101,17 @@
     - name: Debug SSH listening addresses
       ansible.builtin.debug:
         var: ssh_listening_addresses
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Debug SSH listening ports
       ansible.builtin.debug:
         var: ssh_listening_ports
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Debug SSH not listening ports
       ansible.builtin.debug:
         var: ssh_not_listening_ports
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Check that the SSH listening ports and addresses are not empty lists
       ansible.builtin.assert:
@@ -221,12 +221,12 @@
         - name: Debug the list of proposed ciphers
           ansible.builtin.debug:
             var: ssh_ciphers
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Debug the list of available ciphers
           ansible.builtin.debug:
             var: ssh_ciphers_available
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Check that the specified and available SSH cipher lists are not empty
           ansible.builtin.assert:
@@ -256,7 +256,7 @@
             - name: List SSH ciphers without the ones that can't be used
               ansible.builtin.debug:
                 var: ssh_ciphers
-                verbosity: 2
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
             - name: Check that updated SSH cipher list is not empty
               ansible.builtin.assert:
@@ -352,12 +352,12 @@
         - name: Debug the list of proposed SSH host key algorithms
           ansible.builtin.debug:
             var: ssh_host_key_algorithms
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Debug the list of available host key algorithms
           ansible.builtin.debug:
             var: ssh_host_key_algorithms_available
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Check that the specified and available SSH host key algorithm lists are not empty
           ansible.builtin.assert:
@@ -387,7 +387,7 @@
             - name: List SSH host key algorithms without the ones that can't be used
               ansible.builtin.debug:
                 var: ssh_host_key_algorithms
-                verbosity: 2
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
             - name: Check that updated SSH host key algorithms list is not empty
               ansible.builtin.assert:
@@ -444,12 +444,12 @@
         - name: Debug the list of proposed kex algorithms
           ansible.builtin.debug:
             var: ssh_kex_algorithms
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Debug the list of available kex algorithms
           ansible.builtin.debug:
             var: ssh_kex_algorithms_available
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Check that the specified and available SSH kex algorithm lists are not empty
           ansible.builtin.assert:
@@ -479,7 +479,7 @@
             - name: List SSH kex algorithms without the ones that can't be used
               ansible.builtin.debug:
                 var: ssh_kex_algorithms
-                verbosity: 2
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
             - name: Check that updated SSH kex algorithms list is not empty
               ansible.builtin.assert:
@@ -549,7 +549,7 @@
               - "ssh_ports:{% if ssh_ports is defined %} {{ ssh_ports | join(' ') }}{% endif %}"
               - "ssh_listening_ports:{% if ssh_listening_ports is defined %} {{ ssh_listening_ports | join(' ') }}{% endif %}"
               - "ssh_not_listening_ports:{% if ssh_not_listening_ports is defined %} {{ ssh_not_listening_ports | join(' ') }}{% endif %}"
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Check ssh_local_hosts_directory variable
           ansible.builtin.assert:
@@ -654,12 +654,12 @@
         - name: Debug the list of SSH macs
           ansible.builtin.debug:
             var: ssh_macs
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Debug the list of available SSH macs
           ansible.builtin.debug:
             var: ssh_macs_available
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
         - name: Check that the specified and available SSH mac lists are not empty
           ansible.builtin.assert:
@@ -689,7 +689,7 @@
             - name: List SSH macs without the ones that can't be used
               ansible.builtin.debug:
                 var: ssh_macs
-                verbosity: 2
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
             - name: Check that updated SSH mac list is not empty
               ansible.builtin.assert:
