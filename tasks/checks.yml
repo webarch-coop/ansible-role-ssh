@@ -717,9 +717,9 @@
         - name: Check ssh_ports values
           ansible.builtin.assert:
             that:
-              - >-
-                ( ( ssh_port | type_debug == "int" ) and ( ssh_port > 0 ) and ( ssh_port < 61000 ) ) or
-                ( ssh_port == "*" )
+              - ssh_port | type_debug == "int"
+              - ssh_port > 0
+              - ssh_port < 61000
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           loop: "{{ ssh_ports }}"
           loop_control:
