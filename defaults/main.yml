@@ -19,7 +19,7 @@ ssh_audit: true
 # Set ssh_audit_fail to false to skip failing when config pass the ssh-audit policy
 ssh_audit_fail: true
 
-# A local SSH audit policy will be used if the ansible_distribution_release is in the ssh_audit_local_policies list and a file exists in files/policies named ansible_distribution_release plus a .txt extension
+# A local SSH audit policy will be used if the ansible_facts.distribution_release is in the ssh_audit_local_policies list and a file exists in files/policies named ansible_facts.distribution_release plus a .txt extension
 ssh_audit_local_policies:
   - path: /usr/local/share/ssh-audit/policies/buster.txt
     state: present
@@ -83,7 +83,7 @@ ssh_audit_local_policies:
       macs: hmac-sha2-256-etm@openssh.com, hmac-sha2-512-etm@openssh.com, umac-128-etm@openssh.com
 
 # If a ssh_audit_local_policy_file is defined that it will be used for auditing the server
-ssh_audit_local_policy_file: "/usr/local/share/ssh-audit/policies/{{ ansible_distribution_release }}.txt"
+ssh_audit_local_policy_file: "/usr/local/share/ssh-audit/policies/{{ ansible_facts.distribution_release }}.txt"
 
 # https://man.openbsd.org/sshd_config#AllowAgentForwarding
 ssh_allow_agent_forwarding: false
@@ -190,10 +190,10 @@ ssh_local_hosts_file: "{{ ssh_local_hosts_directory }}/config"
 ssh_local_hosts_host: >-
   {{ inventory_hostname_short }}
   {{ inventory_hostname }}
-  {{ ansible_host | default(ansible_default_ipv4.address) | d() }}
+  {{ ansible_host | default(ansible_facts.default_ipv4.address) | d() }}
 
 # Hostname to use in the local Host file
-ssh_local_hosts_hostname: "{{ ansible_host | default(ansible_default_ipv4.address) | d() }}"
+ssh_local_hosts_hostname: "{{ ansible_host | default(ansible_facts.default_ipv4.address) | d() }}"
 
 # UserKnownHostsFile to use in the local Host file
 ssh_local_hosts_user_known_hosts_file: "{{ ssh_local_hosts_directory }}/known_hosts"
@@ -249,8 +249,8 @@ ssh_root_keypair: true
 
 # An array of IP addresses to scan for fingerprinting
 ssh_scan_ip_addresses:
-  - "{{ ansible_default_ipv4.address | d() }}"
-  # - "{{ ansible_default_ipv6.address }}"
+  - "{{ ansible_facts.default_ipv4.address | d() }}"
+  # - "{{ ansible_facts.default_ipv6.address }}"
 
 # Scan the keys available on the {{ ssh_scan_ip_addresses }}
 ssh_scan_keys: true

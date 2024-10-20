@@ -1,4 +1,4 @@
-# Cnopyright 2019-2024 Chris Croome
+# Copyright 2019-2024 Chris Croome
 #
 # This file is part of the Webarchitects OpenSSH Ansible role.
 #
@@ -8,26 +8,8 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-dependency:
-  name: galaxy
-platforms:
-  - name: instance
-provisioner:
-  name: ansible
-  config_options:
-    defaults:
-      ansible_managed: Ansible managed
-      duplicate_dict_key: error
-      error_on_undefined_vars: true
-      inject_facts_as_vars: false
-    # host_vars:
-    #   instance:
-    #     ansible_user: ansible
-  options:
-    D: true
-verifier:
-  name: ansible
-    # host_vars:
-    #   instance:
-    #     ansible_user: ansible
+- name: apt
+  src: https://git.coop/webarch/apt.git
+  version: 4.6.0  # apt
+  scm: git
 ...

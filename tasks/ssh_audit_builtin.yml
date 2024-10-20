@@ -35,19 +35,19 @@
             var: ssh_audit_ubuntu_policy_regex
             verbosity: 2
           vars:
-            ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_distribution_version }} LTS"
+            ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
 
         - name: Set a fact for the SSH audit policy to use for Ubuntu
           ansible.builtin.set_fact:
             ssh_audit_policy: "{{ ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') }}"
           vars:
-            ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_distribution_version }} LTS"
+            ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
           when:
             - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | type_debug == "list"
             - ssh_audit_policies | select('regex', ssh_audit_ubuntu_policy_regex) | type_debug != []
 
       when:
-        - ansible_distribution == "Ubuntu"
+        - ansible_facts.distribution == "Ubuntu"
         - ssh_audit_policies is defined
         - ssh_audit_policies != []
 
@@ -71,7 +71,7 @@
             - ssh_audit_policies | select('regex', ssh_audit_openssh_policy_regex) | type_debug != []
 
       when:
-        - ansible_distribution != "Ubuntu"
+        - ansible_facts.distribution != "Ubuntu"
         - ssh_audit_policies is defined
         - ssh_audit_policies != []
 

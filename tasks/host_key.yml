@@ -61,7 +61,7 @@
 
         - name: Set a fact for the date to be used in the backup path
           ansible.builtin.set_fact:
-            ssh_date: "{{ ansible_date_time.iso8601_basic_short }}"
+            ssh_date: "{{ ansible_facts.date_time.iso8601_basic_short }}"
 
         - name: Backup the old public SSH key
           ansible.builtin.command:

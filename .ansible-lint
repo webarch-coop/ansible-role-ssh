@@ -14,5 +14,6 @@ skip_list:
   - key-order[task]
   # When installing from backports the latest version is wanted
   - package-latest
+var_naming_pattern: "^[ssh|molecule]_?[0-9a-z_]*$"
 # vim: syntax=yaml
 ...

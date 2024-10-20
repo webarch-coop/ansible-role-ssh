@@ -15,7 +15,7 @@
       ansible.builtin.debug:
         msg:
           - "ansible_host{% if ansible_host is defined %} {{ ansible_host }}{% endif %}"
-          - "ansible_default_ipv4.address{% if ansible_default_ipv4.address is defined %} {{ ansible_default_ipv4.address }}{% endif %}"
+          - "ansible_facts.default_ipv4.address{% if ansible_facts.default_ipv4.address is defined %} {{ ansible_facts.default_ipv4.address }}{% endif %}"
           - "ssh_local_hosts_directory{% if ssh_local_hosts_directory is defined %} {{ ssh_local_hosts_directory }}{% endif %}"
           - "ssh_local_hosts_file{% if ssh_local_hosts_file is defined %} {{ ssh_local_hosts_file }}{% endif %}"
           - "ssh_local_hosts_host{% if ssh_local_hosts_host is defined %} {{ ssh_local_hosts_host }}{% endif %}"

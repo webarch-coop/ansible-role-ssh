@@ -82,7 +82,7 @@
 
     - name: Check if the specified local SSH audit policy file is present
       ansible.builtin.stat:
-        path: "/usr/local/share/ssh-audit/policies/{{ ansible_distribution_release }}.txt"
+        path: "/usr/local/share/ssh-audit/policies/{{ ansible_facts.distribution_release }}.txt"
       register: molecule_ssh_audit_local_policy_file_path
 
     - name: Debug molecule_ssh_audit_local_policy_file_path
@@ -108,7 +108,7 @@
       block:
 
         - name: SSH local policy audit with JSON output
-          ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_local_policy_file | quote }} {{ ansible_default_ipv4.address }}"
+          ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_local_policy_file | quote }} {{ ansible_facts.default_ipv4.address }}"
           check_mode: false
           changed_when: false
           register: molecule_ssh_audit_local_policy_json
@@ -170,19 +170,19 @@
                 var: molecule_ssh_audit_ubuntu_policy_regex
                 verbosity: 2
               vars:
-                molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_distribution_version }} LTS"
+                molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
 
             - name: Set a fact for the SSH audit policy to use for Ubuntu
               ansible.builtin.set_fact:
                 molecule_ssh_audit_policy: "{{ molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') }}"
               vars:
-                molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_distribution_version }} LTS"
+                molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
               when:
                 - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | type_debug == "list"
                 - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | type_debug != []
                 - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') | length > 0
 
-          when: ansible_distribution == "Ubuntu"
+          when: ansible_facts.distribution == "Ubuntu"
 
         - name: OpenSSH policy audit config
           block:
@@ -204,10 +204,10 @@
                 - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | type_debug != []
                 - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
 
-          when: ansible_distribution != "Ubuntu"
+          when: ansible_facts.distribution != "Ubuntu"
 
         - name: SSH version audit
-          ansible.builtin.command: "ssh-audit -njP {{ molecule_ssh_audit_policy | quote }} {{ ansible_default_ipv4.address }}"
+          ansible.builtin.command: "ssh-audit -njP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
           check_mode: false
           changed_when: false
           register: molecule_ssh_audit_policy_json
@@ -226,7 +226,7 @@
           block:
 
             - name: SSH profile audit human readable output
-              ansible.builtin.command: "ssh-audit -nP {{ molecule_ssh_audit_policy | quote }} {{ ansible_default_ipv4.address }}"
+              ansible.builtin.command: "ssh-audit -nP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
               check_mode: false
               changed_when: false
               register: molecule_ssh_audit_policy

@@ -11,7 +11,7 @@
 - name: Debug variables
   ansible.builtin.debug:
     msg:
-      - "Debian version {{ ansible_distribution_release }}"
+      - "Debian version {{ ansible_facts.distribution_release }}"
       - "ssh_audit_local_policy_file{% if ssh_audit_local_policy_file is defined %} {{ ssh_audit_local_policy_file }}{% endif %}"
       - "AllowAgentForwarding{% if ssh_allow_agent_forwarding is defined and ssh_allow_agent_forwarding | bool %} yes{% else %} no{% endif %} # ssh_allow_agent_forwarding"
       - "AllowGroups{% if ssh_allow_groups is defined %}{% for g in ssh_allow_groups %} {{ g }}{% endfor %}{% endif %} # ssh_allow_groups "

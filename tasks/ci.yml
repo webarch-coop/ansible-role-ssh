@@ -57,23 +57,12 @@
         remote_src: true
         validate: ssh-keygen -lf %s
 
-    - name: Run which bash
-      ansible.builtin.command: which bash
-      check_mode: false
-      changed_when: false
-      register: which_bash
-      failed_when: which_bash.stdout is not regex('\/bash$')
-
-    - name: Set a variable for the path to Bash
-      ansible.builtin.set_fact:
-        bash: "{{ which_bash.stdout }}"
-
     - name: "Generate a known_hosts file for {{ inventory_hostname }}"
       ansible.builtin.shell: |
         set -e -o pipefail
         ssh-keyscan -t ecdsa -H {{ inventory_hostname }} > /root/.ssh/ci/known_hosts
       args:
-        executable: "{{ bash }}"
+        executable: "{{ ansible_local.bash.path }}"
         creates: /root/.ssh/ci/known_hosts
 
   tags:
