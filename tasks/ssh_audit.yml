@@ -14,16 +14,17 @@
     - name: Gather service facts
       ansible.builtin.service_facts:
 
-    - name: Debug SSHD service status
+    - name: Debug SSH service status
       ansible.builtin.debug:
-        msg: "{{ ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service) }}"
-        # verbosity: 3
+        msg: "{{ ansible_facts | community.general.json_query(ssh_jpq.ssh_service) }}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
 
     - name: Include ssh-audit info tasks
       ansible.builtin.include_tasks: ssh_audit_info.yml
       when:
-        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).status == "enabled"
-        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).state == "running"
+        - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).status == "enabled"
+        - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state == "running"
 
     - name: SSH audit local policies present
       ansible.builtin.include_tasks: ssh_audit_policies.yml

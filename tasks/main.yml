@@ -120,7 +120,7 @@
         mode: "0644"
         owner: root
         group: root
-      notify: Restart ssh
+      notify: Restart sshd
 
     - name: OpenSSH server configured
       ansible.builtin.include_tasks: configure.yml
@@ -149,8 +149,8 @@
         - ssh_listening_addresses != []
         - ssh_listening_ports is defined
         - ssh_listening_ports != []
-        - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).status == "enabled"
-        - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).state == "running"
+        - (ssh_service_facts | community.general.json_query(ssh_jpq.ssh_service)).status == "enabled"
+        - (ssh_service_facts | community.general.json_query(ssh_jpq.ssh_service)).state == "running"
 
   when:
     - ssh is defined
@@ -166,8 +166,8 @@
 
     - name: Debug SSHD service status
       ansible.builtin.debug:
-        msg: "{{ ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service) }}"
-        # verbosity: 3
+        msg: "{{ ansible_facts | community.general.json_query(ssh_jpq.ssh_service) }}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Include ssh-audit tasks
       ansible.builtin.include_tasks: ssh_audit_info.yml
@@ -175,8 +175,8 @@
         ssh_audit_fail: false
         ssh_first_check: true
       when:
-        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).status == "enabled"
-        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).state == "running"
+        - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).status == "enabled"
+        - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state == "running"
         - ssh_audit_results is not defined
 
     - name: Include local OpenSSH client configuration tasks

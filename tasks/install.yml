@@ -33,7 +33,7 @@
         default_release: "{{ ansible_facts.distribution_release }}-backports"
         install_recommends: true
       register: ssh_install_backports
-      notify: Restart ssh
+      notify: Restart sshd
       when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
     - name: OpenSSH and related packages present
@@ -48,7 +48,7 @@
         state: present
         install_recommends: true
       register: ssh_install
-      notify: Restart ssh
+      notify: Restart sshd
 
     - name: Stat /lib/systemd/system/ssh.service
       ansible.builtin.stat:
@@ -62,7 +62,7 @@
 
     - name: OpenSSH enabled and started
       ansible.builtin.systemd_service:
-        name: ssh
+        name: sshd
         enabled: true
         state: started
       register: ssh_service

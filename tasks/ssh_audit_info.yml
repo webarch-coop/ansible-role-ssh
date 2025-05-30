@@ -12,10 +12,16 @@
   block:
 
     - name: Audit SSH to check for failures
-      ansible.builtin.command: "ssh-audit -n -l fail {{ ssh_localhost }}"
+      # ansible.builtin.command: "ssh-audit -n -l fail {{ ssh_localhost }}"
+      ansible.builtin.shell: "ssh-audit -j {{ ssh_localhost }}"
+      args:
+        executable: "{{ ansible_local.bash.path }}"
       check_mode: false
       changed_when: false
       register: ssh_audit_fail_check
+      until: ssh_audit_fail_check.rc == 1
+      retries: 10
+      delay: 2
       failed_when: ssh_audit_fail_check.rc is not regex('0|2|3')
 
     - name: Print the SSH audit failure results if there are any
@@ -29,10 +35,16 @@
       block:
 
         - name: Audit SSH to check informational results
-          ansible.builtin.command: "ssh-audit -n -l info {{ ssh_localhost }}"
+          # ansible.builtin.command: "ssh-audit -n -l info {{ ssh_localhost }}"
+          ansible.builtin.shell: "ssh-audit -j {{ ssh_localhost }}"
+          args:
+            executable: "{{ ansible_local.bash.path }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_info
+          until: ssh_audit_info.rc == 1
+          retries: 10
+          delay: 2
           failed_when:
             - not ssh_first_check | bool
             - ssh_audit_info.rc is not regex('0|2|3')
@@ -55,10 +67,16 @@
         - ssh_audit_fail_check.rc != 0
 
     - name: Audit SSH and generate JSON output
-      ansible.builtin.command: "ssh-audit -j {{ ssh_localhost }}"
+      # ansible.builtin.command: "ssh-audit -j {{ ssh_localhost }}"
+      ansible.builtin.shell: "ssh-audit -j {{ ssh_localhost }}"
+      args:
+        executable: "{{ ansible_local.bash.path }}"
       check_mode: false
       changed_when: false
       register: ssh_audit_json
+      until: ssh_audit_json.rc == 1
+      retries: 10
+      delay: 2
       failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
     - name: Set a fact for the SSH audit results

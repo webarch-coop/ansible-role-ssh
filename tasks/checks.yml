@@ -64,18 +64,17 @@
 
     - name: Check the runing services
       ansible.builtin.service_facts:
-      register: ssh_service_facts
 
     - name: Debug ssh service status
       ansible.builtin.debug:
-        msg: "{{ ssh_service_facts | community.general.json_query(ssh_jpq.service) }}"
+        msg: "{{ ansible_facts | community.general.json_query(ssh_jpq.ssh_service) }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Check that sshd is enabled and running
       ansible.builtin.assert:
         that:
-          - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).status == "enabled"
-          - (ssh_service_facts | community.general.json_query(ssh_jpq.service)).state == "running"
+          - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).status == "enabled"
+          - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state == "running"
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when:
         - ssh_check_fail | bool
