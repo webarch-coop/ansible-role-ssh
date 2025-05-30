@@ -112,6 +112,10 @@ argument_specs:
         type: bool
         required: true
         description: Fail when the ssh-audit policy check fails.
+      ssh_audit_timeout:
+        type: int
+        required: true
+        description: The ssh-audit timeout in seconds.
       ssh_authentication_methods:
         type: str
         required: true
