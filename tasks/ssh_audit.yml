@@ -11,6 +11,14 @@
 - name: SSH Audit
   block:
 
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Debug SSHD service status
+      ansible.builtin.debug:
+        msg: "{{ ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service) }}"
+        # verbosity: 3
+
     - name: Include ssh-audit info tasks
       ansible.builtin.include_tasks: ssh_audit_info.yml
 
