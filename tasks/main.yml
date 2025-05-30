@@ -174,7 +174,10 @@
       vars:
         ssh_audit_fail: false
         ssh_first_check: true
-      when: ssh_audit_results is not defined
+      when:
+        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).status == "enabled"
+        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).state == "running"
+        - ssh_audit_results is not defined
 
     - name: Include local OpenSSH client configuration tasks
       ansible.builtin.include_tasks: local_hosts.yml

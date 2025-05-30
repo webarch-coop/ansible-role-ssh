@@ -21,6 +21,9 @@
 
     - name: Include ssh-audit info tasks
       ansible.builtin.include_tasks: ssh_audit_info.yml
+      when:
+        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).status == "enabled"
+        - ansible_facts.services['ssh.service'] | community.general.json_query(ssh_jpq.service).state == "running"
 
     - name: SSH audit local policies present
       ansible.builtin.include_tasks: ssh_audit_policies.yml
