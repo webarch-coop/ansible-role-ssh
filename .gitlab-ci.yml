@@ -1,4 +1,4 @@
-# Copyright 2019-2024 Chris Croome
+# Copyright 2019-2025 Chris Croome
 #
 # This file is part of the Webarchitects OpenSSH Ansible role.
 #
@@ -18,6 +18,7 @@ variables:
   ANSIBLE_INJECT_FACT_VARS: "0"
   ANSIBLE_NOCOWS: "1"
   ANSIBLE_REMOTE_TMP: "/tmp"
+  ANSIBLE_ROLES_PATH: "${CI_PROJECT_DIR}/..:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles"
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
   DEBIAN_FRONTEND: noninteractive
   DEFAULT_MANAGED_STR: "Ansible managed"
@@ -42,24 +43,24 @@ stages:
   # - noble see #11
   # - trixie see #12
 bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20241008
+  image: registry.git.coop/webarch/containers/images/bookworm:20250527
   stage: bookworm
   script:
     - molecule test
 jammy:
-  image: registry.git.coop/webarch/containers/images/jammy:20241008
+  image: registry.git.coop/webarch/containers/images/jammy:20250527
   stage: jammy
   script:
     - molecule test
 # See #11
 # noble:
-#   image: registry.git.coop/webarch/containers/images/noble:20241008
+#   image: registry.git.coop/webarch/containers/images/noble:20250527
 #   stage: noble
 #   script:
 #     - molecule test
 # See #12
 # trixie:
-#   image: registry.git.coop/webarch/containers/images/trixie:20241008
+#   image: registry.git.coop/webarch/containers/images/trixie:20250527
 #   stage: trixie
 #   script:
 #     - pre-commit install
