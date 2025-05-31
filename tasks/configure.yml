@@ -45,6 +45,7 @@
             quiet: true
 
       when:
+        - ssh_audit | bool
         - ssh_init is defined
         - ssh_init == "systemd"
 

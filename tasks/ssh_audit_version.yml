@@ -55,6 +55,9 @@
 
       when: ssh_which_ssh_audit.rc == 0
 
+  when:
+    - ssh_audit is defined
+    - ssh_audit | bool
   tags:
     - ssh
     - ssh_audit

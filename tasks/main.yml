@@ -143,6 +143,8 @@
       vars:
         ssh_first_check: false
       when:
+        - ssh_audit is defined
+        - ssh_audit | bool
         - ssh_init is defined
         - ssh_init == "systemd"
         - ssh_listening_addresses is defined
@@ -175,6 +177,8 @@
         ssh_audit_fail: false
         ssh_first_check: true
       when:
+        - ssh_audit is defined
+        - ssh_audit | bool
         - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).status == "enabled"
         - (ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state == "running"
         - ssh_audit_results is not defined

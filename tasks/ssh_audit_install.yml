@@ -123,7 +123,10 @@
         - (ssh_audit_sig_get_url.state is defined) and (ssh_audit_sig_get_url.state == "file")
         - (ssh_audit_get_url.state is defined) and (ssh_audit_get_url.state == "file")
 
-  when: (ssh_audit_installed_version is not defined) or (ssh_audit_installed_version is version(ssh_audit_version_latest, '<'))
+  when:
+    - ssh_audit is defined
+    - ssh_audit | bool
+    - (ssh_audit_installed_version is not defined) or (ssh_audit_installed_version is version(ssh_audit_version_latest, '<'))
   tags:
     - ssh
     - ssh_audit

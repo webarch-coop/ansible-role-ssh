@@ -68,6 +68,9 @@
         ( ssh_audit_local_policy_present is not defined ) or
         ( not ssh_audit_local_policy_present | bool )
 
+  when:
+    - ssh_audit is defined
+    - ssh_audit | bool
   tags:
     - ssh
     - ssh_audit

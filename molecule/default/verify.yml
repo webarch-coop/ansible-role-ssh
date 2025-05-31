@@ -136,7 +136,7 @@
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
             fail_msg:
               - "The ssh-audit policy check failed, you can check manually using the following command"
-              - "ssh-audit -nP '{{ molecule_ssh_audit_local_policy_file }}' {{ molecule_ssh_localhost }}"
+              - "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP '{{ molecule_ssh_audit_local_policy_file }}' {{ molecule_ssh_localhost }}"
           when: molecule_ssh_audit_local_policy_result is defined
 
       when:
@@ -225,7 +225,7 @@
           block:
 
             - name: SSH profile audit human readable output
-              ansible.builtin.command: "ssh-audit -nP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
+              ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
               check_mode: false
               changed_when: false
               register: molecule_ssh_audit_policy

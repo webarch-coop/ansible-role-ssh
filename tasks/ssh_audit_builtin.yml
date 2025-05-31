@@ -102,7 +102,7 @@
       block:
 
         - name: SSH profile audit human readable output
-          ansible.builtin.command: "ssh-audit -nP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
+          ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_policy_human
@@ -123,12 +123,15 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg:
           - "The ssh-audit policy check failed, you can check manually using the following command"
-          - "ssh-audit -nP '{{ ssh_audit_policy }}' {{ ssh_localhost }}"
+          - "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP '{{ ssh_audit_policy }}' {{ ssh_localhost }}"
       when:
         - ssh_first_check is defined
         - not ssh_first_check | bool
         - ssh_audit_policy_result is defined
 
+  when:
+    - ssh_audit is defined
+    - ssh_audit | bool
   tags:
     - ssh
     - ssh_audit

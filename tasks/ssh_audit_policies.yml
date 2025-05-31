@@ -51,6 +51,9 @@
         - ssh_audit_local_policy.state is defined
         - ssh_audit_local_policy.state == "present"
 
+  when:
+    - ssh_audit is defined
+    - ssh_sudit | bool
   tags:
     - ssh_audit
     - ssh
