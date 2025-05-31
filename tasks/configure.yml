@@ -15,13 +15,13 @@
       block:
 
         - name: Audit SSH and generate JSON output
-          ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -j -v {{ ssh_localhost }}"
+          ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_json
-          until: ssh_audit_json.rc == 1
-          retries: 10
-          delay: 2
+          # until: ssh_audit_json.rc == 1
+          # retries: 10
+          # delay: 2
           failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
         - name: Set a fact for the SSH audit results
