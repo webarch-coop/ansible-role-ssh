@@ -33,7 +33,7 @@
         name: ssh
       vars:  # noqa var-naming[no-role-prefix]
         ssh: true
-        ssh_audit: true
+        ssh_audit: false
         ssh_localhost: "{{ ansible_facts.default_ipv4.address }}"
         ssh_audit_local_policy_file: "/usr/local/share/ssh-audit/policies/{{ ansible_facts.distribution_release }}.txt"
 ...
