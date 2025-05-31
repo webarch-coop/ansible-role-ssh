@@ -20,7 +20,7 @@ ssh_audit: true
 ssh_audit_fail: true
 
 # Timeout for ssh-audit in seconds
-ssh_audit_timeout: 30
+ssh_audit_timeout: 60
 
 # A local SSH audit policy will be used if the ansible_facts.distribution_release is in the ssh_audit_local_policies list and a file exists in files/policies named ansible_facts.distribution_release plus a .txt extension
 ssh_audit_local_policies:
