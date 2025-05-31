@@ -79,174 +79,180 @@
         var: molecule_ssh_listening
         verbosity: 1
 
-    - name: Check if the specified local SSH audit policy file is present
-      ansible.builtin.stat:
-        path: "/usr/local/share/ssh-audit/policies/{{ ansible_facts.distribution_release }}.txt"
-      register: molecule_ssh_audit_local_policy_file_path
-
-    - name: Debug molecule_ssh_audit_local_policy_file_path
-      ansible.builtin.debug:
-        var: molecule_ssh_audit_local_policy_file_path
-        verbosity: 1
-
-    - name: Set a fact for the local SSH audit policy file
-      ansible.builtin.set_fact:
-        molecule_ssh_audit_local_policy_present: true
-      when:
-        - molecule_ssh_audit_local_policy_file_path is defined
-        - molecule_ssh_audit_local_policy_file_path.stat is defined
-        - molecule_ssh_audit_local_policy_file_path.stat.exists is defined
-        - molecule_ssh_audit_local_policy_file_path.stat.exists | bool
-
-    - name: Debug molecule_ssh_audit_local_policy_present
-      ansible.builtin.debug:
-        var: molecule_ssh_audit_local_policy_present
-        verbosity: 1
-
-    - name: Local SSH policy audit
+    - name: Run ssh-audit tasks
       block:
 
-        - name: SSH local policy audit with JSON output
-          ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_local_policy_file | quote }} {{ ansible_facts.default_ipv4.address }}"
-          check_mode: false
-          changed_when: false
-          register: molecule_ssh_audit_local_policy_json
-          failed_when: molecule_ssh_audit_local_policy_json.rc is not ansible.builtin.regex('^0|3$')
+        - name: Check if the specified local SSH audit policy file is present
+          ansible.builtin.stat:
+            path: "/usr/local/share/ssh-audit/policies/{{ ansible_facts.distribution_release }}.txt"
+          register: molecule_ssh_audit_local_policy_file_path
+
+        - name: Debug molecule_ssh_audit_local_policy_file_path
+          ansible.builtin.debug:
+            var: molecule_ssh_audit_local_policy_file_path
+            verbosity: 1
+
+        - name: Set a fact for the local SSH audit policy file
+          ansible.builtin.set_fact:
+            molecule_ssh_audit_local_policy_present: true
           when:
-            - molecule_ssh_audit_local_policy_file is defined
-            - molecule_ssh_audit_local_policy_file | length > 0
+            - molecule_ssh_audit_local_policy_file_path is defined
+            - molecule_ssh_audit_local_policy_file_path.stat is defined
+            - molecule_ssh_audit_local_policy_file_path.stat.exists is defined
+            - molecule_ssh_audit_local_policy_file_path.stat.exists | bool
 
-        - name: Set a fact for the results of the SSH policy audit
-          ansible.builtin.set_fact:
-            molecule_ssh_audit_local_policy_result: "{{ molecule_ssh_audit_local_policy_json.stdout_lines[0] | ansible.builtin.from_json }}"
-          when:
-            - molecule_ssh_audit_local_policy_json is defined
-            - molecule_ssh_audit_local_policy_json.stdout_lines is defined
-
-        - name: Debug the SSH policy audit errors
+        - name: Debug molecule_ssh_audit_local_policy_present
           ansible.builtin.debug:
-            var: molecule_ssh_audit_local_policy_result.errors
-            verbosity: 2
-          when: molecule_ssh_audit_local_policy_result.errors is defined
+            var: molecule_ssh_audit_local_policy_present
+            verbosity: 1
 
-        - name: Ensure that the SSH policy audit passed
-          ansible.builtin.assert:
-            that:
-              - molecule_ssh_audit_local_policy_result.passed | bool
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-            fail_msg:
-              - "The ssh-audit policy check failed, you can check manually using the following command"
-              - "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP '{{ molecule_ssh_audit_local_policy_file }}' {{ molecule_ssh_localhost }}"
-          when: molecule_ssh_audit_local_policy_result is defined
-
-      when:
-        - molecule_ssh_audit_local_policy_present is defined
-        - molecule_ssh_audit_local_policy_present | bool
-
-    - name: Builtin SSH policy audit
-      block:
-
-        - name: Get a list of the ssh-audit server policies
-          ansible.builtin.command: ssh-audit -nL
-          check_mode: false
-          changed_when: false
-          register: molecule_ssh_audit_policy_list
-
-        - name: Set a fact for the available server policies
-          ansible.builtin.set_fact:
-            molecule_ssh_audit_policies: "{{ molecule_ssh_audit_policy_list.stdout_lines | select('regex', '^.*[ ]Server.*$') | map('regex_replace', '^[ ][ ][*][ ].{1}') | map('regex_replace', '.{1}$') }}"
-
-        - name: Debug available server policies
-          ansible.builtin.debug:
-            var: molecule_ssh_audit_policies
-            verbosity: 2
-
-        - name: Ubuntu SSH policy config
+        - name: Local SSH policy audit
           block:
 
-            - name: Debug SSH audit policy regex
-              ansible.builtin.debug:
-                var: molecule_ssh_audit_ubuntu_policy_regex
-                verbosity: 2
-              vars:
-                molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
-
-            - name: Set a fact for the SSH audit policy to use for Ubuntu
-              ansible.builtin.set_fact:
-                molecule_ssh_audit_policy: "{{ molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') }}"
-              vars:
-                molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
-              when:
-                - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | type_debug == "list"
-                - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | type_debug != []
-                - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') | length > 0
-
-          when: ansible_facts.distribution == "Ubuntu"
-
-        - name: OpenSSH policy audit config
-          block:
-
-            - name: Debug SSH audit policy regex
-              ansible.builtin.debug:
-                var: molecule_ssh_audit_openssh_policy_regex
-                verbosity: 2
-              vars:
-                molecule_ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ molecule_ssh_version }}"
-
-            - name: Set a fact for the SSH audit policy to use for OpenSSH
-              ansible.builtin.set_fact:
-                molecule_ssh_audit_policy: "{{ molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') }}"
-              vars:
-                molecule_ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ molecule_ssh_version }}"
-              when:
-                - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | type_debug == "list"
-                - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | type_debug != []
-                - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
-
-          when: ansible_facts.distribution != "Ubuntu"
-
-        - name: SSH version audit
-          ansible.builtin.command: "ssh-audit -njP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
-          check_mode: false
-          changed_when: false
-          register: molecule_ssh_audit_policy_json
-          failed_when: molecule_ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
-
-        - name: Set a fact for the results of the SSH policy audit
-          ansible.builtin.set_fact:
-            molecule_ssh_audit_policy_result: "{{ molecule_ssh_audit_policy_json.stdout_lines[0] | ansible.builtin.from_json }}"
-
-        - name: Debug the results of the SSH policy audit
-          ansible.builtin.debug:
-            var: molecule_ssh_audit_policy_result
-            verbosity: 2
-
-        - name: Debug SSH policy audit failure
-          block:
-
-            - name: SSH profile audit human readable output
-              ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
+            - name: SSH local policy audit with JSON output
+              ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_local_policy_file | quote }} {{ ansible_facts.default_ipv4.address }}"
               check_mode: false
               changed_when: false
-              register: molecule_ssh_audit_policy
-              failed_when: molecule_ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
+              register: molecule_ssh_audit_local_policy_json
+              failed_when: molecule_ssh_audit_local_policy_json.rc is not ansible.builtin.regex('^0|3$')
+              when:
+                - molecule_ssh_audit_local_policy_file is defined
+                - molecule_ssh_audit_local_policy_file | length > 0
 
-            - name: Debug the SSH profile audit human readable output
+            - name: Set a fact for the results of the SSH policy audit
+              ansible.builtin.set_fact:
+                molecule_ssh_audit_local_policy_result: "{{ molecule_ssh_audit_local_policy_json.stdout_lines[0] | ansible.builtin.from_json }}"
+              when:
+                - molecule_ssh_audit_local_policy_json is defined
+                - molecule_ssh_audit_local_policy_json.stdout_lines is defined
+
+            - name: Debug the SSH policy audit errors
               ansible.builtin.debug:
-                var: molecule_ssh_audit_policy.stdout_lines
+                var: molecule_ssh_audit_local_policy_result.errors
+                verbosity: 2
+              when: molecule_ssh_audit_local_policy_result.errors is defined
+
+            - name: Ensure that the SSH policy audit passed
+              ansible.builtin.assert:
+                that:
+                  - molecule_ssh_audit_local_policy_result.passed | bool
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+                fail_msg:
+                  - "The ssh-audit policy check failed, you can check manually using the following command"
+                  - "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP '{{ molecule_ssh_audit_local_policy_file }}' {{ molecule_ssh_localhost }}"
+              when: molecule_ssh_audit_local_policy_result is defined
 
           when:
-            - molecule_ssh_audit_policy_result is defined
-            - not molecule_ssh_audit_policy_result.passed | bool
+            - molecule_ssh_audit_local_policy_present is defined
+            - molecule_ssh_audit_local_policy_present | bool
 
-        - name: Check that the SSH policy audit passed
-          ansible.builtin.assert:
-            that:
-              - molecule_ssh_audit_policy_result.passed | bool
-            quiet: true
+        - name: Builtin SSH policy audit
+          block:
 
-      when: >-
-        ( ( ssh_audit is defined ) and ( ssh_audit | bool ) ) and
-        ( molecule_ssh_audit_local_policy_present is not defined ) or
-        ( not molecule_ssh_audit_local_policy_present | bool )
+            - name: Get a list of the ssh-audit server policies
+              ansible.builtin.command: ssh-audit -nL
+              check_mode: false
+              changed_when: false
+              register: molecule_ssh_audit_policy_list
+
+            - name: Set a fact for the available server policies
+              ansible.builtin.set_fact:
+                molecule_ssh_audit_policies: "{{ molecule_ssh_audit_policy_list.stdout_lines | select('regex', '^.*[ ]Server.*$') | map('regex_replace', '^[ ][ ][*][ ].{1}') | map('regex_replace', '.{1}$') }}"
+
+            - name: Debug available server policies
+              ansible.builtin.debug:
+                var: molecule_ssh_audit_policies
+                verbosity: 2
+
+            - name: Ubuntu SSH policy config
+              block:
+
+                - name: Debug SSH audit policy regex
+                  ansible.builtin.debug:
+                    var: molecule_ssh_audit_ubuntu_policy_regex
+                    verbosity: 2
+                  vars:
+                    molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
+
+                - name: Set a fact for the SSH audit policy to use for Ubuntu
+                  ansible.builtin.set_fact:
+                    molecule_ssh_audit_policy: "{{ molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') }}"
+                  vars:
+                    molecule_ssh_audit_ubuntu_policy_regex: "^Hardened Ubuntu Server {{ ansible_facts.distribution_version }} LTS"
+                  when:
+                    - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | type_debug == "list"
+                    - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | type_debug != []
+                    - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_ubuntu_policy_regex) | community.general.json_query('[0]') | length > 0
+
+              when: ansible_facts.distribution == "Ubuntu"
+
+            - name: OpenSSH policy audit config
+              block:
+
+                - name: Debug SSH audit policy regex
+                  ansible.builtin.debug:
+                    var: molecule_ssh_audit_openssh_policy_regex
+                    verbosity: 2
+                  vars:
+                    molecule_ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ molecule_ssh_version }}"
+
+                - name: Set a fact for the SSH audit policy to use for OpenSSH
+                  ansible.builtin.set_fact:
+                    molecule_ssh_audit_policy: "{{ molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') }}"
+                  vars:
+                    molecule_ssh_audit_openssh_policy_regex: "^Hardened OpenSSH Server v{{ molecule_ssh_version }}"
+                  when:
+                    - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | type_debug == "list"
+                    - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | type_debug != []
+                    - molecule_ssh_audit_policies | select('regex', molecule_ssh_audit_openssh_policy_regex) | community.general.json_query('[0]') | length > 0
+
+              when: ansible_facts.distribution != "Ubuntu"
+
+            - name: SSH version audit
+              ansible.builtin.command: "ssh-audit -njP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
+              check_mode: false
+              changed_when: false
+              register: molecule_ssh_audit_policy_json
+              failed_when: molecule_ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
+
+            - name: Set a fact for the results of the SSH policy audit
+              ansible.builtin.set_fact:
+                molecule_ssh_audit_policy_result: "{{ molecule_ssh_audit_policy_json.stdout_lines[0] | ansible.builtin.from_json }}"
+
+            - name: Debug the results of the SSH policy audit
+              ansible.builtin.debug:
+                var: molecule_ssh_audit_policy_result
+                verbosity: 2
+
+            - name: Debug SSH policy audit failure
+              block:
+
+                - name: SSH profile audit human readable output
+                  ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ molecule_ssh_audit_policy | quote }} {{ ansible_facts.default_ipv4.address }}"
+                  check_mode: false
+                  changed_when: false
+                  register: molecule_ssh_audit_policy
+                  failed_when: molecule_ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
+
+                - name: Debug the SSH profile audit human readable output
+                  ansible.builtin.debug:
+                    var: molecule_ssh_audit_policy.stdout_lines
+
+              when:
+                - molecule_ssh_audit_policy_result is defined
+                - not molecule_ssh_audit_policy_result.passed | bool
+
+            - name: Check that the SSH policy audit passed
+              ansible.builtin.assert:
+                that:
+                  - molecule_ssh_audit_policy_result.passed | bool
+                quiet: true
+
+          when: >-
+            ( molecule_ssh_audit_local_policy_present is not defined ) or
+            ( not molecule_ssh_audit_local_policy_present | bool )
+
+      when:
+        - ssh_audit is defined
+        - ssh_audit | bool
 ...

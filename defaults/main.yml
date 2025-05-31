@@ -13,8 +13,8 @@
 # Set ssh to true for the tasks in this role to be run
 ssh: false
 
-# Set ssh_audit to false to skip SSH auditing tasks
-ssh_audit: true
+# Set ssh_audit to true to run SSH auditing tasks
+ssh_audit: false
 
 # Set ssh_audit_fail to false to skip failing when config pass the ssh-audit policy
 ssh_audit_fail: true
