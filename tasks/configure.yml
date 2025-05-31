@@ -15,10 +15,7 @@
       block:
 
         - name: Audit SSH and generate JSON output
-          # ansible.builtin.command: "ssh-audit -j {{ ssh_localhost }}"
-          ansible.builtin.shell: "ssh-audit --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
-          args:
-            executable: "{{ ansible_local.bash.path }}"
+          ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_json

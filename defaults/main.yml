@@ -218,7 +218,7 @@ ssh_local_hosts_readme_host: |
   {{ ssh_audit_results.fingerprints | to_nice_yaml }}
   {% endif %}
   ```
-  The above YAML can generated using `ssh-audit -j {{ ssh_local_hosts_hostname }} | jq .fingerprints | yq -P`
+  The above YAML can generated using `ssh-audit --skip-rate-test -j {{ ssh_local_hosts_hostname }} | jq .fingerprints | yq -P`
 
 # https://man.openbsd.org/sshd_config#MACs
 ssh_macs:
