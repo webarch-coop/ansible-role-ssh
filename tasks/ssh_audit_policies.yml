@@ -53,7 +53,7 @@
 
   when:
     - ssh_audit is defined
-    - ssh_sudit | bool
+    - ssh_audit | bool
   tags:
     - ssh_audit
     - ssh
