@@ -14,7 +14,7 @@
 ssh: false
 
 # Set ssh_audit to true to run SSH auditing tasks
-ssh_audit: false
+ssh_audit: true
 
 # Set ssh_audit_fail to false to skip failing when config pass the ssh-audit policy
 ssh_audit_fail: true
