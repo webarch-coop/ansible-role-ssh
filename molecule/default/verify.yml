@@ -249,8 +249,8 @@
                 quiet: true
 
           when: >-
-            ( molecule_ssh_audit_local_policy_present is not defined ) or
-            ( not molecule_ssh_audit_local_policy_present | bool )
+            (molecule_ssh_audit_local_policy_present is not defined) or
+            (not molecule_ssh_audit_local_policy_present | bool)
 
       when:
         - ssh_audit is defined

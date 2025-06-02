@@ -19,6 +19,9 @@ ssh_audit: true
 # Set ssh_audit_fail to false to skip failing when config pass the ssh-audit policy
 ssh_audit_fail: true
 
+# Options to pass to ssh-audit
+ssh_audit_options: "-d --no-colors --skip-rate-test --timeout={{ ssh_audit_timeout }}"
+
 # Timeout for ssh-audit in seconds
 ssh_audit_timeout: 60
 
