@@ -12,7 +12,7 @@
   block:
 
     - name: SSH local policy audit with JSON output
-      ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_local_policy_file | quote }} {{ ssh_localhost }}"
+      ansible.builtin.command: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -njP {{ ssh_audit_local_policy_file | quote }} {{ ssh_localhost }}"
       check_mode: false
       changed_when: false
       register: ssh_audit_local_policy_json
@@ -23,7 +23,7 @@
 
     - name: Set a fact for the results of the SSH policy audit
       ansible.builtin.set_fact:
-        ssh_audit_local_policy_result: "{{ ssh_audit_local_policy_json.stdout_lines[0] | ansible.builtin.from_json }}"
+        ssh_audit_local_policy_result: "{{ ssh_audit_local_policy_json.stdout_lines[-1] | ansible.builtin.from_json }}"
       when:
         - ssh_audit_local_policy_json is defined
         - ssh_audit_local_policy_json.stdout_lines is defined
@@ -38,7 +38,7 @@
       block:
 
         - name: SSH profile audit human readable output
-          ansible.builtin.command: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ ssh_audit_local_policy_file | quote }} {{ ssh_localhost }}"
+          ansible.builtin.command: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ ssh_audit_local_policy_file | quote }} {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_local_policy_human
