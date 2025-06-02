@@ -25,13 +25,13 @@
       ansible.builtin.debug:
         msg:
           - "Location: {{ ssh_audit_headers.location }}"
-          - "Path: {{ ssh_audit_headers.location | urlsplit('path') }}"
-          - "Version: {{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+          - "Path: {{ ssh_audit_headers.location | ansible.builtin.urlsplit('path') }}"
+          - "Version: {{ ssh_audit_headers.location | ansible.builtin.urlsplit('path') | ansible.builtin.basename | ansible.builtin.regex_replace('^v') }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Set a fact for the latest version of ssh-audit
       ansible.builtin.set_fact:
-        ssh_audit_version_latest: "{{ ssh_audit_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+        ssh_audit_version_latest: "{{ ssh_audit_headers.location | ansible.builtin.urlsplit('path') | ansible.builtin.basename | ansible.builtin.regex_replace('^v') }}"
 
     - name: Check if ssh-audit is installed
       ansible.builtin.command: which ssh-audit

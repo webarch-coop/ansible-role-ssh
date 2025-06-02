@@ -8,70 +8,110 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Run ssh-audit for fail and info results
+- name: Run ssh-audit
   block:
 
-    - name: Run ssh-audit to check for failure
+    # - name: Run ssh-audit to check for failure
+    #   block:
+
+    #     - name: Audit SSH to check for failures
+    #       ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} {{ ssh_localhost }}"
+    #       check_mode: false
+    #       changed_when: false
+    #       register: ssh_audit_fail_check
+    #       failed_when: ssh_audit_fail_check.rc is not regex('0|2|3')
+
+    #   rescue:
+
+    #     - name: Print the SSH audit failure stdout
+    #       ansible.builtin.debug:
+    #         var: ssh_audit_fail_check.stdout_lines
+
+    #     - name: Print the SSH audit failure stderr
+    #       ansible.builtin.debug:
+    #         var: ssh_audit_fail_check.stderr_lines
+
+    #     - name: Check port 22
+    #       ansible.builtin.command: "nc -w 10 -q 1 {{ ssh_localhost }} 22"
+    #       check_mode: false
+    #       changed_when: false
+    #       register: ssh_nc
+
+    #     - name: Print the SSH port check result
+    #       ansible.builtin.debug:
+    #         var: ssh_nc
+
+    #     - name: Fail as ssh-audit failed
+    #       ansible.builtin.fail:
+
+    #   when:
+    #     - ssh_check_fail is defined
+    #     - ssh_check_fail | bool
+
+    # - name: Run SSH audit for info results
+    #   block:
+
+    #     - name: Audit SSH to check informational results
+    #       ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} {{ ssh_localhost }}"
+    #       check_mode: false
+    #       changed_when: false
+    #       register: ssh_audit_info
+    #       failed_when:
+    #         - ssh_first_check is defined
+    #         - not ssh_first_check | bool
+    #         - ssh_audit_info.rc is not regex('0|2|3')
+
+    #   rescue:
+
+    #     - name: Print the SSH audit failure stdout
+    #       ansible.builtin.debug:
+    #         var: ssh_audit_info.stdout_lines
+
+    #     - name: Print the SSH audit failure stderr
+    #       ansible.builtin.debug:
+    #         var: ssh_audit_info.stderr_lines
+
+    #     - name: Check port 22
+    #       ansible.builtin.command: "nc -w 10 -q 1 {{ ssh_localhost }} 22"
+    #       check_mode: false
+    #       changed_when: false
+    #       register: ssh_nc
+
+    #     - name: Print the SSH port check result
+    #       ansible.builtin.debug:
+    #         var: ssh_nc
+
+    #     - name: Fail due to ssh-audit results
+    #       ansible.builtin.fail:
+    #         msg:
+    #           - "ssh-audit failed with the above results"
+    #       when:
+    #         - ssh_check_fail is defined
+    #         - ssh_check_fail | bool
+
+
+    - name: Run ssh-audit and output JSON
       block:
 
-        - name: Audit SSH to check for failures
-          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} {{ ssh_localhost }}"
+        - name: Audit SSH and generate JSON output
+          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
-          register: ssh_audit_fail_check
-          failed_when: ssh_audit_fail_check.rc is not regex('0|1|2|3')
-
-      rescue:
-
-        - name: Print the SSH audit failure stdout
-          ansible.builtin.debug:
-            var: ssh_audit_fail_check.stdout_lines
-
-        - name: Print the SSH audit failure stderr
-          ansible.builtin.debug:
-            var: ssh_audit_fail_check.stderr_lines
-
-        - name: Check port 22
-          ansible.builtin.command: "nc -w 10 -q 1 {{ ssh_localhost }} 22"
-          check_mode: false
-          changed_when: false
-          register: ssh_nc
-
-        - name: Print the SSH port check result
-          ansible.builtin.debug:
-            var: ssh_nc
-
-        - name: Fail as ssh-audit failed and ssh_audit_fail is true
-          ansible.builtin.fail:
-          when:
-            - ssh_check_fail is defined
-            - ssh_check_fail | bool
-            - ssh_audit_fail_check.rc != 0
-
-    - name: Run SSH audit for info results
-      block:
-
-        - name: Audit SSH to check informational results
-          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} {{ ssh_localhost }}"
-          check_mode: false
-          changed_when: false
-          register: ssh_audit_info
-          until: ssh_audit_info.rc == 1
+          register: ssh_audit_json
+          until: ssh_audit_json.rc == 1
           retries: 2
           delay: 2
-          failed_when:
-            - not ssh_first_check | bool
-            - ssh_audit_info.rc is not regex('0|2|3')
+          failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
       rescue:
 
         - name: Print the SSH audit failure stdout
           ansible.builtin.debug:
-            var: ssh_audit_info.stdout_lines
+            var: ssh_audit_json.stdout_lines
 
         - name: Print the SSH audit failure stderr
           ansible.builtin.debug:
-            var: ssh_audit_info.stderr_lines
+            var: ssh_audit_json.stderr_lines
 
         - name: Check port 22
           ansible.builtin.command: "nc -w 10 -q 1 {{ ssh_localhost }} 22"
@@ -83,23 +123,8 @@
           ansible.builtin.debug:
             var: ssh_nc
 
-        - name: Fail due to ssh-audit results
+        - name: Fail due to ssh-audit failing
           ansible.builtin.fail:
-            msg:
-              - "ssh-audit failed with the above results"
-          when:
-            - ssh_check_fail | bool
-            - ssh_audit_fail_check.rc != 0
-
-    - name: Audit SSH and generate JSON output
-      ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_localhost }}"
-      check_mode: false
-      changed_when: false
-      register: ssh_audit_json
-      until: ssh_audit_json.rc == 1
-      retries: 2
-      delay: 2
-      failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
     - name: Set a fact for the SSH audit results
       ansible.builtin.set_fact:
