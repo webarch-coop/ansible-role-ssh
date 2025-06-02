@@ -15,7 +15,7 @@
       block:
 
         - name: Audit SSH to check for failures
-          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_localhost }}"
+          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_fail_check
@@ -48,17 +48,11 @@
             - ssh_check_fail | bool
             - ssh_audit_fail_check.rc != 0
 
-      when:
-        - ssh_first_check is defined
-        - not ssh_first_check | bool
-        - ssh_audit_fail_check.rc != 0
-        - ssh_audit_fail_check.stdout_lines is defined
-
     - name: Run SSH audit for info results
       block:
 
         - name: Audit SSH to check informational results
-          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_localhost }}"
+          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_info
@@ -89,30 +83,22 @@
           ansible.builtin.debug:
             var: ssh_nc
 
-        - name: Fail as ssh-audit failed and ssh_audit_fail is true
+        - name: Fail due to ssh-audit results
           ansible.builtin.fail:
-
-      when:
-        - ssh_check_fail | bool
-        - ssh_audit_fail_check.rc != 0
-
-    - name: Fail due to ssh-audit results
-      ansible.builtin.fail:
-        msg:
-          - "ssh-audit failed with the above results"
-      when:
-        - not ssh_first_check | bool
-        - ssh_check_fail | bool
-        - ssh_audit_fail_check.rc != 0
+            msg:
+              - "ssh-audit failed with the above results"
+          when:
+            - ssh_check_fail | bool
+            - ssh_audit_fail_check.rc != 0
 
     - name: Audit SSH and generate JSON output
-      ansible.builtin.command: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
+      ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_localhost }}"
       check_mode: false
       changed_when: false
       register: ssh_audit_json
-      # until: ssh_audit_json.rc == 1
-      # retries: 10
-      # delay: 2
+      until: ssh_audit_json.rc == 1
+      retries: 2
+      delay: 2
       failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
     - name: Set a fact for the SSH audit results
