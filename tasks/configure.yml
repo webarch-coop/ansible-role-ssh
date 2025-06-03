@@ -29,15 +29,30 @@
 
           rescue:
 
-            - name: Check port 22
-              ansible.builtin.command: "nc -w 10 -q 1 {{ ssh_localhost }} 22"
-              check_mode: false
-              changed_when: false
-              register: ssh_nc
+            - name: Gather facts on listening ports
+              community.general.listen_ports_facts:
 
-            - name: Print the SSH port check result
+            - name: Debug TCP ports
               ansible.builtin.debug:
-                var: ssh_nc
+                var: ansible_facts.tcp_listen
+
+            - name: Set facts for the addresses and ports that SSH is listening on and the active ports SSH is not listening on
+              ansible.builtin.set_fact:
+                ssh_listening_addresses: "{{ ansible_facts.tcp_listen | community.general.json_query(ssh_jpq.listening_addresses) | unique | sort }}"
+                ssh_listening_ports: "{{ ansible_facts.tcp_listen | community.general.json_query(ssh_jpq.listening_ports) | unique | sort }}"
+                ssh_not_listening_ports: "{{ ansible_facts.tcp_listen | community.general.json_query(ssh_jpq.not_listening_ports) | unique | sort }}"
+
+            - name: Debug SSH listening addresses
+              ansible.builtin.debug:
+                var: ssh_listening_addresses
+
+            - name: Debug SSH listening ports
+              ansible.builtin.debug:
+                var: ssh_listening_ports
+
+            - name: Debug SSH not listening ports
+              ansible.builtin.debug:
+                var: ssh_not_listening_ports
 
             - name: Fail
               ansible.builtin.fail:
