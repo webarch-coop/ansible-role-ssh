@@ -98,9 +98,9 @@
           check_mode: false
           changed_when: false
           register: ssh_audit_json
-          until: ssh_audit_json.rc == 1
-          retries: 2
-          delay: 2
+          # until: ssh_audit_json.rc == 1
+          # retries: 2
+          # delay: 2
           failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
       rescue:

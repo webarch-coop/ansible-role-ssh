@@ -53,7 +53,9 @@
     - name: Debug ssh_audit_local_policy_present
       ansible.builtin.debug:
         var: ssh_audit_local_policy_present
-        verbosity: 1
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Include ssh-audit local policy tasks
       ansible.builtin.include_tasks: ssh_audit_local.yml

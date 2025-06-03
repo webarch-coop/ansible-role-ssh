@@ -76,11 +76,38 @@
         - ssh_audit_policies != []
 
     - name: SSH profile audit JSON output
-      ansible.builtin.command: "ssh-audit -njP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
-      check_mode: false
-      changed_when: false
-      register: ssh_audit_policy_json
-      failed_when: ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
+      block:
+
+        - name: SSH profile audit JSON output
+          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j -P {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
+          check_mode: false
+          changed_when: false
+          register: ssh_audit_policy_json
+          failed_when: ssh_audit_policy_json.rc is not ansible.builtin.regex('^0|3$')
+
+      rescue:
+
+        - name: Print the SSH audit failure stdout
+          ansible.builtin.debug:
+            var: ssh_audit_policy_json.stdout_lines
+
+        - name: Print the SSH audit failure stderr
+          ansible.builtin.debug:
+            var: ssh_audit_policy_json.stderr_lines
+
+        - name: Check port 22
+          ansible.builtin.command: "nc -w 10 -q 1 {{ ssh_localhost }} 22"
+          check_mode: false
+          changed_when: false
+          register: ssh_nc
+
+        - name: Print the SSH port check result
+          ansible.builtin.debug:
+            var: ssh_nc
+
+        - name: Fail due to ssh-audit failing
+          ansible.builtin.fail:
+
       when:
         - ssh_audit_policy is defined
         - ssh_audit_policy | length > 0
@@ -98,23 +125,23 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_audit_policy_result.errors is defined
 
-    - name: Debug SSH policy audit failure
-      block:
+    # - name: Debug SSH policy audit failure
+    #   block:
 
-        - name: SSH profile audit human readable output
-          ansible.builtin.command: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
-          check_mode: false
-          changed_when: false
-          register: ssh_audit_policy_human
-          failed_when: ssh_audit_policy_human.rc is not ansible.builtin.regex('^0|3$')
+    #     - name: SSH profile audit human readable output
+    #       ansible.builtin.command: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
+    #       check_mode: false
+    #       changed_when: false
+    #       register: ssh_audit_policy_human
+    #       failed_when: ssh_audit_policy_human.rc is not ansible.builtin.regex('^0|3$')
 
-        - name: Debug the SSH profile audit human readable output
-          ansible.builtin.debug:
-            var: ssh_audit_policy_human.stdout_lines
+    #     - name: Debug the SSH profile audit human readable output
+    #       ansible.builtin.debug:
+    #         var: ssh_audit_policy_human.stdout_lines
 
-      when:
-        - ssh_audit_policy_result is defined
-        - not ssh_audit_policy_result.passed | bool
+    #   when:
+    #     - ssh_audit_policy_result is defined
+    #     - not ssh_audit_policy_result.passed | bool
 
     - name: Ensure that the SSH policy audit passed
       ansible.builtin.assert:
