@@ -16,16 +16,16 @@
   tags:
     - ssh
 
-- name: Ensure OpenSSH is running
-  ansible.builtin.service_facts:
-  until: >-
-    (((ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state is defined) and
-    ((ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state == "running")) or
-    (((ansible_facts | community.general.json_query(ssh_jpq.sshd_service)).state is defined) and
-    ((ansible_facts | community.general.json_query(ssh_jpq.sshd_service)).state == "running"))
-  retries: 4
-  delay: 2
-  listen: Restart ssh
-  tags:
-    - ssh
+# - name: Ensure OpenSSH is running
+#   ansible.builtin.service_facts:
+#   until: >-
+#     (((ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state is defined) and
+#     ((ansible_facts | community.general.json_query(ssh_jpq.ssh_service)).state == "running")) or
+#     (((ansible_facts | community.general.json_query(ssh_jpq.sshd_service)).state is defined) and
+#     ((ansible_facts | community.general.json_query(ssh_jpq.sshd_service)).state == "running"))
+#   retries: 4
+#   delay: 2
+#   listen: Restart ssh
+#   tags:
+#     - ssh
 ...
