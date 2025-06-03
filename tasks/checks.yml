@@ -729,6 +729,7 @@
             that:
               - ssh_port not in ssh_not_listening_ports
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: "ssh_not_listening_ports are {{ ssh_not_listening_ports | join(', ') }} and the ssh_ports are {{ ssh_ports | join(', ') }}."
           loop: "{{ ssh_ports }}"
           loop_control:
             loop_var: ssh_port
@@ -742,6 +743,7 @@
             that:
               - ssh_listening_ports == ssh_ports | sort
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: "ssh_listening_ports is {{ ssh_listening_ports | join(', ') }} and the ssh_ports are {{ ssh_ports | join(', ') }}."
           when:
             - ssh_check_fail | bool
             - ssh_first_check is defined
