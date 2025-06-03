@@ -41,20 +41,6 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_keyscan_command.stdout_lines is defined
 
-    # - name: Set a fact for the sorted key scan result
-    #   ansible.builtin.set_fact:
-    #     ssh_keyscan_results: |
-    #       {% for line in ssh_keyscan_command.stdout_lines | sort %}
-    #       {{ line }}
-    #       {% endfor %}
-    #   when: ssh_keyscan_command.stdout_lines is defined
-
-    # - name: Debug the sorted key scan result
-    #   ansible.builtin.debug:
-    #     var: ssh_keyscan_results
-    #     verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-    #   when: (ssh_keyscan_results is defined) and (ssh_keyscan_results != [])
-
     - name: Write any ssh-keyscan results to a local KnownHosts file if one is defined
       ansible.builtin.blockinfile:
         path: "{{ ssh_local_hosts_user_known_hosts_file }}"
