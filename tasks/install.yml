@@ -33,7 +33,7 @@
         default_release: "{{ ansible_facts.distribution_release }}-backports"
         install_recommends: true
       register: ssh_install_backports
-      notify: Restart sshd
+      notify: Restart ssh
       when: ssh_apt_backports in ssh_apt_cache_policy.stdout
 
     - name: OpenSSH and related packages present
@@ -48,7 +48,7 @@
         state: present
         install_recommends: true
       register: ssh_install
-      notify: Restart sshd
+      notify: Restart ssh
 
     - name: Stat /lib/systemd/system/ssh.service
       ansible.builtin.stat:

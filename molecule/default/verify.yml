@@ -51,7 +51,7 @@
       vars:
         molecule_service_jpq: 'services.["ssh.service"]|[0]'
 
-    - name: Check that sshd is enabled and running
+    - name: Check that ssh is enabled and running
       ansible.builtin.assert:
         that:
           - (ansible_facts | community.general.json_query(molecule_service_jpq)).status == "enabled"
@@ -72,7 +72,7 @@
       ansible.builtin.set_fact:
         molecule_ssh_listening: "{{ ansible_facts.tcp_listen | community.general.json_query(molecule_ssh_listen_jpq) }}"
       vars:
-        molecule_ssh_listen_jpq: "[?name=='sshd'].address"
+        molecule_ssh_listen_jpq: "[?name=='ssh'].address"
 
     - name: Debug SSH listening ports
       ansible.builtin.debug:
