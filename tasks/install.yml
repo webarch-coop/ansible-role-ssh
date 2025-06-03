@@ -55,6 +55,12 @@
         path: /lib/systemd/system/ssh.service
       register: ssh_system_service
 
+    - name: OpenSSH enabled
+      ansible.builtin.systemd_service:
+        name: ssh
+        enabled: true
+      when: ssh_system_service.stat.exists | bool
+
     - name: Stat /etc/systemd/system/multi-user.target.wants/ssh.service
       ansible.builtin.stat:
         path: /etc/systemd/system/multi-user.target.wants/ssh.service
@@ -63,12 +69,8 @@
     - name: OpenSSH enabled and started
       ansible.builtin.systemd_service:
         name: ssh
-        enabled: true
         state: started
-      register: ssh_service
-      when:
-        - ssh_system_service.stat.exists | bool
-        - ssh_system_service_symlink.stat.exists | bool
+      when: ssh_system_service_symlink.stat.exists | bool
 
     - name: Restart SSH and re-run checks if when new packages are installed
       block:
