@@ -10,9 +10,9 @@
 ---
 - name: OpenSSH restarted
   ansible.builtin.service:
-    name: sshd
+    name: ssh
     state: restarted
-  listen: Restart sshd
+  listen: Restart ssh
   tags:
     - ssh
 
