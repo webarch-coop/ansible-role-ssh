@@ -1,5 +1,4 @@
 # {{ ansible_managed }}
-# {# j2lint: disable=single-statement-per-line j2lint: disable=jinja-statements-indentation #}
 
 # This is the sshd server system-wide configuration file.  See
 # sshd_config(5) for more information.
@@ -19,9 +18,9 @@ Include /etc/ssh/sshd_config.d/*.conf
 {% endif %}
 
 {% if ssh_ports is defined and ssh_ports != [] %}
-{% for ssh_port in ssh_ports %}
+{%     for ssh_port in ssh_ports %}
 Port {{ ssh_port }}
-{% endfor %}
+{%     endfor %}
 {% else %}
 #Port 22
 {% endif %}
@@ -29,9 +28,9 @@ Port {{ ssh_port }}
 #AddressFamily any
 
 {% if ssh_listen_addresses is defined and ssh_listen_addresses != [] %}
-{% for ssh_listen_address in ssh_listen_addresses %}
+{%     for ssh_listen_address in ssh_listen_addresses %}
 ListenAddress {{ ssh_listen_address }}
-{% endfor %}
+{%     endfor %}
 {% else %}
 #ListenAddress 0.0.0.0
 #ListenAddress ::
@@ -39,9 +38,9 @@ ListenAddress {{ ssh_listen_address }}
 
 # Supported HostKey algorithms by order of preference.
 {% if ssh_host_keys is defined and ssh_host_keys != [] %}
-{% for ssh_key in ssh_host_keys %}
+{%     for ssh_key in ssh_host_keys %}
 HostKey {{ ssh_key.path }}
-{% endfor %}
+{%     endfor %}
 {% else %}
 #HostKey /etc/ssh/ssh_host_rsa_key
 #HostKey /etc/ssh/ssh_host_ecdsa_key
@@ -52,19 +51,19 @@ HostKey {{ ssh_key.path }}
 #RekeyLimit default none
 
 {% if ssh_ciphers is defined  and ssh_ciphers != [] %}
-Ciphers {% for ssh_cipher in ssh_ciphers %}{{ ssh_cipher }}{% if not loop.last %},{% endif %}{% endfor %}
+Ciphers {{ ssh_ciphers | join(',') }}
 {% endif %}
 
 {% if ssh_host_key_algorithms is defined and ssh_host_key_algorithms != [] %}
-HostKeyAlgorithms {% for ssh_host_key_algorithm in ssh_host_key_algorithms %}{{ ssh_host_key_algorithm }}{% if not loop.last %},{% endif %}{% endfor %}
+HostKeyAlgorithms {{ ssh_host_key_algorithms | join(',') }}
 {% endif %}
 
 {% if ssh_macs is defined and ssh_macs != [] %}
-MACs {% for ssh_mac in ssh_macs %}{{ ssh_mac }}{% if not loop.last %},{% endif %}{% endfor %}
+MACs {{ ssh_macs | join(',') }}
 {% endif %}
 
 {% if ssh_kex_algorithms is defined and ssh_kex_algorithms != [] %}
-KexAlgorithms {% for ssh_kex_algorithm in ssh_kex_algorithms %}{{ ssh_kex_algorithm }}{% if not loop.last %},{% endif %}{% endfor %}
+KexAlgorithms {{ ssh_kex_algorithms | join(',') }}
 {% endif %}
 
 # Logging
@@ -78,11 +77,11 @@ LogLevel VERBOSE
 PermitRootLogin {{ ssh_permit_root_login }}
 
 {% if ssh_deny_users is defined and ssh_deny_users != [] %}
-DenyUsers{% for ssh_deny_user in ssh_deny_users %} {{ ssh_deny_user }}{% endfor %}
+DenyUsers {{ ssh_deny_users | join(' ') }}
 {% endif %}
 
 {% if ssh_allow_groups is defined and ssh_allow_groups != [] %}
-AllowGroups{% for ssh_allow_group in ssh_allow_groups %} {{ ssh_allow_group }}{% endfor %}
+AllowGroups {{ ssh_allow_groups | join(' ') }}
 {% endif %}
 
 #StrictModes yes
@@ -91,9 +90,17 @@ AllowGroups{% for ssh_allow_group in ssh_allow_groups %} {{ ssh_allow_group }}{%
 
 AuthenticationMethods {{ ssh_authentication_methods }}
 
-PasswordAuthentication {% if ssh_password_authentication | bool %}yes{% else %}no{% endif %}
+{% if ssh_password_authentication | bool %}
+PasswordAuthentication yes
+{% else %}
+PasswordAuthentication no
+{% endif %}
 
-PubkeyAuthentication {% if ssh_pubkey_authentication | bool %}yes{% else %}no{% endif %}
+{% if ssh_pubkey_authentication | bool %}
+PubkeyAuthentication yes
+{% else %}
+PubkeyAuthentication no
+{% endif %}
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
 #AuthorizedKeysFile     .ssh/authorized_keys .ssh/authorized_keys2
@@ -143,13 +150,21 @@ ChallengeResponseAuthentication no
 UsePAM yes
 
 {% if ssh_allow_agent_forwarding is defined %}
-AllowAgentForwarding {% if ssh_allow_agent_forwarding | bool %}yes{% else %}no{% endif %}
+{%     if ssh_allow_agent_forwarding | bool %}
+AllowAgentForwarding yes
+{%     else %}
+AllowAgentForwarding no
+{%     endif %}
 {% else %}
 #AllowAgentForwarding yes
 {% endif %}
 
 {% if ssh_allow_tcp_forwarding is defined %}
-AllowTcpForwarding {% if ssh_allow_tcp_forwarding | bool %}yes{% else %}no{% endif %}
+{%     if ssh_allow_tcp_forwarding | bool %}
+AllowTcpForwarding yes
+{%     else %}
+AllowTcpForwarding no
+{%     endif %}
 {% else %}
 #AllowTcpForwarding yes
 {% endif %}
@@ -157,7 +172,11 @@ AllowTcpForwarding {% if ssh_allow_tcp_forwarding | bool %}yes{% else %}no{% end
 #GatewayPorts no
 
 {% if ssh_x11_forwarding is defined %}
-X11Forwarding {% if ssh_x11_forwarding | bool %}yes{% else %}no{% endif %}
+{%     if ssh_x11_forwarding | bool %}
+X11Forwarding yes
+{%     else %}
+X11Forwarding no
+{%     endif %}
 {% else %}
 #X11Forwarding yes
 {% endif %}
@@ -180,7 +199,11 @@ PrintMotd no
 #VersionAddendum none
 
 {% if ssh_stream_local_bind_unlink is defined %}
-StreamLocalBindUnlink {% if ssh_stream_local_bind_unlink | bool %}yes{% else %}no{% endif %}
+{%     if ssh_stream_local_bind_unlink | bool %}
+StreamLocalBindUnlink yes
+{%     else %}
+StreamLocalBindUnlink no
+{%     endif %}
 {% else %}
 #StreamLocalBindUnlink no
 {% endif %}
@@ -203,8 +226,7 @@ Subsystem       sftp    internal-sftp
 #	ForceCommand cvs server
 
 {% if ssh_allow_groups is defined and ssh_allow_groups != [] %}
-
-{% if 'chroot' in ssh_allow_groups and ssh_chroot_users_dir is defined %}
+{%     if 'chroot' in ssh_allow_groups and ssh_chroot_users_dir is defined %}
 Match group chroot
     AllowGroups chroot
     DenyGroups sudo root sftponly sshonly xenshell
@@ -217,17 +239,17 @@ Match group chroot
     PermitUserRC no
     PermitTTY yes
     PermitRootLogin No
-{% endif %}
+{%     endif %}
 
-{% if 'git' in ssh_allow_groups and ssh_gitlab is defined and ssh_gitlab | bool %}
+{%     if 'git' in ssh_allow_groups and ssh_gitlab is defined and ssh_gitlab | bool %}
 # https://docs.gitlab.com/ee/administration/operations/fast_ssh_key_lookup.html
 Match User git    # Apply the AuthorizedKeysCommands to the git user only
     AuthorizedKeysCommand /opt/gitlab/embedded/service/gitlab-shell/bin/gitlab-shell-authorized-keys-check git %u %k
     AuthorizedKeysCommandUser git
 Match all    # End match, settings apply to all users again
-{% endif %}
+{%     endif %}
 
-{% if 'sftponly' in ssh_allow_groups %}
+{%     if 'sftponly' in ssh_allow_groups %}
 Match group sftponly
     AllowGroups sftponly
     DenyGroups chroot sshonly sudo root xenshell
@@ -241,9 +263,9 @@ Match group sftponly
     PermitRootLogin No
     PermitTTY yes
     ForceCommand internal-sftp
-{% endif %}
+{%     endif %}
 
-{% if 'sshonly' in ssh_allow_groups %}
+{%     if 'sshonly' in ssh_allow_groups %}
 Match group sshonly
     AllowGroups sshonly
     DenyGroups chroot sftponly sudo root xenshell
@@ -256,9 +278,9 @@ Match group sshonly
     PermitUserRC no
     PermitTTY yes
     PermitRootLogin No
-{% endif %}
+{%     endif %}
 
-{% if 'xenshell' in ssh_allow_groups %}
+{%     if 'xenshell' in ssh_allow_groups %}
 Match group xenshell
     AllowGroups xenshell
     DenyGroups chroot sftponly sshonly sudo root
@@ -270,8 +292,7 @@ Match group xenshell
     PermitUserRC no
     PermitTTY yes
     PermitRootLogin No
+{%     endif %}
 {% endif %}
 
-{% endif %}
-
-# vim: ft=sshdconfig
+# vim: ft=sshdconfig{# vim: syntax=jinja2 #}
