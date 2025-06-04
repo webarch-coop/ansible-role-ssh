@@ -26,6 +26,8 @@
         var: ssh_audit_policies
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_audit_policies is defined
+      tags:
+        - debug
 
     - name: OpenSSH Ubuntu policy audit
       block:
@@ -139,6 +141,8 @@
         var: ssh_audit_policy_result.errors
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: ssh_audit_policy_result.errors is defined
+      tags:
+        - debug
 
     - name: Ensure that the SSH policy audit passed
       ansible.builtin.assert:

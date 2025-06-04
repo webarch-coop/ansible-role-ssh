@@ -46,6 +46,7 @@
       - "X11Forwarding{% if ssh_x11_forwarding is defined and ssh_x11_forwarding | bool %} yes{% else %} no{% endif %} # ssh_x11_forwarding"
     verbosity: 1
   tags:
+    - debug
     - ssh
     - ssh_debug
 ...

@@ -36,6 +36,8 @@
           ansible.builtin.debug:
             var: ssh_pip3_ssh_audit
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
 
         - name: Uninstall pip3 ssh-audit
           ansible.builtin.pip:

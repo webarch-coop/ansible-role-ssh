@@ -23,7 +23,9 @@
           - "ssh_local_hosts_user_known_hosts_file{% if ssh_local_hosts_user_known_hosts_file is defined %} {{ ssh_local_hosts_user_known_hosts_file }}{% endif %}"
           - "ssh_local_hosts_port{% if ssh_local_hosts_port is defined %} {{ ssh_local_hosts_port }}{% endif %}"
           - "ssh_local_hosts_readme{% if ssh_local_hosts_readme is defined %} {{ ssh_local_hosts_readme }}{% endif %}"
-        verbosity: 1
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: SSH Audit
       block:
@@ -61,36 +63,48 @@
             var: ssh_local_hosts_directory
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           when: ssh_local_hosts_directory is defined
+          tags:
+            - debug
 
         - name: Debug path to the local Host file
           ansible.builtin.debug:
             var: ssh_local_hosts_file
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           when: ssh_local_hosts_file is defined
+          tags:
+            - debug
 
         - name: Debug Host to use in the local Host file
           ansible.builtin.debug:
             var: ssh_local_hosts_host
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           when: ssh_local_hosts_host is defined
+          tags:
+            - debug
 
         - name: Debug Hostname to use in the local Host file
           ansible.builtin.debug:
             var: ssh_local_hosts_hostname
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           when: ssh_local_hosts_hostname is defined
+          tags:
+            - debug
 
         - name: Debug UserKnownHostsFile to use in the local Host file
           ansible.builtin.debug:
             var: ssh_local_hosts_user_known_hosts_file
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           when: ssh_local_hosts_user_known_hosts_file is defined
+          tags:
+            - debug
 
         - name: Debug Port to use in the local Host file
           ansible.builtin.debug:
             var: ssh_local_hosts_port
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
           when: ssh_local_hosts_port is defined
+          tags:
+            - debug
 
         - name: Local Host directory present
           ansible.builtin.file:
@@ -104,6 +118,8 @@
             var: ssh_local_hosts_dir
             verbosity: 1
           when: ssh_local_hosts_dir is defined
+          tags:
+            - debug
 
         - name: Last line in local Host file present
           ansible.builtin.lineinfile:
@@ -136,7 +152,9 @@
                 UserKnownHostsFile {{ ssh_local_hosts_user_known_hosts_file }}
               {%     endif %}
               {% endif %}
-            verbosity: 1
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
 
         - name: Host present in the local Host file
           ansible.builtin.blockinfile:

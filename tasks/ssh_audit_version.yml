@@ -28,6 +28,8 @@
           - "Path: {{ ssh_audit_headers.location | ansible.builtin.urlsplit('path') }}"
           - "Version: {{ ssh_audit_headers.location | ansible.builtin.urlsplit('path') | ansible.builtin.basename | ansible.builtin.regex_replace('^v') }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Set a fact for the latest version of ssh-audit
       ansible.builtin.set_fact:

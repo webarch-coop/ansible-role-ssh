@@ -15,11 +15,15 @@
       ansible.builtin.debug:
         var: sshvarnames
         verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+      tags:
+        - debug
 
     - name: Debug the hostvars variable names that start with ssh_
       ansible.builtin.debug:
         var: sshhostvars
         verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+      tags:
+        - debug
 
     - name: Check ssh_ variables using meta/argument_specs.yml
       ansible.builtin.validate_argument_spec:

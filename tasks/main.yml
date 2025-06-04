@@ -30,6 +30,8 @@
 
     - name: Debug variables
       ansible.builtin.include_tasks: debug.yml
+      tags:
+        - debug
 
     - name: Verify variables
       ansible.builtin.include_tasks: verify.yml
@@ -170,6 +172,8 @@
       ansible.builtin.debug:
         msg: "{{ ansible_facts | community.general.json_query(ssh_jpq.ssh_service) }}"
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Include ssh-audit tasks
       ansible.builtin.include_tasks: ssh_audit_info.yml

@@ -15,6 +15,8 @@
       ansible.builtin.debug:
         var: ssh_host_key
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Check the bits required for SSH DSA keys
       ansible.builtin.assert:
@@ -88,6 +90,8 @@
           ansible.builtin.debug:
             var: ssh_host_key_fingerprint
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
 
         - name: RSA key need to be regenerated
           ansible.builtin.debug:

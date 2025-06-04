@@ -38,7 +38,9 @@
           {{ ssh_audit_local_policy_content.key }} = {% if ssh_audit_local_policy_content.key == "name" %}"{% endif %}{{ ssh_audit_local_policy_content.value }}{% if ssh_audit_local_policy_content.key == "name" %}"{% endif %}
 
           {% endfor %}
-        verbosity: 1
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: SSH audit policy present
       ansible.builtin.template:
