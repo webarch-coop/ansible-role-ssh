@@ -508,10 +508,12 @@
           ansible.builtin.assert:
             that:
               - ssh_ip | ansible.utils.ipaddr == ssh_ip
+            fail_msg: "The SSH ListenAddress is set to {{ ssh_ip }} and the ansible.utils.ipaddr test for this returns {{ ssh_ip | ansible.utils.ipaddr }}"
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when:
             - ssh_ip != "0.0.0.0"
             - ssh_ip != "::"
+            - ssh_ip != "*"
           loop: "{{ ssh_listen_addresses }}"
           loop_control:
             loop_var: ssh_ip
@@ -520,6 +522,7 @@
           ansible.builtin.assert:
             that:
               - ssh_listening_addresses == ssh_listen_addresses | sort
+            fail_msg: "The ssh_listening_addresses are {{ ssh_listening_addresses | join(', ') }} and the ssh_listen_addresses are {{ ssh_listen_addresses | sort | | join(', ') }} and they need to match."
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when:
             - ssh_check_fail | bool

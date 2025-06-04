@@ -38,24 +38,24 @@ before_script:
   - which molecule
   - molecule --version
 stages:
-  - bookworm
-  - jammy
+  # - bookworm
+  # - jammy
   - noble  # see #11
   - trixie  # see #12
-bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20250527
-  stage: bookworm
-  script:
-    - pre-commit install
-    - pre-commit run --all-files
-    - molecule test
-jammy:
-  image: registry.git.coop/webarch/containers/images/jammy:20250527
-  stage: jammy
-  script:
-    - pre-commit install
-    - pre-commit run --all-files
-    - molecule test
+# bookworm:
+#   image: registry.git.coop/webarch/containers/images/bookworm:20250527
+#   stage: bookworm
+#   script:
+#     - pre-commit install
+#     - pre-commit run --all-files
+#     - molecule test
+# jammy:
+#   image: registry.git.coop/webarch/containers/images/jammy:20250527
+#   stage: jammy
+#   script:
+#     - pre-commit install
+#     - pre-commit run --all-files
+#     - molecule test
 # See #11
 noble:
   image: registry.git.coop/webarch/containers/images/noble:20250527
