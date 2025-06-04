@@ -522,7 +522,7 @@
           ansible.builtin.assert:
             that:
               - ssh_listening_addresses == ssh_listen_addresses | sort
-            fail_msg: "The ssh_listening_addresses are {{ ssh_listening_addresses | join(', ') }} and the ssh_listen_addresses are {{ ssh_listen_addresses | sort | | join(', ') }} and they need to match."
+            fail_msg: "The ssh_listening_addresses are {{ ssh_listening_addresses | join(', ') }} and the ssh_listen_addresses are {{ ssh_listen_addresses | sort | join(', ') }} and they need to match."
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
           when:
             - ssh_check_fail | bool
