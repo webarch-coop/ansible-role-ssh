@@ -39,7 +39,15 @@
       changed_when: false
       register: ssh_keyscan_command
 
-    - name: Debug the key scan result
+    - name: Debug the key scan standard error
+      ansible.builtin.debug:
+        var: ssh_keyscan_command.stderr_lines
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      when: ssh_keyscan_command.stderr_lines is defined
+      tags:
+        - debug
+
+    - name: Debug the key scan standard out
       ansible.builtin.debug:
         var: ssh_keyscan_command.stdout_lines
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
@@ -54,9 +62,11 @@
         create: true
         marker: "{% if ssh_port == 22 %}# {mark} {{ ssh_ip }}{% else %}# {mark} {{ ssh_ip }}:{{ ssh_port }}{% endif %}"
         block: |
-          {%- for ssh_fingerprint in ssh_keyscan_command.stdout_lines | sort %}
+          {%- for ssh_fingerprint in ssh_keyscan_command.stdout_lines | sort -%}
+          {%-     if ssh_fingerprint is not ansible.builtin.regex('^#') %}
           {{ ssh_fingerprint }}
-          {% endfor -%}
+          {%     endif -%}
+          {%- endfor -%}
       become: false
       delegate_to: localhost
       when:
