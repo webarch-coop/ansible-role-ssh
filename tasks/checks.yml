@@ -562,8 +562,8 @@
             - not ssh_first_check | bool
             - ssh_init is defined
             - ssh_init == "systemd"
-            # Ubuntu listens on * and config is for 0.0.0.0
-            - ( ssh_listening_addresses[0] != "*" ) and ( ssh_listen_addresses[0] != "0.0.0.0" )
+            # Ubuntu listens on * and config is for 0.0.0.0 or :: or both
+            - (ssh_listening_addresses[0] != "*") and ((ssh_listen_addresses[0] != "0.0.0.0") or (ssh_listen_addresses[0] != "::") or (ssh_listen_addresses | sort != ["::","0.0.0.0"]))
 
       when:
         - ssh_listen_addresses is defined
