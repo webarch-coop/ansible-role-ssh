@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Chris Croome
+# Copyright 2019-2026 Chris Croome
 #
 # This file is part of the Webarchitects SSH Ansible role.
 #
@@ -8,12 +8,8 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects SSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-# https://docs.ansible.com/ansible-lint/rules/default_rules.html
 skip_list:
-  # You can improve the task key order to: name, when, block
   - key-order[task]
-  # When installing from backports the latest version is wanted
-  - package-latest
-var_naming_pattern: "^[ssh|molecule]_?[0-9a-z_]*$"
+var_naming_pattern: "^[ansible|ssh|molecule]_?[a-z0-9_]*$"
 # vim: syntax=yaml
 ...

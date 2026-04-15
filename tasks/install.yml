@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Chris Croome
+# Copyright 2019-2026 Chris Croome
 #
 # This file is part of the Webarchitects OpenSSH Ansible role.
 #
@@ -23,7 +23,7 @@
       changed_when: false
       register: ssh_apt_cache_policy
 
-    - name: OpenSSH packages present from backports
+    - name: OpenSSH packages present from backports  # noqa: package-latest
       ansible.builtin.apt:
         pkg:
           - openssh-client

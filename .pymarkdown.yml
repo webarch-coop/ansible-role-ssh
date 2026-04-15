@@ -8,18 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-ssh_apt_backports: "{{ ansible_facts.distribution_release }}-backports"
-
-# JMESPath queries
-ssh_jpq:
-  listening_addresses: "[?name=='sshd'].address"
-  listening_ports: "[?name=='sshd'].port"
-  not_listening_ports: "[?name!='sshd'].port"
-  ssh_service: 'services.["ssh.service"]|[0]'
-  sshd_service: 'services.["sshd.service"]|[0]'
-  systemd: "[?name!='systemd']"
-
-# https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
-sshvarnames: "{{ q('varnames', '^ssh_') | sort }}"
-sshhostvars: "{{ dict(sshvarnames | list | zip(q('vars', *sshvarnames))) }}"
+plugins:
+  md013:
+    enabled: false
 ...

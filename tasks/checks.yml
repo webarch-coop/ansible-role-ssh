@@ -1,4 +1,4 @@
-# Copyright 2019-2025 Chris Croome
+# Copyright 2019-2026 Chris Croome
 #
 # This file is part of the Webarchitects OpenSSH Ansible role.
 #
@@ -17,7 +17,8 @@
       when: ssh_first_check is not defined
 
     - name: Check the version of SSH installed
-      ansible.builtin.command: ssh -V
+      ansible.builtin.command:
+        cmd: ssh -V
       check_mode: false
       changed_when: false
       register: ssh_v
@@ -43,7 +44,8 @@
 
     # When in a docker container ssh_init.stdout is usually "sh" or "bash"
     - name: Check if system has been booted with systemd as init system
-      ansible.builtin.command: ps -p 1 -o comm=
+      ansible.builtin.command:
+        cmd: 'ps -p 1 -o comm='
       check_mode: false
       changed_when: false
       register: ssh_ps
@@ -88,6 +90,26 @@
         - not ssh_first_check | bool
         - ssh_init is defined
         - ssh_init == "systemd"
+
+    - name: Run sshd -T to get the current configuration
+      ansible.builtin.command:
+        cmd: sshd -T
+      check_mode: false
+      changed_when: false
+      register: ssh_t
+
+    # https://github.com/kellyjonbrazil/jc/issues/282
+    - name: Set a fact for the current sshd configuration
+      ansible.builtin.set_fact:
+        # ssh_cnf: "{{ ssh_t.stdout_lines | ansible.builtin.map('ansible.builtin.regex_replace', ssh_regex_search, ssh_regex_replace) | ansible.builtin.join('\n') | community.general.jc('ini_dup') }}"
+        ssh_cnf: "{{ ssh_t.stdout | community.general.jc('sshd_conf') }}"
+
+    - name: Debug the current sshd configuration
+      ansible.builtin.debug:
+        var: ssh_cnf
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Gather facts on listening ports
       community.general.listen_ports_facts:
@@ -211,7 +233,8 @@
       when: ssh_ci_ips is defined
 
     - name: Get a list of available SSH ciphers
-      ansible.builtin.command: ssh -Q cipher
+      ansible.builtin.command:
+        cmd: ssh -Q cipher
       check_mode: false
       changed_when: false
       register: ssh_q_cipher
@@ -343,7 +366,8 @@
         - ssh_gitlab | bool
 
     - name: Get a list of available SSH host key algorithms
-      ansible.builtin.command: ssh -Q hostkeyalgorithms
+      ansible.builtin.command:
+        cmd: ssh -Q hostkeyalgorithms
       check_mode: false
       changed_when: false
       register: ssh_q_host_key_algorithms
@@ -446,7 +470,8 @@
       when: ssh_host_keys is defined
 
     - name: Get a list of available SSH kex algorithms
-      ansible.builtin.command: ssh -Q kexalgorithms
+      ansible.builtin.command:
+        cmd: ssh -Q kexalgorithms
       check_mode: false
       changed_when: false
       register: ssh_q_kex_algorithms
@@ -667,7 +692,8 @@
         - ssh_local_hosts | bool
 
     - name: Get a list of available SSH macs
-      ansible.builtin.command: ssh -Q mac
+      ansible.builtin.command:
+        cmd: ssh -Q mac
       check_mode: false
       changed_when: false
       register: ssh_q_mac
