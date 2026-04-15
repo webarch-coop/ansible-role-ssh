@@ -229,6 +229,15 @@ argument_specs:
         elements: str
         required: false
         description: ListenAddress, IP addresses that SSH should listen for connections on.
+      ssh_listen_addr_port:
+        type: str
+        required: false
+        description: SSHD listening IP addresses and ports generated from ssh_listen_addresses and ssh_ports
+      ssh_listen_addr_port_list:
+        type: list
+        elements: str
+        required: false
+        description: List of SSHD listening IP addresses and ports generated from ssh_listen_addresses and ssh_ports
       ssh_localhost:
         type: str
         required: true

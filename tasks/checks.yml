@@ -101,7 +101,7 @@
 
         - name: Run sshd -T to get the current configuration
           ansible.builtin.command:
-            cmd: sshd -T
+            cmd: /usr/sbin/sshd -T
           check_mode: false
           changed_when: false
           register: ssh_t
@@ -241,95 +241,110 @@
 
       when: ssh_ci_ips is defined
 
-    - name: Get a list of available SSH ciphers
-      ansible.builtin.command:
-        cmd: ssh -Q cipher
-      check_mode: false
-      changed_when: false
-      register: ssh_q_cipher
-      failed_when: ssh_q_cipher.rc is not regex('^0|255$')
-
-    - name: Fail when the check for SSH ciphers failed
-      ansible.builtin.assert:
-        that:
-          - ssh_q_cipher.rc == 0
-          - ssh_q_cipher.stdout_lines | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        msg: "{{ ssh_q_cipher.stderr_lines }}"
-      when: ssh_check_fail | bool
-
-    - name: Check the ciphers
+    - name: Cipher checks
       block:
 
-        - name: Set a fact for the list of available SSH ciphers
-          ansible.builtin.set_fact:
-            ssh_ciphers_available: "{{ ssh_q_cipher.stdout_lines | list }}"
+        - name: Get a list of available SSH ciphers
+          ansible.builtin.command:
+            cmd: ssh -Q cipher
+          check_mode: false
+          changed_when: false
+          register: ssh_q_cipher
+          failed_when: ssh_q_cipher.rc is not regex('^0|255$')
 
-        - name: Debug the list of proposed ciphers
-          ansible.builtin.debug:
-            var: ssh_ciphers
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-          tags:
-            - debug
-
-        - name: Debug the list of available ciphers
-          ansible.builtin.debug:
-            var: ssh_ciphers_available
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-          tags:
-            - debug
-
-        - name: Check that the specified and available SSH cipher lists are not empty
+        - name: Fail when the check for SSH ciphers failed
           ansible.builtin.assert:
             that:
-              - ssh_ciphers != []
-              - ssh_ciphers_available != []
+              - ssh_q_cipher.rc == 0
+              - ssh_q_cipher.stdout_lines | length > 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            msg: "{{ ssh_q_cipher.stderr_lines }}"
+          when: ssh_check_fail | bool
 
-        - name: Generate a list of SSH ciphers that need to be omitted
-          ansible.builtin.set_fact:
-            ssh_ciphers_omit: "{{ ssh_ciphers | ansible.builtin.difference(ssh_ciphers_available) }}"
+        - name: Print the available SSH ciphers
+          ansible.builtin.debug:
+            var: ssh_q_cipher.stdout_lines
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
 
-        - name: Omit unsupported SSH ciphers
+        - name: Check the ciphers
           block:
 
-            - name: List the SSH ciphers that need to be omitted as they are not supported
-              ansible.builtin.debug:
-                var: ssh_ciphers_omit
-
-            - name: Omit unsupported SSH ciphers
+            - name: Set a fact for the list of available SSH ciphers
               ansible.builtin.set_fact:
-                ssh_ciphers: "{{ ssh_ciphers | reject('search', ssh_cipher_omit) }}"
-              loop: "{{ ssh_ciphers_omit }}"
-              loop_control:
-                loop_var: ssh_cipher_omit
+                ssh_ciphers_available: "{{ ssh_q_cipher.stdout_lines | list }}"
 
-            - name: List SSH ciphers without the ones that can't be used
+            - name: Debug the list of proposed ciphers
               ansible.builtin.debug:
                 var: ssh_ciphers
                 verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+              tags:
+                - debug
 
-            - name: Check that updated SSH cipher list is not empty
+            - name: Debug the list of available ciphers
+              ansible.builtin.debug:
+                var: ssh_ciphers_available
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+              tags:
+                - debug
+
+            - name: Check that the specified and available SSH cipher lists are not empty
               ansible.builtin.assert:
                 that:
                   - ssh_ciphers != []
+                  - ssh_ciphers_available != []
                 quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-          when: ssh_ciphers_omit != []
+            - name: Generate a list of SSH ciphers that need to be omitted
+              ansible.builtin.set_fact:
+                ssh_ciphers_omit: "{{ ssh_ciphers | ansible.builtin.difference(ssh_ciphers_available) }}"
 
-        - name: Check that the ciphers wanted are available
-          ansible.builtin.assert:
-            that:
-              - ssh_cipher in ssh_ciphers_available
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          loop: "{{ ssh_ciphers }}"
-          loop_control:
-            loop_var: ssh_cipher
-          when: ssh_check_fail | bool
+            - name: Omit unsupported SSH ciphers
+              block:
 
-      when:
-        - ssh_q_cipher.rc == 0
-        - ssh_q_cipher.stdout_lines | length > 0
+                - name: List the SSH ciphers that need to be omitted as they are not supported
+                  ansible.builtin.debug:
+                    var: ssh_ciphers_omit
+
+                - name: Omit unsupported SSH ciphers
+                  ansible.builtin.set_fact:
+                    ssh_ciphers: "{{ ssh_ciphers | reject('search', ssh_cipher_omit) }}"
+                  loop: "{{ ssh_ciphers_omit }}"
+                  loop_control:
+                    loop_var: ssh_cipher_omit
+
+                - name: List SSH ciphers without the ones that can't be used
+                  ansible.builtin.debug:
+                    var: ssh_ciphers
+                    verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+                - name: Check that updated SSH cipher list is not empty
+                  ansible.builtin.assert:
+                    that:
+                      - ssh_ciphers != []
+                    quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+              when: ssh_ciphers_omit != []
+
+            - name: Check that the ciphers wanted are available
+              ansible.builtin.assert:
+                that:
+                  - ssh_cipher in ssh_ciphers_available
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+              loop: "{{ ssh_ciphers }}"
+              loop_control:
+                loop_var: ssh_cipher
+              when: ssh_check_fail | bool
+
+          when:
+            - ssh_q_cipher.rc == 0
+            - ssh_q_cipher.stdout_lines | length > 0
+
+      when: >-
+        (ssh_cnf is not defined) or
+        ((ssh_cnf is defined) and
+        (ssh_cnf.ciphers | ansible.builtin.difference(ssh_ciphers) != []))
 
     - name: DenyUsers checks
       block:
@@ -374,234 +389,265 @@
         - ssh_gitlab is defined
         - ssh_gitlab | bool
 
-    - name: Get a list of available SSH host key algorithms
-      ansible.builtin.command:
-        cmd: ssh -Q hostkeyalgorithms
-      check_mode: false
-      changed_when: false
-      register: ssh_q_host_key_algorithms
-      failed_when: ssh_q_host_key_algorithms.rc is not regex('^0|255$')
-
-    - name: Fail when the check for SSH host key algorithms failed
-      ansible.builtin.assert:
-        that:
-          - ssh_q_host_key_algorithms.rc == 0
-          - ssh_q_host_key_algorithms.stdout_lines | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        fail_msg: "{{ ssh_q_host_key_algorithms.stderr_lines }}"
-      when:
-        - ssh_check_fail | bool
-        - ssh_first_check is defined
-        - not ssh_first_check | bool
-
-    - name: Check the host key algorithms
+    - name: SSH host key algorithm checks
       block:
 
-        - name: Set a fact for the list of available SSH host key algorithms
-          ansible.builtin.set_fact:
-            ssh_host_key_algorithms_available: "{{ ssh_q_host_key_algorithms.stdout_lines | list }}"
+        - name: Get a list of available SSH host key algorithms
+          ansible.builtin.command:
+            cmd: ssh -Q hostkeyalgorithms
+          check_mode: false
+          changed_when: false
+          register: ssh_q_host_key_algorithms
+          failed_when: ssh_q_host_key_algorithms.rc is not regex('^0|255$')
 
-        - name: Debug the list of proposed SSH host key algorithms
-          ansible.builtin.debug:
-            var: ssh_host_key_algorithms
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-          tags:
-            - debug
-
-        - name: Debug the list of available host key algorithms
-          ansible.builtin.debug:
-            var: ssh_host_key_algorithms_available
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-          tags:
-            - debug
-
-        - name: Check that the specified and available SSH host key algorithm lists are not empty
+        - name: Fail when the check for SSH host key algorithms failed
           ansible.builtin.assert:
             that:
-              - ssh_host_key_algorithms != []
-              - ssh_host_key_algorithms_available != []
+              - ssh_q_host_key_algorithms.rc == 0
+              - ssh_q_host_key_algorithms.stdout_lines | length > 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: "{{ ssh_q_host_key_algorithms.stderr_lines }}"
+          when:
+            - ssh_check_fail | bool
+            - ssh_first_check is defined
+            - not ssh_first_check | bool
 
-        - name: Generate a list of SSH host key algorithms that need to be omitted
-          ansible.builtin.set_fact:
-            ssh_host_key_algorithms_omit: "{{ ssh_host_key_algorithms | ansible.builtin.difference(ssh_host_key_algorithms_available) }}"
-
-        - name: Omit unsupported SSH host key algorithms
+        - name: Check the host key algorithms
           block:
 
-            - name: List the SSH host key algorithms that need to be omitted as they are not supported
-              ansible.builtin.debug:
-                var: ssh_host_key_algorithms_omit
-              tags:
-                - debug
-
-            - name: Omit unsupported SSH host key algorithms
+            - name: Set a fact for the list of available SSH host key algorithms
               ansible.builtin.set_fact:
-                ssh_host_key_algorithms: "{{ ssh_host_key_algorithms | reject('search', ssh_host_key_algorithm_omit) }}"
-              loop: "{{ ssh_ciphers_omit }}"
-              loop_control:
-                loop_var: ssh_host_key_algorithm_omit
+                ssh_host_key_algorithms_available: "{{ ssh_q_host_key_algorithms.stdout_lines | list }}"
 
-            - name: List SSH host key algorithms without the ones that can't be used
+            - name: Debug the list of proposed SSH host key algorithms
               ansible.builtin.debug:
                 var: ssh_host_key_algorithms
                 verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
               tags:
                 - debug
 
-            - name: Check that updated SSH host key algorithms list is not empty
+            - name: Debug the list of available host key algorithms
+              ansible.builtin.debug:
+                var: ssh_host_key_algorithms_available
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+              tags:
+                - debug
+
+            - name: Check that the specified and available SSH host key algorithm lists are not empty
               ansible.builtin.assert:
                 that:
                   - ssh_host_key_algorithms != []
+                  - ssh_host_key_algorithms_available != []
                 quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-          when: ssh_host_key_algorithms_omit != []
+            - name: Generate a list of SSH host key algorithms that need to be omitted
+              ansible.builtin.set_fact:
+                ssh_host_key_algorithms_omit: "{{ ssh_host_key_algorithms | ansible.builtin.difference(ssh_host_key_algorithms_available) }}"
 
-        - name: Check that the host key algorithms wanted are available
-          ansible.builtin.assert:
-            that:
-              - ssh_host_key_algorithm in ssh_host_key_algorithms_available
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          loop: "{{ ssh_host_key_algorithms }}"
+            - name: Omit unsupported SSH host key algorithms
+              block:
+
+                - name: List the SSH host key algorithms that need to be omitted as they are not supported
+                  ansible.builtin.debug:
+                    var: ssh_host_key_algorithms_omit
+                  tags:
+                    - debug
+
+                - name: Omit unsupported SSH host key algorithms
+                  ansible.builtin.set_fact:
+                    ssh_host_key_algorithms: "{{ ssh_host_key_algorithms | reject('search', ssh_host_key_algorithm_omit) }}"
+                  loop: "{{ ssh_ciphers_omit }}"
+                  loop_control:
+                    loop_var: ssh_host_key_algorithm_omit
+
+                - name: List SSH host key algorithms without the ones that can't be used
+                  ansible.builtin.debug:
+                    var: ssh_host_key_algorithms
+                    verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+                  tags:
+                    - debug
+
+                - name: Check that updated SSH host key algorithms list is not empty
+                  ansible.builtin.assert:
+                    that:
+                      - ssh_host_key_algorithms != []
+                    quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+              when: ssh_host_key_algorithms_omit != []
+
+            - name: Check that the host key algorithms wanted are available
+              ansible.builtin.assert:
+                that:
+                  - ssh_host_key_algorithm in ssh_host_key_algorithms_available
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+              loop: "{{ ssh_host_key_algorithms }}"
+              loop_control:
+                loop_var: ssh_host_key_algorithm
+
+          when:
+            - ssh_q_host_key_algorithms.rc == 0
+            - ssh_q_host_key_algorithms.stdout_lines | length > 0
+
+        - name: SSH host keys checks
+          ansible.builtin.include_tasks: check_host_key.yml
+          loop: "{{ ssh_host_keys }}"
           loop_control:
-            loop_var: ssh_host_key_algorithm
+            loop_var: ssh_host_key
+            label: "{{ ssh_host_key.name }}"
+          when: ssh_host_keys is defined
 
-      when:
-        - ssh_q_host_key_algorithms.rc == 0
-        - ssh_q_host_key_algorithms.stdout_lines | length > 0
+      when: >-
+        (ssh_cnf is not defined) or
+        ((ssh_cnf is defined) and
+        (ssh_cnf.hostkeyalgorithms | ansible.builtin.difference(ssh_host_key_algorithms) != []))
 
-    - name: SSH host keys checks
-      ansible.builtin.include_tasks: check_host_key.yml
-      loop: "{{ ssh_host_keys }}"
-      loop_control:
-        loop_var: ssh_host_key
-        label: "{{ ssh_host_key.name }}"
-      when: ssh_host_keys is defined
-
-    - name: Get a list of available SSH kex algorithms
-      ansible.builtin.command:
-        cmd: ssh -Q kexalgorithms
-      check_mode: false
-      changed_when: false
-      register: ssh_q_kex_algorithms
-      failed_when: ssh_q_kex_algorithms.rc is not regex('^0|255$')
-
-    - name: Fail when the check for SSH kex algorithms failed
-      ansible.builtin.assert:
-        that:
-          - ssh_q_kex_algorithms.rc == 0
-          - ssh_q_kex_algorithms.stdout_lines | length > 0
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        fail_msg: "{{ ssh_q_kex_algorithms.stderr_lines }}"
-      when: ssh_check_fail | bool
-
-    - name: Check the kex algorithms
+    - name: SSH kex algorithm checks
       block:
 
-        - name: Set a fact for the list of available SSH kex algorithms
-          ansible.builtin.set_fact:
-            ssh_kex_algorithms_available: "{{ ssh_q_kex_algorithms.stdout_lines | list }}"
+        - name: Get a list of available SSH kex algorithms
+          ansible.builtin.command:
+            cmd: ssh -Q kexalgorithms
+          check_mode: false
+          changed_when: false
+          register: ssh_q_kex_algorithms
+          failed_when: ssh_q_kex_algorithms.rc is not regex('^0|255$')
 
-        - name: Debug the list of proposed kex algorithms
-          ansible.builtin.debug:
-            var: ssh_kex_algorithms
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-          tags:
-            - debug
-
-        - name: Debug the list of available kex algorithms
-          ansible.builtin.debug:
-            var: ssh_kex_algorithms_available
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-          tags:
-            - debug
-
-        - name: Check that the specified and available SSH kex algorithm lists are not empty
+        - name: Fail when the check for SSH kex algorithms failed
           ansible.builtin.assert:
             that:
-              - ssh_kex_algorithms != []
-              - ssh_kex_algorithms_available != []
+              - ssh_q_kex_algorithms.rc == 0
+              - ssh_q_kex_algorithms.stdout_lines | length > 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: "{{ ssh_q_kex_algorithms.stderr_lines }}"
+          when: ssh_check_fail | bool
 
-        - name: Generate a list of SSH kex algorithms that need to be omitted
-          ansible.builtin.set_fact:
-            ssh_kex_algorithms_omit: "{{ ssh_kex_algorithms | ansible.builtin.difference(ssh_kex_algorithms_available) }}"
-
-        - name: Omit unsupported SSH kex algorithms
+        - name: Check the kex algorithms
           block:
 
-            - name: List the SSH kex algorithms that need to be omitted as they are not supported
-              ansible.builtin.debug:
-                var: ssh_kex_algorithms_omit
-
-            - name: Omit unsupported SSH kex algorithms
+            - name: Set a fact for the list of available SSH kex algorithms
               ansible.builtin.set_fact:
-                ssh_kex_algorithms: "{{ ssh_kex_algorithms | reject('search', ssh_kex_algorithm_omit) }}"
-              loop: "{{ ssh_kex_algorithms_omit }}"
-              loop_control:
-                loop_var: ssh_kex_algorithm_omit
+                ssh_kex_algorithms_available: "{{ ssh_q_kex_algorithms.stdout_lines | list }}"
 
-            - name: List SSH kex algorithms without the ones that can't be used
+            - name: Debug the list of proposed kex algorithms
               ansible.builtin.debug:
                 var: ssh_kex_algorithms
                 verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+              tags:
+                - debug
 
-            - name: Check that updated SSH kex algorithms list is not empty
+            - name: Debug the list of available kex algorithms
+              ansible.builtin.debug:
+                var: ssh_kex_algorithms_available
+                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+              tags:
+                - debug
+
+            - name: Check that the specified and available SSH kex algorithm lists are not empty
               ansible.builtin.assert:
                 that:
                   - ssh_kex_algorithms != []
+                  - ssh_kex_algorithms_available != []
                 quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-          when: ssh_kex_algorithms_omit != []
+            - name: Generate a list of SSH kex algorithms that need to be omitted
+              ansible.builtin.set_fact:
+                ssh_kex_algorithms_omit: "{{ ssh_kex_algorithms | ansible.builtin.difference(ssh_kex_algorithms_available) }}"
 
-        - name: Check that the kex algorithms wanted are available
-          ansible.builtin.assert:
-            that:
-              - ssh_kex_algorithm in ssh_kex_algorithms_available
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          loop: "{{ ssh_kex_algorithms }}"
-          loop_control:
-            loop_var: ssh_kex_algorithm
+            - name: Omit unsupported SSH kex algorithms
+              block:
 
-      when:
-        - ssh_q_kex_algorithms.rc == 0
-        - ssh_q_kex_algorithms.stdout_lines | length > 0
+                - name: List the SSH kex algorithms that need to be omitted as they are not supported
+                  ansible.builtin.debug:
+                    var: ssh_kex_algorithms_omit
 
-    - name: Check ListenAddress
+                - name: Omit unsupported SSH kex algorithms
+                  ansible.builtin.set_fact:
+                    ssh_kex_algorithms: "{{ ssh_kex_algorithms | reject('search', ssh_kex_algorithm_omit) }}"
+                  loop: "{{ ssh_kex_algorithms_omit }}"
+                  loop_control:
+                    loop_var: ssh_kex_algorithm_omit
+
+                - name: List SSH kex algorithms without the ones that can't be used
+                  ansible.builtin.debug:
+                    var: ssh_kex_algorithms
+                    verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+                - name: Check that updated SSH kex algorithms list is not empty
+                  ansible.builtin.assert:
+                    that:
+                      - ssh_kex_algorithms != []
+                    quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+              when: ssh_kex_algorithms_omit != []
+
+            - name: Check that the kex algorithms wanted are available
+              ansible.builtin.assert:
+                that:
+                  - ssh_kex_algorithm in ssh_kex_algorithms_available
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+              loop: "{{ ssh_kex_algorithms }}"
+              loop_control:
+                loop_var: ssh_kex_algorithm
+
+          when:
+            - ssh_q_kex_algorithms.rc == 0
+            - ssh_q_kex_algorithms.stdout_lines | length > 0
+
+      when: >-
+        (ssh_cnf is not defined) or
+        ((ssh_cnf is defined) and
+        (ssh_cnf.kexalgorithms | ansible.builtin.difference(ssh_kex_algorithms) != []))
+
+    - name: Debug the listening IP addresses and ports
+      ansible.builtin.debug:
+        var: ssh_listen_addr_port_list
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
+    - name: ListenAddress checks
       block:
 
-        - name: Ensure that all ListenAddress are IP addresses
-          ansible.builtin.assert:
-            that:
-              - ssh_ip | ansible.utils.ipaddr == ssh_ip
-            fail_msg: "The SSH ListenAddress is set to {{ ssh_ip }} and the ansible.utils.ipaddr test for this returns {{ ssh_ip | ansible.utils.ipaddr }}"
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          when:
-            - ssh_ip != "0.0.0.0"
-            - ssh_ip != "::"
-            - ssh_ip != "*"
-          loop: "{{ ssh_listen_addresses }}"
-          loop_control:
-            loop_var: ssh_ip
+        - name: Check ListenAddress
+          block:
 
-        - name: Check that the SSH listening addresses match the configuration
-          ansible.builtin.assert:
-            that:
-              - ssh_listening_addresses == ssh_listen_addresses | sort
-            fail_msg: "The ssh_listening_addresses are {{ ssh_listening_addresses | join(', ') }} and the ssh_listen_addresses are {{ ssh_listen_addresses | sort | join(', ') }} and they need to match."
-            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-          when:
-            - ssh_check_fail | bool
-            - ssh_first_check is defined
-            - not ssh_first_check | bool
-            - ssh_init is defined
-            - ssh_init == "systemd"
-            # Ubuntu listens on * and config is for 0.0.0.0 or :: or both
-            - (ssh_listening_addresses[0] != "*") and ((ssh_listen_addresses[0] != "0.0.0.0") or (ssh_listen_addresses[0] != "::") or (ssh_listen_addresses | sort != ["::","0.0.0.0"]))
+            - name: Ensure that all ListenAddress are IP addresses
+              ansible.builtin.assert:
+                that:
+                  - ssh_ip | ansible.utils.ipaddr == ssh_ip
+                fail_msg: "The SSH ListenAddress is set to {{ ssh_ip }} and the ansible.utils.ipaddr test for this returns {{ ssh_ip | ansible.utils.ipaddr }}"
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+              when:
+                - ssh_ip != "0.0.0.0"
+                - ssh_ip != "::"
+                - ssh_ip != "*"
+              loop: "{{ ssh_listen_addresses }}"
+              loop_control:
+                loop_var: ssh_ip
 
-      when:
-        - ssh_listen_addresses is defined
-        - ssh_listen_addresses != []
+            - name: Check that the SSH listening addresses match the configuration
+              ansible.builtin.assert:
+                that:
+                  - ssh_listening_addresses == ssh_listen_addresses | sort
+                fail_msg: "The ssh_listening_addresses are {{ ssh_listening_addresses | join(', ') }} and the ssh_listen_addresses are {{ ssh_listen_addresses | sort | join(', ') }} and they need to match."
+                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+              when:
+                - ssh_check_fail | bool
+                - ssh_first_check is defined
+                - not ssh_first_check | bool
+                - ssh_init is defined
+                - ssh_init == "systemd"
+                # Ubuntu listens on * and config is for 0.0.0.0 or :: or both
+                - (ssh_listening_addresses[0] != "*") and ((ssh_listen_addresses[0] != "0.0.0.0") or (ssh_listen_addresses[0] != "::") or (ssh_listen_addresses | sort != ["::","0.0.0.0"]))
+
+          when:
+            - ssh_listen_addresses is defined
+            - ssh_listen_addresses != []
+
+      when: >-
+        (ssh_cnf is not defined) or
+        ((ssh_cnf is defined) and
+        (ssh_cnf.listenaddress | ansible.builtin.difference(ssh_listen_addr_port_list) != []))
 
     - name: Check ssh_local_hosts variables
       block:
@@ -699,6 +745,8 @@
       when:
         - ssh_local_hosts is defined
         - ssh_local_hosts | bool
+
+    # TODO Skip MAC tchecks when the existing ones match the proposed ones
 
     - name: Get a list of available SSH macs
       ansible.builtin.command:
@@ -836,6 +884,10 @@
       when:
         - ssh_ports is defined
         - ssh_ports != []
+        - >-
+          (ssh_cnf is not defined) or
+          ((ssh_cnf is defined) and
+          (ssh_cnf.listenaddress | ansible.builtin.difference(ssh_listen_addr_port_list) != []))
 
   tags:
     - ssh

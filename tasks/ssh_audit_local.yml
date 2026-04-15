@@ -15,7 +15,8 @@
       block:
 
         - name: SSH local policy audit with JSON output
-          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j -P {{ ssh_audit_local_policy_file | quote }} {{ ssh_localhost }}"
+          ansible.builtin.command:
+            cmd: "ssh-audit {{ ssh_audit_options }} -j -P {{ ssh_audit_local_policy_file | quote }} {{ ssh_listen_addr_port_list[1] }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_local_policy_json
@@ -85,7 +86,7 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg:
           - "The ssh-audit policy check failed, you can check manually using the following command"
-          - "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -P '{{ ssh_audit_local_policy_file }}' {{ ssh_localhost }}"
+          - "ssh-audit --timeout={{ ssh_audit_timeout }} -P '{{ ssh_audit_local_policy_file }}' {{ ssh_localhost }}"
       when:
         - ssh_first_check is defined
         - not ssh_first_check | bool

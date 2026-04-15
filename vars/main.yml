@@ -19,6 +19,16 @@ ssh_jpq:
   sshd_service: 'services.["sshd.service"]|[0]'
   systemd: "[?name!='systemd']"
 
+# Generate a list of addresses and ports that match the sshd -T format of listenaddress
+# in a not very elegant way...
+ssh_listen_addr_port: |-
+  {%- for ssh_listen_address in ssh_listen_addresses %}
+  {%-     for ssh_port in ssh_ports %}
+  {{ ssh_listen_address }}:{{ ssh_port }}
+  {%     endfor -%}
+  {% endfor -%}
+ssh_listen_addr_port_list: "{{ ssh_listen_addr_port | ansible.builtin.split('\n') | ansible.builtin.reject('regex', '^$') }}"
+
 # https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
 sshvarnames: "{{ q('varnames', '^ssh_') | sort }}"
 sshhostvars: "{{ dict(sshvarnames | list | zip(q('vars', *sshvarnames))) }}"

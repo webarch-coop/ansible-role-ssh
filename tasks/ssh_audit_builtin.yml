@@ -12,7 +12,8 @@
   block:
 
     - name: Get a list of the ssh-audit server policies
-      ansible.builtin.command: ssh-audit -nL
+      ansible.builtin.command:
+        cmd: ssh-audit -nL
       check_mode: false
       changed_when: false
       register: ssh_audit_policy_list
@@ -81,7 +82,8 @@
       block:
 
         - name: SSH profile audit JSON output
-          ansible.builtin.command: "ssh-audit {{ ssh_audit_options }} -j -P {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
+          ansible.builtin.command:
+            cmd: "ssh-audit {{ ssh_audit_options }} -j -P {{ ssh_audit_policy | quote }} {{ ssh_localhost }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_policy_json
