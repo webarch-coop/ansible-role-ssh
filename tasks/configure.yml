@@ -17,15 +17,19 @@
         - name: Run ssh-audit
           block:
 
-            - name: "Audit SSH and generate JSON output using {{ ssh_listen_addr_port_list[1] }}"
+            - name: "Audit SSH and generate JSON output using {{ ssh_listen_addr_port_list[0] }}"
               ansible.builtin.command:
-                cmd: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_listen_addr_port_list[1] }}"
+                cmd: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_listen_addr_port_list[0] }}"
               check_mode: false
               changed_when: false
               register: ssh_audit_json
               failed_when: ssh_audit_json.rc is not regex('0|2|3')
 
           rescue:
+
+            - name: Debug ssh_listen_addr_port_list
+              ansible.builtin.debug:
+                var: ssh_listen_addr_port_list
 
             - name: Debug ssh_audit_json.stderr_lines
               ansible.builtin.debug:

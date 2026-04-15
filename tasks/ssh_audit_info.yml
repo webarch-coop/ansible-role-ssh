@@ -14,9 +14,9 @@
     - name: Run ssh-audit and output JSON
       block:
 
-        - name: "Audit SSH and generate JSON output using {{ ssh_listen_addr_port_list[1] }}"
+        - name: "Audit SSH and generate JSON output using {{ ssh_listen_addr_port_list[0] }}"
           ansible.builtin.command:
-            cmd: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_listen_addr_port_list[1] }}"
+            cmd: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_listen_addr_port_list[0] }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_json
