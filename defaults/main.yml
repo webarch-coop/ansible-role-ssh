@@ -184,7 +184,8 @@ ssh_kex_algorithms:
   - diffie-hellman-group16-sha512
   - diffie-hellman-group18-sha512
   - diffie-hellman-group-exchange-sha256
-  - kex-strict-s-v00@openssh.com
+  # The following is unsupported on Debian Trixie
+  # - kex-strict-s-v00@openssh.com
 
 # https://man.openbsd.org/sshd_config#ListenAddress
 ssh_listen_addresses:

@@ -27,6 +27,14 @@
 
           rescue:
 
+            - name: Debug ssh_audit_json.stderr_lines
+              ansible.builtin.debug:
+                var: ssh_audit_json.stderr_lines
+
+            - name: Debug ssh_audit_json.stdout_lines
+              ansible.builtin.debug:
+                var: ssh_audit_json.stdout_lines
+
             - name: Gather facts on listening ports
               community.general.listen_ports_facts:
 
