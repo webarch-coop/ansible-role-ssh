@@ -17,9 +17,9 @@
         - name: Run ssh-audit
           block:
 
-            - name: "Audit SSH and generate JSON output using {{ ssh_listen_addr_port_list[0] }}"
+            - name: "Audit SSH and generate JSON output using {{ ssh_listen_addr_port[0] }}"
               ansible.builtin.command:
-                cmd: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_listen_addr_port_list[0] }}"
+                cmd: "ssh-audit -d --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_listen_addr_port[0] }}"
               check_mode: false
               changed_when: false
               register: ssh_audit_json
@@ -27,9 +27,9 @@
 
           rescue:
 
-            - name: Debug ssh_listen_addr_port_list
+            - name: Debug ssh_listen_addr_port
               ansible.builtin.debug:
-                var: ssh_listen_addr_port_list
+                var: ssh_listen_addr_port
 
             - name: Debug ssh_audit_json.stderr_lines
               ansible.builtin.debug:

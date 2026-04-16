@@ -16,7 +16,7 @@
 
         - name: SSH local policy audit with JSON output
           ansible.builtin.command:
-            cmd: "ssh-audit {{ ssh_audit_options }} -j -P {{ ssh_audit_local_policy_file | quote }} {{ ssh_listen_addr_port_list[0] }}"
+            cmd: "ssh-audit {{ ssh_audit_options }} -j -P {{ ssh_audit_local_policy_file | quote }} {{ ssh_listen_addr_port[0] }}"
           check_mode: false
           changed_when: false
           register: ssh_audit_local_policy_json

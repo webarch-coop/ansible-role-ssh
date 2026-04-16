@@ -118,6 +118,13 @@
           tags:
             - debug
 
+        - name: Debug ssh_listen_addr_port
+          ansible.builtin.debug:
+            var: ssh_listen_addr_port
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
+
       when: ssh_sshd.stat.exists | ansible.builtin.bool
 
     - name: Gather facts on listening ports
@@ -600,7 +607,7 @@
 
     - name: Debug the listening IP addresses and ports
       ansible.builtin.debug:
-        var: ssh_listen_addr_port_list
+        var: ssh_listen_addr_port
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       tags:
         - debug
@@ -647,7 +654,7 @@
       when: >-
         (ssh_cnf is not defined) or
         ((ssh_cnf is defined) and
-        (ssh_cnf.listenaddress | ansible.builtin.difference(ssh_listen_addr_port_list) != []))
+        (ssh_cnf.listenaddress | ansible.builtin.difference(ssh_listen_addr_port) != []))
 
     - name: Check ssh_local_hosts variables
       block:
@@ -887,7 +894,7 @@
         - >-
           (ssh_cnf is not defined) or
           ((ssh_cnf is defined) and
-          (ssh_cnf.listenaddress | ansible.builtin.difference(ssh_listen_addr_port_list) != []))
+          (ssh_cnf.listenaddress | ansible.builtin.difference(ssh_listen_addr_port) != []))
 
   tags:
     - ssh
