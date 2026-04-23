@@ -102,7 +102,7 @@ ssh_audit_local_policies:
   - path: /usr/local/share/ssh-audit/policies/forky.txt
     state: present
     content:
-      name: Trixie
+      name: Forky
       version: '1'
       host_key_sizes: '{"rsa-sha2-256": {"hostkey_size": 4096}, "ssh-rsa": {"hostkey_size": 4096}, "rsa-sha2-512": {"hostkey_size": 4096}, "ssh-ed25519": {"hostkey_size": 256}}'
       dh_modulus_sizes: '{"diffie-hellman-group-exchange-sha256": 4096}'
