@@ -41,7 +41,6 @@ stages:
   - lint
   - bookworm
   - forky
-  - jammy
   - noble
   - resolute
   - trixie
@@ -59,11 +58,6 @@ bookworm:
 forky:
   image: registry.git.coop/webarch/containers/images/forky:20260405
   stage: forky
-  script:
-    - molecule test
-jammy:
-  image: registry.git.coop/webarch/containers/images/jammy:20260405
-  stage: jammy
   script:
     - molecule test
 noble:
