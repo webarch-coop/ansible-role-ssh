@@ -129,6 +129,7 @@
 
       when:
         - ssh_audit_policy is defined
+        - ssh_audit_policy | ansible.builtin.type_debug != "NoneType"
         - ssh_audit_policy | length > 0
 
     - name: Set a fact for the results of the SSH policy audit
