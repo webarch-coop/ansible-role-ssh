@@ -14,10 +14,12 @@
     - name: Run ssh-audit and output JSON
       block:
 
-        - name: "Audit SSH and generate JSON output using {{ ssh_listen_addr_port[0] }}"
+        - name: "Audit SSH and generate JSON output using {{ ssh_cmd }}"
           ansible.builtin.command:
-            cmd: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_listen_addr_port[0] }}"
+            cmd: "{{ ssh_cmd }}"
           check_mode: false
+          vars:
+            ssh_cmd: "ssh-audit {{ ssh_audit_options }} -j {{ ssh_listen_addr_port[0] }}"
           changed_when: false
           register: ssh_audit_json
           # until: ssh_audit_json.rc == 1
@@ -88,7 +90,7 @@
           ansible.builtin.debug:
             msg: "{{ ssh_audit_json.stdout_lines[-1] | ansible.builtin.type_debug }}"
 
-        - name: Settig a fact for the SSH audit JSON results failed
+        - name: Setting a fact for the SSH audit JSON results failed
           ansible.builtin.fail:
 
     - name: Debug the SSH audit results

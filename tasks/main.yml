@@ -11,7 +11,7 @@
 - name: Skip the tasks in this role as ssh is false
   ansible.builtin.debug:
     msg: "The ssh variable need to be true for the tasks in this role to run."
-  when: ( ssh is not defined ) or ( not ssh | bool )
+  when: (ssh is not defined) or (not ssh | bool)
   tags:
     - ssh
 
@@ -23,10 +23,10 @@
         name: apt
         tasks_from: local_facts.yml
       when: >-
-        ( ansible_local.dpkg.arch is not defined ) or
-        ( ansible_local.dpkg.installed is not defined ) or
-        ( ansible_local.gpg.version is not defined ) or
-        ( ansible_local.bash.path is not defined )
+        (ansible_local.dpkg.arch is not defined) or
+        (ansible_local.dpkg.installed is not defined) or
+        (ansible_local.gpg.version is not defined) or
+        (ansible_local.bash.path is not defined)
 
     - name: Debug variables
       ansible.builtin.include_tasks: debug.yml
@@ -65,9 +65,9 @@
     - name: Include ssh-audit install tasks
       ansible.builtin.include_tasks: ssh_audit_install.yml
       when: >-
-        ( ssh_which_ssh_audit.rc == 1 ) or
-        ( ssh_audit_installed_version is not defined ) or
-        ( ssh_audit_installed_version is version(ssh_audit_version_latest, '<') )
+        (ssh_which_ssh_audit.rc == 1) or
+        (ssh_audit_installed_version is not defined) or
+        (ssh_audit_installed_version is version(ssh_audit_version_latest, '<'))
 
     - name: SSH Audit
       ansible.builtin.include_tasks: ssh_audit.yml

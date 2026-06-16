@@ -154,7 +154,7 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg:
           - "The ssh-audit policy check failed, you can check manually using the following command"
-          - "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -nP '{{ ssh_audit_policy }}' {{ ssh_localhost }}"
+          - "ssh-audit --timeout={{ ssh_audit_timeout }} -nP '{{ ssh_audit_policy }}' {{ ssh_localhost }}"
       when:
         - ssh_first_check is defined
         - not ssh_first_check | bool

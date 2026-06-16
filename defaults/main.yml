@@ -20,7 +20,7 @@ ssh_audit: true
 ssh_audit_fail: true
 
 # Options to pass to ssh-audit
-ssh_audit_options: "--no-colors --skip-rate-test --timeout={{ ssh_audit_timeout }}"
+ssh_audit_options: "--no-colors --timeout={{ ssh_audit_timeout }}"
 
 # Timeout for ssh-audit in seconds
 ssh_audit_timeout: 60
