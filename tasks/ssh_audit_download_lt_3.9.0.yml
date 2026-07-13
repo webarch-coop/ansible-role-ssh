@@ -1,0 +1,35 @@
+# Copyright 2019-2026 Chris Croome
+#
+# This file is part of the Webarchitects OpenSSH Ansible role.
+#
+# The Webarchitects OpenSSH Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects OpenSSH Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects OpenSSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Download ssh-audit
+  block:
+
+    - name: GPG signature for archive of ssh-audit source present
+      ansible.builtin.get_url:
+        url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
+        dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz.sig"
+        mode: "0644"
+        owner: root
+        group: root
+      register: ssh_audit_sig_get_url
+
+    - name: Archive of ssh-audit source present
+      ansible.builtin.get_url:
+        url: "https://github.com/jtesta/ssh-audit/releases/download/v{{ ssh_audit_version_latest }}/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
+        dest: "/usr/local/src/ssh-audit-{{ ssh_audit_version_latest }}.tar.gz"
+        mode: "0644"
+        owner: root
+        group: root
+      register: ssh_audit_get_url
+
+  tags:
+    - ssh
+    - ssh_audit
+...

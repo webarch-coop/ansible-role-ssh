@@ -9,6 +9,7 @@
 # You should have received a copy of the GNU General Public License along with the Webarchitects SSH Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 skip_list:
+  - complexity[tasks]  # checks.yml contains 123 tasks, exceeding the maximum of 100.
   - key-order[task]
 var_naming_pattern: "^[ansible|ssh|molecule]_?[a-z0-9_]*$"
 # vim: syntax=yaml

@@ -42,38 +42,36 @@ stages:
   - bookworm
   - forky
   - noble
-  # Uncomment resolute when it is supportedf by ssh-audit
-  # https://github.com/jtesta/ssh-audit/issues/346
-  # - resolute
+  - resolute
   - trixie
 lint:
-  image: registry.git.coop/webarch/containers/images/trixie:20260424
+  image: registry.git.coop/webarch/containers/images/trixie:20260701
   stage: lint
   script:
     - pre-commit install
     - pre-commit run --all-files
 bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20260424
+  image: registry.git.coop/webarch/containers/images/bookworm:20260701
   stage: bookworm
   script:
     - molecule test
 forky:
-  image: registry.git.coop/webarch/containers/images/forky:20260424
+  image: registry.git.coop/webarch/containers/images/forky:20260701
   stage: forky
   script:
     - molecule test
 noble:
-  image: registry.git.coop/webarch/containers/images/noble:20260424
+  image: registry.git.coop/webarch/containers/images/noble:20260701
   stage: noble
   script:
     - molecule test
-# resolute:
-#   image: registry.git.coop/webarch/containers/images/resolute:20260424
-#   stage: resolute
-#   script:
-#     - molecule test
+resolute:
+  image: registry.git.coop/webarch/containers/images/resolute:20260701
+  stage: resolute
+  script:
+    - molecule test
 trixie:
-  image: registry.git.coop/webarch/containers/images/trixie:20260424
+  image: registry.git.coop/webarch/containers/images/trixie:20260701
   stage: trixie
   script:
     - molecule test
