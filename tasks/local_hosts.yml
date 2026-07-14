@@ -34,7 +34,7 @@
           ansible.builtin.command:
             cmd: "{{ ssh_cmd }}"
           vars:
-            ssh_cmd: "ssh-audit --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
+            ssh_cmd: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
           check_mode: false
           delegate_to: "{{ inventory_hostname }}"
           changed_when: false
@@ -62,7 +62,7 @@
         - name: "Fail because running the following command failed {{ ssh_cmd }}"
           ansible.builtin.fail:
           vars:
-            ssh_cmd: "ssh-audit --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
+            ssh_cmd: "ssh-audit --skip-rate-test --timeout={{ ssh_audit_timeout }} -j {{ ssh_localhost }}"
 
       when: ssh_audit | bool
 
