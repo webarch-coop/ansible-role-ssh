@@ -39,8 +39,8 @@ before_script:
   - molecule --version
 stages:
   - lint
-  - trixie
   - resolute
+  - trixie
   - bookworm
   - forky
   - noble
