@@ -39,11 +39,11 @@ before_script:
   - molecule --version
 stages:
   - lint
+  - trixie
+  - resolute
   - bookworm
   - forky
   - noble
-  - resolute
-  - trixie
 lint:
   image: registry.git.coop/webarch/containers/images/trixie:20260701
   stage: lint
