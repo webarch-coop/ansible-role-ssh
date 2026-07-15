@@ -54,7 +54,7 @@
           - mlkem768x25519-sha256
           - sntrup761x25519-sha512
           - sntrup761x25519-sha512@openssh.com
-          - ext-info-s
+          # - ext-info-s
           # - kex-strict-s-v00@openssh.com
         ssh_ciphers:
           - chacha20-poly1305@openssh.com
