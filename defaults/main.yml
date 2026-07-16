@@ -177,14 +177,17 @@ ssh_host_key_algorithms:
 
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
+  - name: dsa
+    path: /etc/ssh/ssh_host_dsa_key
+    state: absent
+  - name: ecdsa
+    bits: 521
+    path: /etc/ssh/ssh_host_ecdsa_key
+  - name: ed25519
+    path: /etc/ssh/ssh_host_ed25519_key
   - name: rsa
     bits: 4096
     path: /etc/ssh/ssh_host_rsa_key
-  - name: ed25519
-    path: /etc/ssh/ssh_host_ed25519_key
-  # - name: ecdsa
-  #   bits: 521
-  #   path: /etc/ssh/ssh_host_ecdsa_key
 
 # https://man.openbsd.org/sshd_config#KexAlgorithms
 ssh_kex_algorithms:

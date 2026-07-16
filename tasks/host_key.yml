@@ -16,12 +16,12 @@
         path: "{{ ssh_host_key.path }}"
       register: ssh_host_key_state
 
-    - name: Check if the SSH key is present
+    - name: "Check if the SSH key is present at {{ ssh_host_key.path }}"
       ansible.builtin.stat:
         path: "{{ ssh_host_key.path }}"
       register: ssh_host_key_path
 
-    - name: Debug the results of the host SSH key path check
+    - name: "Debug the results of the host SSH key path check for {{ ssh_host_key.path }}"
       ansible.builtin.debug:
         var: ssh_host_key_path
         verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
@@ -31,7 +31,7 @@
     - name: Run additional checks when the host key exists
       block:
 
-        - name: Check the host SSH keys attributes
+        - name: "Check the host SSH keys attributes for {{ ssh_host_key.path }}"
           ansible.builtin.assert:
             that:
               - ssh_host_key_path.stat.isreg | ansible.builtin.bool
@@ -41,16 +41,16 @@
               - ssh_host_key_path.stat.uid == 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-        - name: Check host SSH key fingerprint
+        - name: "Check host SSH key fingerprint for {{ ssh_host_key.path }}"
           ansible.builtin.command:
             cmd: "ssh-keygen -l -f {{ ssh_host_key.path }}"
           check_mode: false
           changed_when: false
           register: ssh_host_key_gen_fingerprint
 
-        - name: Set a fact for the SSH key fingerprint results
+        - name: "Set a fact for the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.set_fact:
-            ssh_host_key_fingerprint: "{{ ssh_host_key_gen_fingerprint.stdout | split(' ') | list }}"
+            ssh_host_key_fingerprint: "{{ ssh_host_key_gen_fingerprint.stdout | ansible.builtin.split(' ') | ansible.builtin.list }}"
 
         - name: "Debug the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.debug:
@@ -61,6 +61,32 @@
 
       when: ssh_host_key_path.stat.exists | ansible.builtin.bool
 
+    - name: Delete keys
+      block:
+
+        - name: Set a fact for the date to be used in the backup path
+          ansible.builtin.set_fact:
+            ssh_date: "{{ ansible_facts.date_time.iso8601_basic_short }}"
+
+        - name: "Backup the old public SSH key {{ ssh_host_key_path_pub }}"
+          ansible.builtin.command:
+            cmd: "mv {{ ssh_host_key_path_pub }} {{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.pub.{{ ssh_date }}.bak"
+            creates: "{{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.pub.{{ ssh_date }}.bak"
+            removes: "{{ ssh_host_key_path_pub }}"
+          vars:
+            ssh_host_key_path_pub: "{{ ssh_host_key.path }}.pub"
+
+        - name: "Backup the old private SSH key {{ ssh_host_key.path }}"
+          ansible.builtin.command:
+            cmd: "mv {{ ssh_host_key.path }} {{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.{{ ssh_date }}.bak"
+            creates: "{{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.{{ ssh_date }}.bak"
+            removes: "{{ ssh_host_key.path }}"
+
+      when:
+        - ssh_host_key_path.stat.exists | ansible.builtin.bool
+        - ssh_host_key.state is ansible.builtin.defined
+        - ssh_host_key.state == "absent"
+
     - name: Generate new keys
       block:
 
@@ -68,13 +94,15 @@
           ansible.builtin.set_fact:
             ssh_date: "{{ ansible_facts.date_time.iso8601_basic_short }}"
 
-        - name: Backup the old public SSH key
+        - name: "Backup the old public SSH key {{ ssh_host_key_path_pub }}"
           ansible.builtin.command:
-            cmd: "mv {{ ssh_host_key.path }}.pub {{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.pub.{{ ssh_date }}.bak"
+            cmd: "mv {{ ssh_host_key_path_pub }} {{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.pub.{{ ssh_date }}.bak"
             creates: "{{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.pub.{{ ssh_date }}.bak"
-            removes: "{{ ssh_host_key.path }}.pub"
+            removes: "{{ ssh_host_key_path_pub }}"
+          vars:
+            ssh_host_key_path_pub: "{{ ssh_host_key.path }}.pub"
 
-        - name: Backup the old private SSH key
+        - name: "Backup the old private SSH key {{ ssh_host_key.path }}"
           ansible.builtin.command:
             cmd: "mv {{ ssh_host_key.path }} {{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.{{ ssh_date }}.bak"
             creates: "{{ ssh_host_key.path | ansible.builtin.dirname }}/.{{ ssh_host_key.path | ansible.builtin.basename }}.{{ ssh_date }}.bak"
@@ -82,7 +110,7 @@
 
         - name: Generate new RSA SSH key pair
           ansible.builtin.command:
-            cmd: ssh-keygen -t rsa -b {{ ssh_host_key.bits }} -f /etc/ssh/ssh_host_rsa_key -N "" -C "root@{{ inventory_hostname }}"
+            cmd: ssh-keygen -t rsa -b {{ ssh_host_key.bits | ansible.builtin.default('4096') }} -f /etc/ssh/ssh_host_rsa_key -N "" -C "root@{{ inventory_hostname }}"
             creates: /etc/ssh/ssh_host_rsa_key
           when: ssh_host_key.name == "rsa"
 
@@ -92,17 +120,23 @@
             creates: /etc/ssh/ssh_host_ed25519_key
           when: ssh_host_key.name == "ed25519"
 
+        - name: Generate new ECDSA SSH key pair
+          ansible.builtin.command:
+            cmd: ssh-keygen -t ECDSA -b {{ ssh_host_key.bits | ansible.builtin.default('512') }} -f /etc/ssh/ssh_host_ecdsa_key -N "" -C "root@{{ inventory_hostname }}"
+            creates: /etc/ssh/ssh_host_ecdsa_key
+          when: ssh_host_key.name == "ecdsa"
+
       when: >-
         (not ssh_host_key_path.stat.exists) or
-        ((ssh_host_key.name == "rsa") and (ssh_host_key.bits != ssh_host_key_fingerprint[0] | ansible.builtin.int)) or
-        ((ssh_host_key.name == "ecdsa") and (ssh_host_key.bits != ssh_host_key_fingerprint[0] | ansible.builtin.int))
+        ((ssh_host_key.name == "rsa") and (ssh_host_key.bits is ansible.builtin.defined) and (ssh_host_key.bits != ssh_host_key_fingerprint[0] | ansible.builtin.int)) or
+        ((ssh_host_key.name == "ecdsa") and (ssh_host_key.bits is ansible.builtin.defined) and (ssh_host_key.bits != ssh_host_key_fingerprint[0] | ansible.builtin.int))
 
-    - name: Check if the SSH key is present
+    - name: "Check if the SSH key is present at {{ ssh_host_key.path }}"
       ansible.builtin.stat:
         path: "{{ ssh_host_key.path }}"
       register: ssh_host_key_path
 
-    - name: Debug the results of the host SSH key path check
+    - name: "Debug the results of the host SSH key path check for {{ ssh_host_key.path }}"
       ansible.builtin.debug:
         var: ssh_host_key_path
         verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
@@ -112,7 +146,7 @@
     - name: Run additional checks when the host key exists
       block:
 
-        - name: Check the host SSH keys attributes
+        - name: "Check the host SSH keys attributes for {{ ssh_host_key.path }}"
           ansible.builtin.assert:
             that:
               - ssh_host_key_path.stat.isreg | ansible.builtin.bool
@@ -122,14 +156,14 @@
               - ssh_host_key_path.stat.uid == 0
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-        - name: Check host SSH key fingerprint
+        - name: "Check host SSH key fingerprint for {{ ssh_host_key.path }}"
           ansible.builtin.command:
             cmd: "ssh-keygen -l -f {{ ssh_host_key.path }}"
           check_mode: false
           changed_when: false
           register: ssh_host_key_gen_fingerprint
 
-        - name: Set a fact for the SSH key fingerprint results
+        - name: "Set a fact for the SSH key fingerprint results for {{ ssh_host_key.path }}"
           ansible.builtin.set_fact:
             ssh_host_key_fingerprint: "{{ ssh_host_key_gen_fingerprint.stdout | ansible.builtin.split(' ') | ansible.builtin.list }}"
 

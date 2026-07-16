@@ -194,6 +194,13 @@ argument_specs:
             type: str
             required: true
             description: The path to the SSH private key.
+          state:
+            type: str
+            required: false
+            description: The state of the SSH key pair.
+            choices:
+              - absent
+              - present
       ssh_jpq:
         type: dict
         required: true
