@@ -166,14 +166,14 @@ ssh_gitlab: false
 
 # https://man.openbsd.org/sshd_config#HostKeyAlgorithms
 ssh_host_key_algorithms:
-  - ssh-ed25519
-  - ssh-ed25519-cert-v01@openssh.com
-  - sk-ssh-ed25519@openssh.com
-  - sk-ssh-ed25519-cert-v01@openssh.com
   - rsa-sha2-512
   - rsa-sha2-512-cert-v01@openssh.com
   - rsa-sha2-256
   - rsa-sha2-256-cert-v01@openssh.com
+  - ssh-ed25519
+  - ssh-ed25519-cert-v01@openssh.com
+  - sk-ssh-ed25519@openssh.com
+  - sk-ssh-ed25519-cert-v01@openssh.com
 
 # https://man.openbsd.org/sshd_config#HostKey
 ssh_host_keys:
